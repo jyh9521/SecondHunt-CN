@@ -28,7 +28,7 @@
 Windows 构建基于 2026-10-18 的 MIT 提交
 `41452f2d053fcfa679e33c00a73d120a53f59e61`。上游较新的源码另有许可条件，
 这里没有混入那些改动。Android 默认流程、ROM 文件格式、存档格式和房间 ID
-均未改。新分支没有被推送或发布。
+均未改。汉化源码在 `zh-cn-windows` 分支；Windows 下载见 [Releases](https://github.com/jyh9521/SecondHunt-CN/releases)。
 
 - `locales/zh-CN/ui.json` 是应用的 UI 字符串字典；`settings.json` 按稳定 ID
   保存选项提示、键位和选项值，`terms.json` 保存导入卡片的标题、来源和内置资源名称。
@@ -52,7 +52,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
   剧情中后期用开发版检查点定位，不是逐任务通关，也不代替公网联机或可选导入游戏的实机验收。
   厂商标志、人名署名、玩家输入
   及第三方模组自带文本按原样显示。Windows 安全桌面上的真实 UAC 交互需要现场批准或取消。
-- 本地构建沿用基线依赖。若计划公开分发，还应单独复核 NuGet 审计结果和联网功能。
+- `0.3.5-zh.5` 发布的是此前验收的原包，仍沿用基线依赖。NuGet 审计列出 ImageSharp 3.1.12 的已知问题（例如 [GHSA-v76p-62qx-wwq2](https://github.com/advisories/GHSA-v76p-62qx-wwq2)）；请只加载信任的模组、图像及导入资源。
 
 ## 复现构建
 

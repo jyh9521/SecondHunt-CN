@@ -1,1 +1,3 @@
 tools/localization/ROLLBACK.sh text eol=lf
+# Keep inherited replay recordings out of the source archives attached to releases.
+tests/replays/*.mphreplay export-ignore
