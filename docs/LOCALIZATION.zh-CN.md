@@ -62,7 +62,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.6
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.7
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -83,6 +83,17 @@ dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c R
 
 检查扩展页面时可在 `--ui-inventory <game> <report.json>` 后再传入含实际回放的测试 `data` 目录。
 工具会打开第一条回放，额外检查有数据才显示的详情标签。
+
+## 简体中文标点
+
+- 独立的单句系统提示（如状态、操作提示、设置说明）中，如果正文没有括号以外的
+  标点，句尾省略句号。例如「暂无回放」「未能创建可写目录（退出码 {0}）」。
+  仅用于换行的行分隔和格式占位符不是标点。问号、叹号按语气保留。
+- 按实际显示语境断句。同一句里的条件、结果或紧密衔接的分句用逗号，例如
+  「暂停地图使用原版房间模型，在地图中按 Y 切换。」不同步骤、确认问句、
+  图鉴叙述及剧情的独立句保留原有断句。拼接的模板按完整显示结果判断。
+- 标点修订只编辑译文值。保留目录键、ROM 源指纹、条目元数据、格式占位符、
+  明确的换行及原画遮罩。路径、版本号、IP 地址和人名里的点保持原样。
 
 ## 继续维护译文
 

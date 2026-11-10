@@ -28,7 +28,7 @@ if (args is ["--settings-only"])
     DesktopLocale.Init("zh-CN");
     string hint = LocalText.Ui(ControlHints.For("maplook.map"));
     Console.WriteLine("MAP_HINT=" + hint);
-    const string expected = "暂停地图使用原版房间模型。在地图中按 Y 切换。";
+    const string expected = "暂停地图使用原版房间模型，在地图中按 Y 切换。";
     if (hint != expected)
     {
         Console.Error.WriteLine("FAIL: the selected Map Look value did not produce its Chinese hint.");
@@ -154,6 +154,20 @@ try
     var msg = Strings.GetEntry('M', 5, StringTables.GameMessages)!;
     Check(msg.Value1.Contains("&tab0") && msg.Value2.Contains("&tab0") && msg.Value2.Contains("&tab1"),
         "campaign substitution tokens preserved");
+    Check(LocalText.Ui("no replays yet.") == "暂无回放"
+        && LocalText.Format("Windows setup did not create a writable directory (exit code {0}).", 7)
+            == "未能创建可写目录（退出码 7）"
+        && LocalText.FormatId("ship.slot.saved", "saved to slot {0}.", 2) == "已将进度保存到栏位 2",
+        "standalone system notices omit the final stop and preserve parentheses and format arguments");
+    Check(Strings.GetEntry('M', 3, StringTables.GameMessages)!.Value2 == "导弹容量增加 10 枚"
+        && Strings.GetScanEntry(13)!.Value2 == "导弹容量增加 10 枚。"
+        && Strings.GetScanEntry(346)!.Value2 == "舰艇甲板的传送门已启动"
+        && Strings.GetScanEntry(251)!.Value2 == "门外的微弱能量盾用于隔绝游荡的生物，任何武器都能打开这扇门。",
+        "ROM popup and console styles differ from catalogue prose, and related scan clauses stay together");
+    Check(Strings.GetScanEntry(54)!.Value2.Contains("这是我们留下的最后记录。我们即将离开这片死亡之地。")
+        && Strings.GetEntry('W', 3, StringTables.HudMessagesMP)!.Value1 == "已与主机断开。\n\n按 A 返回菜单。"
+        && LocalText.FormatId("replay.detail.refused", "refused.\n\n{0}", "版本不符") == "无法播放这份回放\n\n版本不符",
+        "deliberate narrative breaks and dialog paragraphs remain intact");
     Check(Strings.GetEntry('B', 1, StringTables.MBBanner)!.Value1 == "密特罗德究极：猎人"
         && Strings.GetEntry('S', 21, StringTables.HudMessagesMP)!.Value1 == "究极猎人规则"
         && LocalText.Ui("METROID") == "密特罗德" && LocalText.Ui("PRIME") == "究极",
@@ -247,7 +261,7 @@ static bool CheckSettingsCatalogue()
         }
     string alternate = ControlHints.ForSetting("maplook", "DETAILED", "unused", true);
     string mapped = ControlHints.ForSetting("maplook", "MAP", "unused", true);
-    bool ok = mapped == "暂停地图使用原版房间模型。在地图中按 Y 切换。"
+    bool ok = mapped == "暂停地图使用原版房间模型，在地图中按 Y 切换。"
         && alternate.Contains("实际形状")
         && ControlHints.ForSetting("importgames", "OPEN", "unused", true).Contains("高清装甲")
         && ControlHints.DisplayValue("map\nlook", "MAP") == "原版模型"
