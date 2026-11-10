@@ -445,7 +445,7 @@ namespace MphRecomp.Frontend
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or KeyNotFoundException or IndexOutOfRangeException)
             {
-                Import.Popup?.Inform("can't make this game.\n\n" + ex.Message.ToLowerInvariant());
+                Import.Popup?.Inform("can't make this game.\n\n" + Problem(ex));
                 StopSearch();
                 return;
             }

@@ -156,7 +156,7 @@ namespace MphRecomp.Frontend
         // a JOIN waiting on its SELECT HUNTER (the lobby page starts it), and the page the JOIN was on
         private (string? GameId, string? Host)? _pendingJoin;
         private int _joinFrom = -1;
-        private bool Live => _client != null || _previewMe != null;
+        private bool Live => _client != null || _previewMe != null && _netError == null;
         private PlayerCard? MeCard => _client?.Me ?? _previewMe;
 
         // tools (MphRead.Tools -onlinemenu / -onlinemenutest): the pages, what's known, and where a game sits on BROWSE
@@ -171,14 +171,15 @@ namespace MphRecomp.Frontend
         internal int OnlineShownIndex(string gameId) => Shown().FindIndex(g => g.Id == gameId);
 
         // tools (MphRead.Tools -onlinemenu): show these instead of the server's, and never connect
-        internal void OnlinePreview(PlayerCard me, List<GameCard> games, List<PlayerCard> friendsOnline, int hunters, int pingMs)
+        internal void OnlinePreview(PlayerCard me, List<GameCard> games, List<PlayerCard> friendsOnline, int hunters, int pingMs,
+            Exception? problem = null)
         {
             _previewMe = me;
             _games = games;
             _friendsOn = friendsOnline;
             _hunters = hunters;
             _pingMs = pingMs;
-            _netError = null;
+            _netError = problem == null ? null : Problem(problem);
             Redraw();
         }
 
@@ -661,7 +662,7 @@ namespace MphRecomp.Frontend
             {
                 Console.Error.WriteLine("online: the server connection dropped: " + _client.CloseReason);
                 CloseOnline(); // (dropped: connect again)
-                _netError = "lost the server. connecting again...";
+                _netError = LocalText.Ui("lost the server. connecting again...");
                 Redraw();
             }
             if (_client == null)
@@ -877,15 +878,28 @@ namespace MphRecomp.Frontend
 
         // why something online failed, in words (not .NET's: a trimmed Android build gives resource ids such as
         // "net_webstatus_connectfailure" for a WebSocket or HTTP error: N21)
-        private static string Problem(Exception ex) => ex switch
+        private static string Problem(Exception ex)
         {
-            OperationCanceledException => "no answer from the server in 15 s.",
-            OnlineException { Code: "disconnected" or "timeout" } => "lost the server. connecting again...",
-            OnlineException o => o.Message.ToLowerInvariant(),
-            System.Net.WebSockets.WebSocketException or HttpRequestException or IOException or System.Net.Sockets.SocketException
-                => "can't reach the server. trying again...",
-            _ => ex.Message.ToLowerInvariant(),
-        };
+            if (ex is OnlineException { ProtocolVersions: { } versions })
+                return LocalText.FormatId("online.error.protocol", "server protocol {0}, this game speaks {1}: update the game",
+                    versions.Server, versions.Client);
+            string original = ex switch
+            {
+                OperationCanceledException => "no answer from the server in 15 s.",
+                OnlineException { Code: "disconnected" or "timeout" } => "lost the server. connecting again...",
+                System.Net.WebSockets.WebSocketException or HttpRequestException or IOException or System.Net.Sockets.SocketException
+                    => "can't reach the server. trying again...",
+                _ => ex.Message.ToLowerInvariant(),
+            };
+            if (!LocalText.IsLocalized) return original;
+            string display = LocalText.Ui(original);
+            if (display != original) return display;
+            // A server or the OS can return arbitrary diagnostic prose. Keep it
+            // in the log, and show a localized reason by code (not wire text).
+            Console.Error.WriteLine($"online: {(ex as OnlineException)?.Code ?? ex.GetType().Name}: {ex.Message}");
+            string fallback = LocalText.Id("online.error.generic", "The online operation failed. See the log for details.");
+            return ex is OnlineException o ? LocalText.Id("online.error." + o.Code, fallback) : fallback;
+        }
 
         private OnlinePlayer Me() => OnlineMe?.Invoke() ?? new OnlinePlayer(OnlineNames.Default, -1, Hunter.Samus, null, null);
 
@@ -1263,7 +1277,7 @@ namespace MphRecomp.Frontend
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or KeyNotFoundException or IndexOutOfRangeException)
             {
-                Import.Popup?.Inform("can't make this game.\n\n" + ex.Message.ToLowerInvariant());
+                Import.Popup?.Inform("can't make this game.\n\n" + Problem(ex));
                 return;
             }
             OnlinePlayer me = Me();
@@ -1808,7 +1822,7 @@ namespace MphRecomp.Frontend
                     OnlineException { Code: "host_left" or "host_gone" } when served => "the server closed the game.\n\ntry another one.",
                     OnlineException { Code: "host_left" } => "the host left.\n\nthe game is closed.",
                     OnlineException { Code: "host_gone" } => "lost the host.\n\nthe game is closed.",
-                    OnlineException { Code: "kicked" } k => k.Message.ToLowerInvariant() + "\n\nthe others are playing.",
+                    OnlineException { Code: "kicked" } k => Problem(k) + "\n\nthe others are playing.",
                     _ => "couldn't join.\n\n" + Problem(ex),
                 });
                 RefreshOnline(lists: true); // a new connection (the match's went with it)
@@ -1833,7 +1847,7 @@ namespace MphRecomp.Frontend
             }
             catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or KeyNotFoundException or IndexOutOfRangeException)
             {
-                Import.Popup?.Inform("can't change this game.\n\n" + ex.Message.ToLowerInvariant());
+                Import.Popup?.Inform("can't change this game.\n\n" + Problem(ex));
                 return;
             }
             t.Mode = now.Mode;
@@ -2057,9 +2071,10 @@ namespace MphRecomp.Frontend
             TextS(FindOn ? "find game" : "quick match", Mx(440), My(276), 0, Orange, q, SizeS);
             TextS(!FindOn ? "jump into a game now" : _finding ? "searching..." : _party != null ? LocalText.FormatId("online.party.search.count", "search with your party of {0}", _party.Members.Count)
                 : "any mode, players near you", Mx(440), My(342), 0, White, q, SizeM);
-            string status = _connecting ? "connecting..." : !Live && _netError != null ? "offline: " + _netError
+            string status = _connecting ? "connecting..." : !Live && _netError != null
+                ? LocalText.FormatId("online.status.offline", "offline: {0}", _netError)
                 : _hunters >= 0 ? LocalText.FormatId("online.hub.hunters", "{0} hunter{1} online", _hunters, _hunters == 1 ? "" : "s") : "";
-            TextS(Fit(status, 34), Mx(440), My(388), 0, !Live && _netError != null && !_connecting ? Red : Cyan, q, SizeM);
+            TextS(Fit(LocalText.Ui(status), 34), Mx(440), My(388), 0, !Live && _netError != null && !_connecting ? Red : Cyan, q, SizeM);
             Capsule(Mx(440), My(448), Mw(420), Mw(76), "go", Live, -1, glows, SizeS);
             // BROWSE, CREATE
             int open = _games.Count(g => JoinBlock(g.Info) == null);
@@ -2138,7 +2153,8 @@ namespace MphRecomp.Frontend
                 string host = OnlineNames.Display(g.Host.Name, g.Host.Tag).ToLowerInvariant();
                 TextS(host, tx, My(by + 18), 0, White, tag, SizeS);
                 Badge(g.Host, tx + _drawMenu!.Font.Measure(host) + Mw(14), My(by + 16), Mw(44), tag);
-                TextS(ModeOf(g) is GameMode m ? ModeName(m) : g.Info.Mode.ToLowerInvariant(), tx, My(by + 72), 0, Orange, tag, SizeS);
+                TextS(ModeOf(g) is GameMode m ? ModeName(m) : LocalText.Id("online.mode.unknown", g.Info.Mode.ToLowerInvariant()),
+                    tx, My(by + 72), 0, Orange, tag, SizeS);
                 string players = LocalText.FormatId("online.browse.players", "{0}/{1} players", g.Players, g.Info.MaxPlayers);
                 TextS(players, tx, My(by + 130), 0, Pale, tag, SizeM);
                 BanIcons(g.Info, tx + _drawMenu!.Font.Measure(players) * SizeM + Mw(24), My(by + 122), Mw(40), tag);
@@ -2155,7 +2171,7 @@ namespace MphRecomp.Frontend
                 int tag = _bTitle;
                 string first = _connecting ? "connecting..." : !Live ? "can't reach the server." : _games.Count == 0 ? "no open games right now."
                     : "no games match the filters.";
-                string second = !Live && !_connecting ? _netError ?? "" : "tap refresh to look again.";
+                string second = !Live && !_connecting ? _netError ?? "" : LocalText.Ui("tap refresh to look again.");
                 Text(first, 128, -80, 2, White, tag);
                 TextS(Fit(second, 50), 128, -94, 2, Pale, tag, SizeM);
             }
@@ -2194,11 +2210,12 @@ namespace MphRecomp.Frontend
             }
             if (g.Info.Mods != GameInfo.NoMods) facts.Add(("mods", g.Info.Mods.ToLowerInvariant()));
             if (g.Info.Version != VersionKey) facts.Add(("version", "different: can't join"));
-            else if (JoinBlock(g.Info) is string why) facts.Add(("join", "can't: " + why));
+            else if (JoinBlock(g.Info) is string why)
+                facts.Add(("join", LocalText.FormatId("online.join.blocked", "can't: {0}", LocalText.Ui(why))));
             foreach ((string k, string v) in facts)
             {
                 TextS(k, fx, My(y), 0, Pale, tag, SizeM);
-                TextS(Fit(v, 28), fr, My(y), 1, White, tag, SizeM);
+                TextS(Fit(LocalText.Ui(v), 28), fr, My(y), 1, White, tag, SizeM);
                 y += 44;
             }
             TextS("ping", fx, My(y), 0, Pale, tag, SizeM);
@@ -2252,14 +2269,15 @@ namespace MphRecomp.Frontend
             foreach ((string k, string v) in Multiplayer?.OnlineSummary() ?? Array.Empty<(string, string)>())
             {
                 TextS(k, Mx(1336), My(y), 0, Pale, side, SizeM);
-                TextS(Fit(v, 16), Mx(1824), My(y), 1, White, side, SizeM);
+                TextS(Fit(LocalText.Ui(v), 16), Mx(1824), My(y), 1, White, side, SizeM);
                 y += 50;
             }
             WhoValue(0, "bots", s_bots, _wBots, glows);
             WhoValue(1, "players", s_seats, _wPlayers, glows);
             WhoValue(2, "bot level", s_botLevel + 1, _wLevel, glows);
             Capsule(Mx(1330), My(760), Mw(500), Mw(110), "create", Live, _wCreate, glows, SizeS);
-            string status = _connecting ? "connecting..." : !Live && _netError != null ? "offline: " + _netError : "";
+            string status = _connecting ? "connecting..." : !Live && _netError != null
+                ? LocalText.FormatId("online.status.offline", "offline: {0}", _netError) : "";
             TextS(Fit(status, 30), Mx(1580), My(890), 2, _connecting ? Cyan : Red, _wCreate, SizeX);
         }
 
@@ -2378,7 +2396,7 @@ namespace MphRecomp.Frontend
             foreach ((string k, string v) in facts)
             {
                 TextS(k, Mx(1452), My(y), 0, Pale, side, SizeX);
-                TextS(Fit(v, 16), Mx(1830), My(y), 1, White, side, SizeX);
+                TextS(Fit(LocalText.Ui(v), 16), Mx(1830), My(y), 1, White, side, SizeX);
                 y += 40;
             }
             if (host)
@@ -2485,7 +2503,8 @@ namespace MphRecomp.Frontend
                 if (i < level) Fill(bx + 0.4f, top - h + bh - 0.4f, bx + bw - 0.4f, top - h + 0.4f, r, g, b, 1, tag);
                 else Fill(bx + 0.4f, top - h + bh - 0.4f, bx + bw - 0.4f, top - h + 0.4f, 0.24f, 0.24f, 0.24f, 1, tag);
             }
-            TextS($"{ms} ms", x + 4 * bw * 1.45f + Mw(12), top - h + 8 * SizeM, 0, White, tag, SizeM);
+            TextS(LocalText.FormatId("online.ping.ms", "{0} ms", ms),
+                x + 4 * bw * 1.45f + Mw(12), top - h + 8 * SizeM, 0, White, tag, SizeM);
         }
 
         // a game's seats in a row: who's in (round icons), then open seats up to its size (eight: two rows of four, smaller)

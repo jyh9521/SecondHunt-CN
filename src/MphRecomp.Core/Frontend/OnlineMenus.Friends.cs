@@ -638,7 +638,7 @@ namespace MphRecomp.Frontend
                         _ => ("nobody yet.", "hunters you play online show here."),
                     };
                 TextS(first, Mx(960), My(480), 2, White, tag, SizeS);
-                TextS(Fit(second, 50), Mx(960), My(540), 2, Pale, tag, SizeM);
+                TextS(Fit(LocalText.Ui(second), 50), Mx(960), My(540), 2, Pale, tag, SizeM);
             }
             int pages = Pages(rows.Count, FrRows);
             if (pages > 1)

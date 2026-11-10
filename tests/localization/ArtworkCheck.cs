@@ -100,6 +100,30 @@ internal static class ArtworkCheck
             }
             int changed = ChangedPixels(source, modified, 4);
             SavePair<Rgba32>(report, $"texture-{i}", source, modified, meta.Width, meta.Height);
+            if (i >= 4)
+            {
+                int mark = 0, intact = 0;
+                for (int my = 22; my < 35; my++)
+                    for (int mx = 190; mx < 202; mx++)
+                    {
+                        int at = (my * meta.Width + mx) * 4;
+                        if (source[at] != 82 || source[at + 1] != 33 || source[at + 2] != 16 || source[at + 3] == 0) continue;
+                        mark++;
+                        if (source.AsSpan(at, 4).SequenceEqual(modified.AsSpan(at, 4))) intact++;
+                    }
+                Console.WriteLine($"MARK {path}#{id}: {intact}/{mark} original registered-mark pixels intact.");
+                if (intact != 36 || mark != 36)
+                    throw new InvalidOperationException("The title edit clipped or overpainted the registered mark.");
+                int holes = 0;
+                for (int iy = 8; iy <= 103; iy++)
+                    for (int ix = 55; ix <= 146; ix++)
+                    {
+                        float u = (ix - 100.5f) / 44.6f, v = (iy - 55f) / 47.5f;
+                        int alpha = (iy * meta.Width + ix) * 4 + 3;
+                        if (u * u + v * v < .9f * .9f && source[alpha] == 255 && modified[alpha] < 255) holes++;
+                    }
+                if (holes != 0) throw new InvalidOperationException($"The medallion gained {holes} translucent holes.");
+            }
             if (changed < 80 || changed > (i >= 4 ? 13500 : 5000))
                 throw new InvalidOperationException($"Texture edit is not localized: {path}, {changed} pixels.");
             Console.WriteLine($"TEXTURE {path}#{id}: {changed} changed, {meta.Width * meta.Height - changed} unchanged; protected art identical.");

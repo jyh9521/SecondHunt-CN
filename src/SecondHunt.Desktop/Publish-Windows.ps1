@@ -2,7 +2,7 @@
 # an existing portable install (which might hold the player's data) is not touched.
 param(
     [ValidatePattern('^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?$')]
-    [string]$Version = "0.3.5-zh.7",
+    [string]$Version = "0.3.5-zh.8",
     [string]$OutDir = "",
     [string]$Dotnet = "dotnet"
 )

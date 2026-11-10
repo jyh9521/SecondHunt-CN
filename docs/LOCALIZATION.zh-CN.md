@@ -62,7 +62,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.7
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.8
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -82,7 +82,8 @@ dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c R
 的游戏渲染器导出实际画面；截图和 ROM 测试数据只保存在本机。
 
 检查扩展页面时可在 `--ui-inventory <game> <report.json>` 后再传入含实际回放的测试 `data` 目录。
-工具会打开第一条回放，额外检查有数据才显示的详情标签。
+工具会记录真正送到字体渲染器的文字，遍历七种已填值的对战规则、在线断连和协议不符等
+分支。传入回放时会额外打开第一条记录的详情。联机预览使用本地样本，不改协议、也不连接服务器。
 
 ## 简体中文标点
 

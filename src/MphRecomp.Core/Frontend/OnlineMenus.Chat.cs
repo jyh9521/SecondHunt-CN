@@ -325,7 +325,7 @@ namespace MphRecomp.Frontend
                         _chatSending = false;
                         string code = (ex as OnlineException)?.Code ?? "";
                         if (code == "chat_rate") ChatNote("slow down: wait a moment.");
-                        else if (code is "chat_locked" or "chat_muted") Import.Popup?.Inform(ex.Message.ToLowerInvariant());
+                        else if (code is "chat_locked" or "chat_muted") Import.Popup?.Inform(Problem(ex));
                         else ChatNote("not sent: " + Problem(ex));
                     });
                 }

@@ -78,10 +78,17 @@ namespace MphRecomp.Online
     public sealed class OnlineException : Exception
     {
         public string Code { get; }
+        public (int Server, int Client)? ProtocolVersions { get; }
 
         public OnlineException(string code, string text) : base(text)
         {
             Code = code;
+        }
+
+        public OnlineException(int server, int client)
+            : this("old_version", $"server protocol {server}, this game speaks {client}: update the game")
+        {
+            ProtocolVersions = (server, client);
         }
     }
 

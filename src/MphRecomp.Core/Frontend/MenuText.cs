@@ -97,6 +97,9 @@ namespace MphRecomp.Frontend
         public int TextureId { get; }
         public int AtlasWidth { get; }
         public int AtlasHeight { get; }
+        // The UI inventory records text after localization and before glyph
+        // emission. Leave unset outside the test harness.
+        internal Action<string>? ObserveDrawing { get; set; }
 
         public MenuFont(UiTextureCache textures)
         {
@@ -190,10 +193,14 @@ namespace MphRecomp.Frontend
         }
 
         // Break into lines at '\n', and at spaces when a line would pass wrapWidth (0 = never).
-        public List<string> Lines(string text, int wrapWidth)
+        public List<string> Lines(string text, int wrapWidth) => Lines(text, wrapWidth, drawing: false);
+
+        private List<string> Lines(string text, int wrapWidth, bool drawing)
         {
             var lines = new List<string>();
-            foreach (string raw in LocalText.Ui(text).Split('\n'))
+            string display = LocalText.Ui(text);
+            if (drawing) ObserveDrawing?.Invoke(display);
+            foreach (string raw in display.Split('\n'))
             {
                 if (wrapWidth <= 0 || MeasureRaw(raw) <= wrapWidth)
                 {
@@ -231,7 +238,7 @@ namespace MphRecomp.Frontend
             float r, float g, float b, float a, float z, List<WidgetTri> output)
         {
             float top = y - 192 + lineHeight; // the anchor is the BOTTOM of the first line (checked against the game)
-            foreach (string line in Lines(text, wrapWidth))
+            foreach (string line in Lines(text, wrapWidth, drawing: true))
             {
                 float width = MeasureRaw(line);
                 float penX = align == 1 ? x - width : align == 2 ? x - MathF.Floor(width / 2) : x;
@@ -264,7 +271,7 @@ namespace MphRecomp.Frontend
         {
             float lineHeight = Cell * scale;
             float lineTop = y;
-            foreach (string line in Lines(text, wrapWidth: 0))
+            foreach (string line in Lines(text, wrapWidth: 0, drawing: true))
             {
                 float width = MeasureRaw(line) * scale;
                 float penX = align == 1 ? x - width : align == 2 ? x - width / 2 : x;

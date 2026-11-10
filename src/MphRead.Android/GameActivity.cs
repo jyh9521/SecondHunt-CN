@@ -363,7 +363,7 @@ public class GameActivity : Activity
         MenuKeys key = KeyFor(keyCode);
         if (key != MenuKeys.None)
         {
-            if (e?.RepeatCount == 0) _renderer.Post(s => s.Press(key));
+            if (e?.RepeatCount == 0) _renderer.Press(key);
             return true;
         }
         return base.OnKeyDown(keyCode, e);
@@ -447,7 +447,7 @@ public class GameActivity : Activity
         if (e != null && kind >= 0 && _renderer != null)
         {
             float x = e.GetX(), y = e.GetY();
-            _renderer.Post(s => s.TouchCanvas(x, y, kind));
+            _renderer.Touch(x, y, kind);
             return true;
         }
         return base.OnTouchEvent(e);

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using MphRead;
 using MphRead.Formats.Sound;
+using MphRead.Text;
 using MphRecomp.Frontend;
 using MphRecomp.Media;
 using MphRecomp.PrimeMusic;
@@ -18,7 +19,8 @@ internal sealed class FrontendRenderer : IGlScreen
     readonly string _settingsPath, _modsDir, _savesDir;
     FrontendSession? _session;
     string? _error;
-    readonly ConcurrentQueue<Action<FrontendSession>> _input = new();
+    readonly record struct MenuInput(Action<FrontendSession> Apply, bool SkipMovie);
+    readonly ConcurrentQueue<MenuInput> _input = new();
     readonly Stopwatch _clock = new();
     readonly UiGlDrawer _drawer = new();
     MoviePlayer? _movie;
@@ -61,7 +63,15 @@ internal sealed class FrontendRenderer : IGlScreen
         _savesDir = savesDir;
     }
 
-    public void Post(Action<FrontendSession> action) => _input.Enqueue(action);
+    public void Post(Action<FrontendSession> action) => _input.Enqueue(new MenuInput(action, SkipMovie: false));
+
+    public void Press(MenuKeys key) => _input.Enqueue(new MenuInput(s => s.Press(key), SkipMovie: true));
+    public void Tap(float x, float y) => _input.Enqueue(new MenuInput(s => s.TouchCanvas(x, y), SkipMovie: true));
+
+    // The release and drag belong to the original gesture. They must not turn
+    // into a new press when the down event opened a gallery film last frame.
+    public void Touch(float x, float y, int phase = 0)
+        => _input.Enqueue(new MenuInput(s => s.TouchCanvas(x, y, phase), SkipMovie: phase == 0));
 
     // the control customizer is waiting for a button ("pad" / "keys", else null): the host posts its next press as
     // s.Recomp.CaptureInput(name) instead of Press / Navigate (read off the GL thread: a reference, at worst a frame old)
@@ -125,7 +135,9 @@ internal sealed class FrontendRenderer : IGlScreen
             {
                 _error = ex.ToString();
                 Log.Error("MPHFrontend", _error);
-                StatusSink?.Invoke("Front end failed to load:\n" + ex.Message);
+                StatusSink?.Invoke(LocalText.IsLocalized
+                    ? LocalText.Id("frontend.load.failed", "The menu could not be loaded. See the log for details.")
+                    : "Front end failed to load:\n" + ex.Message);
             }
         }
         _clock.Restart();
@@ -171,10 +183,10 @@ internal sealed class FrontendRenderer : IGlScreen
             DrawMovie(dt);
             return;
         }
-        while (_input.TryDequeue(out var action))
+        while (_input.TryDequeue(out MenuInput input))
         {
             _idleSince = -1; // any input restarts the title's idle count (StepAttract)
-            try { action(session); }
+            try { input.Apply(session); }
             catch (Exception ex) { Log.Error("MPHFrontend", "input: " + ex); }
         }
         // RECOMP SETTINGS > MUSIC and OPTIONS > AUDIO apply live (a few compares a frame): the music quality (the menu theme
@@ -471,8 +483,10 @@ internal sealed class FrontendRenderer : IGlScreen
             {
                 // page 5 "logofinal" reached Idle and fired the (0,8) call that starts this movie -- vanilla starts it
                 // at tick ~1135 (see DesiredMenuMusic's comment)
-                Log.Info("MPHAudio", $"logo end (movie start): our tick {_session?.Frame} (vanilla ~{FlashTickTarget})");
+                if (_session?.Menu.Page?.Index == 5)
+                    Log.Info("MPHAudio", $"logo end (movie start): our tick {_session.Frame} (vanilla ~{FlashTickTarget})");
             }
+            else ReturnFromGalleryMovie(failed: true);
             return;
         }
         RequestSink?.Invoke(r);
@@ -485,7 +499,7 @@ internal sealed class FrontendRenderer : IGlScreen
             _movie?.Dispose();
             _movie = MoviePlayer.Open(name);
             _presenter ??= new MoviePresenter();
-            Log.Info("MPHFrontend", $"movie {name}: {_movie.FrameCount} frames, {_movie.Duration:0.0} s");
+            Log.Info("MPHFrontend", $"movie {name}: opening");
             while (_input.TryDequeue(out _)) { } // a button that skipped the logos doesn't also skip the movie
             return true;
         }
@@ -541,13 +555,17 @@ internal sealed class FrontendRenderer : IGlScreen
     void DrawMovie(double dt)
     {
         MoviePlayer movie = _movie!;
-        if (!_input.IsEmpty)
+        bool skip = false;
+        while (_input.TryDequeue(out MenuInput input)) skip |= input.SkipMovie;
+        if (skip)
         {
-            while (_input.TryDequeue(out _)) { }
             movie.Skip();
             Log.Info("MPHFrontend", $"movie skipped at {movie.Position:0.0} s");
         }
+        bool started = movie.Started;
         movie.Update(dt);
+        if (!started && movie.Started)
+            Log.Info("MPHFrontend", $"movie {movie.Name}: playing {movie.FrameCount} frames, {movie.Duration:0.0} s");
         _presenter!.Draw(movie, _width, _height);
         if (movie.Finished || movie.Error != null)
         {
@@ -558,7 +576,15 @@ internal sealed class FrontendRenderer : IGlScreen
             _movie = null;
             _clock.Restart(); // the menus pick up where they were, without catching up
             _last = 0;
-            if (_session is { } s) s.Movies.OnMovieDone(s.Menu); // a MOVIES tile's movie: its page comes in again
+            ReturnFromGalleryMovie(failed: movie.Error != null || !movie.Started && !movie.Skipped);
         }
+    }
+
+    void ReturnFromGalleryMovie(bool failed)
+    {
+        if (_session is not { } s || s.Movies.ReturnPage < 0) return;
+        s.Movies.OnMovieDone(s.Menu);
+        if (failed)
+            s.Popup?.Inform(LocalText.Id("movie.gallery.failed", "The movie could not be played. Check the game data or see the log."));
     }
 }

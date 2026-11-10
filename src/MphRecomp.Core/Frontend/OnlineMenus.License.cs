@@ -406,7 +406,7 @@ namespace MphRecomp.Frontend
             string note = _licError != null ? _licError : _licLoading && _licLicense == null ? "loading..."
                 : _licLicense == null ? "no license stats yet." : "";
             if (where.Length > 0) TextS(where, mid, cardBottom - Mw(84), 2, colour, tag, SizeM);
-            if (note.Length > 0) TextS(Fit(note, 40), mid, cardBottom - Mw(where.Length > 0 ? 130 : 84), 2, _licError != null ? Red : OnGrey, tag, SizeX);
+            if (note.Length > 0) TextS(Fit(LocalText.Ui(note), 40), mid, cardBottom - Mw(where.Length > 0 ? 130 : 84), 2, _licError != null ? Red : OnGrey, tag, SizeX);
 
             // HEAD TO HEAD
             Fill(Mx(1194), My(200), Mx(1846), My(238), HeaderBar.R, HeaderBar.G, HeaderBar.B, 1, side);

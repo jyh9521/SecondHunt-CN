@@ -158,6 +158,11 @@ public sealed class LocalizedArtwork
         float u = (pixel % width - ring.Cx) / ring.Rx, v = (pixel / width - ring.Cy) / ring.Ry;
         float radius = MathF.Sqrt(u * u + v * v);
         if (radius > 1.07f) return;
+        // Inside the medallion, an opaque source pixel covers an opaque
+        // surface. Borrowing a rim shadow (or no sample) there makes holes.
+        bool opaque = radius < .9f && source[pixel * 4 + 3] == 255;
+        bool Usable(int p) => mask[p] == 0
+            && (opaque ? source[p * 4 + 3] == 255 : radius > .95f || source[p * 4 + 3] > 0);
         float angle = MathF.Atan2(v, u);
         (int Index, int Steps) Arc(int direction)
         {
@@ -168,7 +173,7 @@ public sealed class LocalizedArtwork
                 int y = (int)MathF.Round(ring.Cy + radius * ring.Ry * MathF.Sin(a));
                 if (x < 0 || x >= width || y < 0 || y >= height) continue;
                 int p = y * width + x;
-                if (mask[p] == 0 && (radius > .95f || source[p * 4 + 3] > 0))
+                if (Usable(p))
                     return (p * 4, k);
             }
             return (-1, 0);
@@ -186,9 +191,30 @@ public sealed class LocalizedArtwork
                 int x = (int)MathF.Round(ring.Cx + d * ring.Rx * MathF.Cos(angle));
                 int y = (int)MathF.Round(ring.Cy + d * ring.Ry * MathF.Sin(angle));
                 int p = y * width + x;
-                if (mask[p] != 0 || source[p * 4 + 3] == 0) continue;
+                if (!Usable(p)) continue;
                 source.AsSpan(p * 4, 4).CopyTo(color);
                 return;
+            }
+            if (opaque)
+            {
+                // The original English word covered the entire local arc.
+                // Use the closest intact interior pixel, never a flat fill.
+                int px = pixel % width, py = pixel / width;
+                int best = -1, distance = int.MaxValue;
+                int minX = Math.Max(0, (int)(ring.Cx - ring.Rx)), maxX = Math.Min(width - 1, (int)(ring.Cx + ring.Rx));
+                int minY = Math.Max(0, (int)(ring.Cy - ring.Ry)), maxY = Math.Min(height - 1, (int)(ring.Cy + ring.Ry));
+                for (int y = minY; y <= maxY; y++)
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        int dx = x - px, dy = y - py, d = dx * dx + dy * dy;
+                        if (d >= distance) continue;
+                        float nx = (x - ring.Cx) / ring.Rx, ny = (y - ring.Cy) / ring.Ry;
+                        int candidate = y * width + x;
+                        if (nx * nx + ny * ny >= .9f * .9f || !Usable(candidate)) continue;
+                        best = candidate;
+                        distance = d;
+                    }
+                if (best >= 0) source.AsSpan(best * 4, 4).CopyTo(color);
             }
             return;
         }

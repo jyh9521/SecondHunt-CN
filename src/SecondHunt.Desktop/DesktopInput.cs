@@ -128,6 +128,15 @@ internal sealed class DesktopInput
                 float y = float.Parse(xy[1], System.Globalization.CultureInfo.InvariantCulture);
                 ScriptClick(x, y);
             }
+            else if (action.StartsWith("touch@", StringComparison.Ordinal) && _app.TopScreen is FrontendRenderer front)
+            {
+                // QA: press, drag and release can be separated across frames.
+                string[] args = action[6..].Split(';');
+                var format = System.Globalization.CultureInfo.InvariantCulture;
+                if (args.Length == 3 && int.TryParse(args[0], out int phase) && phase is >= 0 and <= 3
+                    && float.TryParse(args[1], format, out float x) && float.TryParse(args[2], format, out float y))
+                    front.Touch(x, y, phase);
+            }
             else if (action.StartsWith("text:", StringComparison.Ordinal))
             {
                 foreach (char c in action[5..]) OnText(c); // typed, as the window's TextInput
@@ -160,7 +169,7 @@ internal sealed class DesktopInput
     {
         switch (_app.TopScreen)
         {
-        case FrontendRenderer front: front.Post(s => s.TouchCanvas(x, y)); break;
+        case FrontendRenderer front: front.Tap(x, y); break;
         case CampaignRenderer game when game.PauseMenuOpen: game.PauseMenuInput(p => p.Touch(x, y)); break;
         case CampaignRenderer game when game.ShipMenuOpen: game.ShipTouch(x, y, 0); game.ShipTouch(x, y, 2); break;
         case PageScreen page: page.Click(x, y); break;
@@ -224,7 +233,7 @@ internal sealed class DesktopInput
         {
         case FrontendRenderer front:
             if (front.Typing && TypingKey(front, e)) break;
-            MenuKey(e, key => front.Post(s => s.Press(key)), (dx, dy) => front.Post(s => s.Navigate(dx, dy)));
+            MenuKey(e, front.Press, (dx, dy) => front.Post(s => s.Navigate(dx, dy)));
             break;
         case CampaignRenderer game:
             GameKeyDown(game, e);
@@ -297,7 +306,7 @@ internal sealed class DesktopInput
             if (!e.IsRepeat) front.Post(s => s.TypeKey(backspace: false));
             return true;
         case Keys.Escape:
-            if (!e.IsRepeat) front.Post(s => s.Press(MenuKeys.B));
+            if (!e.IsRepeat) front.Press(MenuKeys.B);
             return true;
         default:
             return true; // (typed: TextInput)
@@ -421,8 +430,8 @@ internal sealed class DesktopInput
         switch (_app.TopScreen)
         {
         case FrontendRenderer front:
-            if (e.Button == MouseButton.Left) front.Post(s => s.TouchCanvas(x, y, 0)); // the DS touch screen (a drag scrolls settings)
-            else if (e.Button == MouseButton.Right) front.Post(s => s.Press(MenuKeys.B));
+            if (e.Button == MouseButton.Left) front.Touch(x, y, 0); // the DS touch screen (a drag scrolls settings)
+            else if (e.Button == MouseButton.Right) front.Press(MenuKeys.B);
             break;
         case CampaignRenderer game:
             game.KeyboardHints = true;
@@ -466,7 +475,7 @@ internal sealed class DesktopInput
         if (_app.TopScreen is FrontendRenderer front && e.Button == MouseButton.Left)
         {
             float fx = _w.MouseState.X, fy = _w.MouseState.Y;
-            front.Post(s => s.TouchCanvas(fx, fy, 2)); // (a click held on settings' rows lands here)
+            front.Touch(fx, fy, 2); // (a click held on settings' rows lands here)
             return;
         }
         if (_app.TopScreen is not CampaignRenderer game || _captured || e.Button != MouseButton.Left) return;
@@ -483,7 +492,7 @@ internal sealed class DesktopInput
         switch (_app.TopScreen)
         {
         case FrontendRenderer front when _w.MouseState.IsButtonDown(MouseButton.Left):
-            front.Post(s => s.TouchCanvas(e.X, e.Y, 1)); // a held click drags settings and CONTROLS
+            front.Touch(e.X, e.Y, 1); // a held click drags settings and CONTROLS
             break;
         case CampaignRenderer game:
             if (_captured)
@@ -619,7 +628,7 @@ internal sealed class DesktopInput
             if (MenuStick(ry)) front.Post(s => s.ScrollStick(ry));
             foreach ((GamepadButton b, MenuKeys key) in MenuButtons)
             {
-                if (Pressed(b)) front.Post(s => s.Press(key));
+                if (Pressed(b)) front.Press(key);
             }
             break;
         case CampaignRenderer game:

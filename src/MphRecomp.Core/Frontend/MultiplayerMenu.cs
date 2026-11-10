@@ -140,7 +140,10 @@ namespace MphRecomp.Frontend
         public IReadOnlyList<(string Label, string Value)> OnlineSummary()
         {
             ModeInfo m = CurrentMode;
-            var lines = new List<(string, string)> { ("mode", Word(m.Name) + (_setup.TeamPlay && m.Teams != m.Solo ? " teams" : "")), ("arena", ArenaName(_setup.Arena)) };
+            string mode = Word(m.Name);
+            if (_setup.TeamPlay && m.Teams != m.Solo)
+                mode = LocalText.FormatId("match.rules.teams", "{0} teams", mode);
+            var lines = new List<(string, string)> { ("mode", mode), ("arena", ArenaName(_setup.Arena)) };
             string[] labels = RuleLabels(m);
             for (int r = 0; r < m.Rules.Length; r++)
             {
@@ -608,9 +611,10 @@ namespace MphRecomp.Frontend
             return -1;
         }
 
-        // a ROM word by its English text (falls back to the text itself)
+        // Resolve the ROM index with English, then use its display value before
+        // it becomes part of a generated string or fills another ROM widget.
         private string Word(string english) =>
-            _text.TryGetValue(english, out int id) && id >= 0 ? _strings![id] : english;
+            LocalText.Ui(_text.TryGetValue(english, out int id) && id >= 0 ? _strings!.Display(id) : english);
 
         // ---- the setup's rules ----
 
@@ -747,14 +751,19 @@ namespace MphRecomp.Frontend
             foreach (MenuItem it in p.Items)
             {
                 if (!it.IsText) continue;
-                string s = _strings![it.States[0].Text!.StringId];
+                int id = it.States[0].Text!.StringId;
+                string s = _strings![id];
                 string[] parts = s.Split("\n\n");
                 if (parts.Length >= m.Rules.Length && parts.Length <= 4 && s.Contains("TIME LIMIT", StringComparison.Ordinal))
                 {
-                    return parts.Take(m.Rules.Length).ToArray();
+                    string translated = _strings.Display(id);
+                    string[] display = translated.Split("\n\n");
+                    if (display.Length >= m.Rules.Length && translated != s)
+                        return display.Take(m.Rules.Length).ToArray();
+                    return m.Rules.Select((r, i) => LocalText.Id("match.rule." + r, parts[i])).ToArray();
                 }
             }
-            return m.Rules.Select(r => r.ToString().ToUpperInvariant()).ToArray();
+            return m.Rules.Select(r => LocalText.Id("match.rule." + r, r.ToString().ToUpperInvariant())).ToArray();
         }
 
         private string ArenaName(int index)
@@ -1403,7 +1412,7 @@ namespace MphRecomp.Frontend
                 menu.GoTo(TypePage);
                 return;
             }
-            string text = _endWireless >= 0 ? _strings![_endWireless] : "this will end wireless communications.\n\nare you sure?";
+            string text = _endWireless >= 0 ? _strings!.Display(_endWireless) : "this will end wireless communications.\n\nare you sure?";
             Popup.Ask(text, yes =>
             {
                 if (yes) menu.GoTo(TypePage);
@@ -2079,7 +2088,7 @@ namespace MphRecomp.Frontend
             string name = hosts[k].Name.ToLowerInvariant();
             if (name.Length > 10) name = name[..10];
             bool twin = hosts.Where((h, i) => i != k && h.Name.Equals(hosts[k].Name, StringComparison.OrdinalIgnoreCase)).Any();
-            if (hosts[k].Running) return "rejoin " + (name.Length > 6 ? name[..6] : name); // (your seat in its match)
+            if (hosts[k].Running) return LocalText.FormatId("lan.host.rejoin", "rejoin {0}", name.Length > 6 ? name[..6] : name);
             return twin ? $"{name} {hosts[k].Address.Address.GetAddressBytes()[^1]}" : name;
         }
 
@@ -2728,7 +2737,7 @@ namespace MphRecomp.Frontend
         {
             if (_hint < 0 || p.Index != LobbyPage) return;
             int id = StringOf(p, _hint);
-            _hintRom ??= _strings![id];
+            _hintRom ??= _strings!.Display(id);
             string? address = Hosting ? LocalAddresses().FirstOrDefault() : null;
             _strings!.Fill(id, address == null ? _hintRom : LocalText.FormatId("lan.lobby.address", "{0}\naddress: {1}", LocalText.Ui(_hintRom), address));
         }
@@ -2876,7 +2885,7 @@ namespace MphRecomp.Frontend
             catch (Exception ex)
             {
                 Log?.Invoke("multiplayer: can't start: " + ex.Message);
-                Popup?.Inform(ex.Message);
+                Popup?.Inform(LocalText.Id("match.start.error", ex.Message));
             }
         }
 
@@ -3017,7 +3026,8 @@ namespace MphRecomp.Frontend
                 string text = _promptRom;
                 if (_textDone != null && you > 0 && cut > you && metroid > cut + 4)
                 {
-                    text = _promptRom[..you] + _promptRom[(cut + 4)..metroid] + _promptRom[(you + 1)..cut] + ".";
+                    text = LocalText.Id("menu.keyboard.prompt", _promptRom[..you] + _promptRom[(cut + 4)..metroid]
+                        + _promptRom[(you + 1)..cut] + ".");
                 }
                 _strings!.Fill(id, text);
             }
@@ -3093,7 +3103,7 @@ namespace MphRecomp.Frontend
                 if (_name.Trim().Length == 0)
                 {
                     // vanilla: "invalid name. please enter a name that has characters other than just spaces."
-                    if (_sInvalidName >= 0) Popup?.Inform(_strings![_sInvalidName]);
+                    if (_sInvalidName >= 0) Popup?.Inform(_strings!.Display(_sInvalidName));
                     return true;
                 }
                 if (_textDone != null) // EditText: the caller's text, not the nickname

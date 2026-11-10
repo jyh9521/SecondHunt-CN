@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MphRead.Text;
 using MphRecomp.Multiplayer;
 
 namespace MphRecomp.Frontend
@@ -112,7 +113,9 @@ namespace MphRecomp.Frontend
             s.Set(_extraBound.PickupsValue, On(ShownPickups));
             s.Set(_extraBound.CharactersValue, On(ShownCharacters));
             if (_extraBound.ArenasValue >= 0) s.Set(_extraBound.ArenasValue, On(ShownArenas));
-            string summary = ShownCharacters ? "extras: all" : ShownPickups ? "extras: pickups" : "extras: off";
+            string summary = ShownCharacters ? LocalText.Id("match.extras.all", "extras: all")
+                : ShownPickups ? LocalText.Id("match.extras.pickups", "extras: pickups")
+                : LocalText.Id("match.extras.off", "extras: off");
             s.Set(_extraBound.Summary, rules ? summary : "");
         }
 

@@ -13,6 +13,14 @@ RecompSettings.PublicBuild = true;
 RecompSettings.DesktopHost = true;
 if (args.Length is >= 2 and <= 4 && args[0] == "--hud-readability")
     return HudReadability.Run(args[1], args.Length >= 3 ? args[2] : null, args.Length == 4 ? args[3] : "zh-CN");
+if (args is ["--gallery-click", string galleryGame, string galleryOutput])
+    return FrontendGallery.Run(galleryGame, galleryOutput);
+if (args is ["--gallery-missing", string missingGame, string missingOutput])
+    return FrontendGallery.Run(missingGame, missingOutput, "missing");
+if (args is ["--frontend-shot", string frontGame, string frontOutput, string frontCase] && frontCase is "rules" or "protocol")
+    return FrontendGallery.Run(frontGame, frontOutput, frontCase);
+if (args is ["--gallery-decode", string decodeGame])
+    return FrontendGallery.DecodeAll(decodeGame);
 if (args is ["--media-inventory", string assets, string output, string stride])
     return MediaInventory.Run(assets, output, int.Parse(stride));
 if (args is ["--movie-inventory", string movie, string movieOutput, string movieStride])

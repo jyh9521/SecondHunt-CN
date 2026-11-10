@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using MphRead.Text;
 
 namespace MphRecomp.Online
 {
@@ -27,7 +28,13 @@ namespace MphRecomp.Online
 
         public static string Tag(int tag) => tag.ToString("D4");
 
-        public static string Display(string name, int tag) => $"{name}#{Tag(tag)}";
+        public static string Display(string name, int tag)
+        {
+            // Tag 0 is the UI's unassigned placeholder, never a server identity.
+            if (tag == 0 && name.Equals(Default, StringComparison.OrdinalIgnoreCase))
+                name = LocalText.Id("online.name.placeholder", name);
+            return $"{name}#{Tag(tag)}";
+        }
 
         // "kanden" -> (kanden, null); "kanden#421" / "KANDEN#0421" -> (kanden, 421)
         public static (string Name, int? Tag) ParseQuery(string? query)

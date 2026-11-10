@@ -59,8 +59,7 @@ namespace MphRecomp.Online
                 }
                 if (challenge.Proto != OnlineProtocol.Version)
                 {
-                    throw new OnlineException("old_version", $"server protocol {challenge.Proto}, this game speaks "
-                        + $"{OnlineProtocol.Version}: update the game");
+                    throw new OnlineException(challenge.Proto, OnlineProtocol.Version);
                 }
                 client.ServerVersion = challenge.Server;
                 byte[] nonce = Convert.FromBase64String(challenge.Nonce);

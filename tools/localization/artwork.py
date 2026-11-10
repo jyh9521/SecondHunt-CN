@@ -136,7 +136,6 @@ def texture_stencil(rgba, rule):
         for box in rule["chromeBoxes"]:
             chrome |= restrict(grey, box)
         chrome = (dilate(chrome, 1) | shift(dilate(chrome, 2), 1, 2)) & (alpha > 0)
-        chrome[:, 191:] &= ~restrict(np.ones_like(chrome), (191, 19, 202, 33))[:, 191:]
         red, green, blue = np.moveaxis(rgb, -1, 0)
         orange = restrict((red > 70) & (red-green > 24) & (green-blue > 9) & (alpha > 0),
                           rule["orangeBox"])
@@ -151,9 +150,13 @@ def texture_stencil(rgba, rule):
         # All remaining non-transparent shadow pixels outside the medallion
         # are lettering, apart from the separate registered-mark glyph.
         rim_shadows = restrict(outside & (alpha > 0), rule["shadowBox"])
-        for l, t, r, b in rule["keepBoxes"]:
-            rim_shadows[t:b, l:r] = False
-        return cropped((chrome | orange | black | rim_shadows).astype(np.uint8) * 255)
+        mark = rule["registeredMark"]
+        registered = restrict((rgb == mark["rgb"]).all(axis=2) & (alpha > 0), mark["box"])
+        if np.count_nonzero(registered) != mark["pixels"]:
+            raise ValueError("title registered mark does not match the verified source")
+        # Keep the entire original glyph after all dilation, without retaining
+        # the adjacent strokes and shadows of the English title's final D.
+        return cropped(((chrome | orange | black | rim_shadows) & ~registered).astype(np.uint8) * 255)
     else:
         raise ValueError(rule["method"])
     area = np.zeros_like(sel)
