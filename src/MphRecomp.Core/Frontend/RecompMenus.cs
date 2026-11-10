@@ -1,4 +1,5 @@
 using System;
+using LocalText = MphRead.Text.LocalText;
 using System.Collections.Generic;
 using System.Linq;
 using MphRecomp.Config;
@@ -1863,14 +1864,17 @@ namespace MphRecomp.Frontend
         private static IEnumerable<int> LiveRows(RowsPage p) => Enumerable.Range(0, RowsShown(p))
             .Where(r => p.Rows[p.Offset + r].Disabled?.Invoke() != true);
 
+        private static string PagedTitle(string title, int page, int pages) => pages > 1
+            ? LocalText.FormatId("ui.title.pages", "{0} {1}/{2}", LocalText.Ui(title), page, pages) : LocalText.Ui(title);
+
         private void Refresh(RowsPage p)
         {
             p.Rows = p.Source();
             PageStarts(p);
             int pages = PageCount(p), shown = RowsShown(p);
             string? section = shown > 0 ? p.Rows[p.Offset].Section : null;
-            string title = section != null ? $"{p.Title} - {section}" : p.Title;
-            if (p.Header >= 0) _strings.Set(p.Header, pages > 1 ? $"{title} {PageIndex(p) + 1}/{pages}" : title);
+            string title = section != null ? $"{LocalText.Ui(p.Title)} - {LocalText.Ui(section)}" : p.Title;
+            if (p.Header >= 0) _strings.Set(p.Header, PagedTitle(title, PageIndex(p) + 1, pages));
             for (int r = 0; r < RowsPerPage; r++)
             {
                 RowModel? m = r < shown ? p.Rows[p.Offset + r] : null;

@@ -2,6 +2,7 @@ using System.Drawing;
 using System.Net;
 using System.Text.Json;
 using MphRead;
+using LocalText = MphRead.Text.LocalText;
 using MphRecomp.App;
 using MphRecomp.Multiplayer;
 using MphRecomp.Multiplayer.Net;
@@ -101,7 +102,7 @@ internal sealed class LobbyScreen : PageScreen
         Save();
         if (template == null)
         {
-            _note = "Can't read the game's files, so LAN play can't start: restart the app and try again";
+            _note = LocalText.Id("lobby.rom", "Can't read the game's files, so LAN play can't start: restart the app and try again");
             Invalidate();
             return;
         }
@@ -112,13 +113,14 @@ internal sealed class LobbyScreen : PageScreen
         }
         catch (Exception ex)
         {
-            _note = "Can't host: " + ex.Message;
+            _note = LocalText.FormatId("lobby.host.error", "Can't host: {0}", ex.Message);
             Invalidate();
             return;
         }
         LanSession.Current = _session;
-        _status = _session.Status;
-        _session.StatusChanged += s => { _status = s; Invalidate(); };
+        _status = _session.DisplayStatus;
+        LanSession hosting = _session;
+        _session.StatusChanged += _ => { _status = hosting.DisplayStatus; Invalidate(); };
         _session.Joined += () => _joined = true;
         _mode = Mode.Hosting;
         _focus = 0;
@@ -129,14 +131,14 @@ internal sealed class LobbyScreen : PageScreen
     {
         if (!_lobby.EnsurePaths()) // the ROM revision the handshake compares
         {
-            _note = "Can't read the game's files, so LAN play can't start: restart the app and try again";
+            _note = LocalText.Id("lobby.rom", "Can't read the game's files, so LAN play can't start: restart the app and try again");
             Invalidate();
             return;
         }
         LanSession.Current?.Dispose();
         _session = LanSession.Browse(MatchLobby.LanRomKey(Paths.MphKey));
         LanSession.Current = _session;
-        _status = _session.Status;
+        _status = _session.DisplayStatus;
         string mine = LanSession.LocalAddress();
         int dot = mine.LastIndexOf('.');
         _address = dot > 0 ? mine[..(dot + 1)] : "";
@@ -150,7 +152,7 @@ internal sealed class LobbyScreen : PageScreen
     {
         if (_joining || _session == null) return;
         _joining = true;
-        _status = $"joining {target.Address}...";
+        _status = LocalText.FormatId("lan.joining", "joining {0}...", target.Address);
         Invalidate();
         LanSession session = _session;
         Task.Run(() =>
@@ -158,7 +160,7 @@ internal sealed class LobbyScreen : PageScreen
             bool ok = session.Join(target, Enum.Parse<Hunter>(MatchLobby.Hunters[_lobby.Hunter]), "Windows PC");
             _joining = false;
             if (ok) _joined = true;
-            else _status = session.Status;
+            else _status = session.DisplayStatus;
             Invalidate();
         });
     }
@@ -180,7 +182,7 @@ internal sealed class LobbyScreen : PageScreen
         }
         else
         {
-            _status = $"\"{text}\" isn't an address like 10.0.0.23";
+            _status = LocalText.FormatId("lobby.bad.address", "\"{0}\" isn't an address like 10.0.0.23", text);
             Invalidate();
         }
     }
@@ -219,7 +221,7 @@ internal sealed class LobbyScreen : PageScreen
             }
             if (!_joining)
             {
-                string status = _hosts.Count == 0 ? _session.Status : "click a match to join:";
+                string status = _hosts.Count == 0 ? _session.DisplayStatus : LocalText.Id("lobby.join.list", "click a match to join:");
                 if (status != _status)
                 {
                     _status = status;
@@ -375,7 +377,7 @@ internal sealed class LobbyScreen : PageScreen
         y += 44 * s;
         using (Font sub = Font(14))
         {
-            string text = _note ?? "LAN play is experimental: two players on the same network, any mode, with your bots.";
+            string text = _note ?? LocalText.Id("lobby.description", "LAN play is experimental: two players on the same network, any mode, with your bots.");
             DrawText(g, text, sub, Warning, new RectangleF(x, y, w, 24 * s));
         }
         y += 32 * s;
@@ -448,7 +450,7 @@ internal sealed class LobbyScreen : PageScreen
             IPEndPoint target = _hosts[i].Address;
             var r = new RectangleF(x, y, w, 46 * s);
             Box(g, r, _focus == i);
-            DrawText(g, _hosts[i].Label, body, Color.White, new RectangleF(r.X + 16 * s, r.Y, r.Width - 32 * s, r.Height), v: StringAlignment.Center, wrap: false);
+            DrawText(g, _hosts[i].DisplayLabel, body, Color.White, new RectangleF(r.X + 16 * s, r.Y, r.Width - 32 * s, r.Height), v: StringAlignment.Center, wrap: false);
             _hits.Add((r, () => JoinTarget(target), i));
             y += 51 * s;
         }

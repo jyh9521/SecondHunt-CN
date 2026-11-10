@@ -122,7 +122,7 @@ namespace MphRead.Entities
                     color = new ColorRgba((byte)(rg * 255), (byte)(rg * 255), 255, 255);
                 }
                 // name | rank box (the game's two halves, 32 px each) | values, on one line
-                DrawText2D(46, posY + 4, Align.Center, 0, GameState.Nicknames[slot], color, fontSpacing: 8);
+                DrawText2D(46, posY + 4, Align.Center, 0, GameState.DisplayNickname(slot), color, fontSpacing: 8);
                 int stars = GameState.Stars[slot];
                 _starsInst.PositionX = 80 / 256f;
                 _starsInst.PositionY = posY / 192f;

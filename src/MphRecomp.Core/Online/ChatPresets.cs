@@ -1,4 +1,5 @@
 using System;
+using MphRead.Text;
 
 namespace MphRecomp.Online
 {
@@ -19,5 +20,7 @@ namespace MphRecomp.Online
         public static bool Valid(int index) => index >= 0 && index < All.Length;
 
         public static string Text(int index) => Valid(index) ? All[index] : "";
+
+        public static string Display(int index) => Valid(index) ? LocalText.Id("chat.preset." + index, All[index]) : "";
     }
 }

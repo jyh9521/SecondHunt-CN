@@ -14,7 +14,7 @@ namespace MphRecomp.Online
         {
             public bool IsPreset => Preset >= 0;
             // what to show: the quick message's words, or the (masked) typed text
-            public string Shown => IsPreset ? ChatPresets.Text(Preset) : Text;
+            public string Shown => IsPreset ? ChatPresets.Display(Preset) : Text;
         }
 
         public const int Keep = 100;

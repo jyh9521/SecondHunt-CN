@@ -762,7 +762,7 @@ namespace MphRecomp.Frontend
             int room = ArenaRooms[index];
             if (room == RandomArena) return Word("random");
             RoomMetadata? meta = Metadata.GetRoomById(room, noThrow: true);
-            return ArenaWord(meta?.InGameName ?? "");
+            return ArenaWord(LocalText.IsLocalized ? DisplayNames.Room(meta) : meta?.InGameName ?? "");
         }
 
         // an arena name as the ROM writes it: lower case (the small capitals). The ROM's own string, when it has one, is
@@ -1819,7 +1819,7 @@ namespace MphRecomp.Frontend
         // a name in the menu font (lower case = its small capitals): a bot by the ROM's bot name, a player by the nickname
         private string MenuName(MatchResults.Player p) =>
             p.Bot && p.Character != null ? p.Character.ToLowerInvariant() // D7: a TROOPER / DARK SAMUS bot by its character
-            : p.Bot && BotNames.TryGetValue(p.Hunter, out string? bot) ? Word(bot) : p.Nickname.ToLowerInvariant();
+            : p.Bot && BotNames.TryGetValue(p.Hunter, out string? bot) ? LocalText.MatchNickname(Word(bot), p.Hunter, bot: true) : p.Nickname.ToLowerInvariant();
 
         private void Results(MenuEngine menu, bool entering = false)
         {
@@ -2184,7 +2184,7 @@ namespace MphRecomp.Frontend
             {
                 bool ok = rejoin ? RejoinHost(lan, target, hunter, nickname, rank, character, skin)
                     : lan.Join(target.Address, hunter, nickname, rankLevel: rank, character: character, skin: skin);
-                _joinFailure = ok ? "" : lan.Status;
+                _joinFailure = ok ? "" : lan.DisplayStatus;
                 _joinState = ok ? 2 : -1;
             });
             Log?.Invoke($"multiplayer: lan: joining {target.Address} as {hunter}");
@@ -2977,7 +2977,7 @@ namespace MphRecomp.Frontend
             string tail = _sNoticeTail >= 0 ? _strings![_sNoticeTail] : "\nyou can change it in the hunter license.";
             tail = tail.Replace("the edit friends and rivals menu", "the hunter license", StringComparison.Ordinal);
             Log?.Invoke($"multiplayer: nickname notice ({_license.Name})");
-            Popup.Inform(head + _license.Name.ToUpperInvariant() + tail);
+            Popup.Inform(LocalText.FormatId("license.nickname.notice", "{0}{1}{2}", head, _license.Name.ToUpperInvariant(), tail));
         }
 
         // The name keyboard for another screen (Replay mode's RENAME, owner 2026-10-08 "go ahead with that hook"): `start` already
@@ -3593,7 +3593,7 @@ namespace MphRecomp.Frontend
             int index = Array.IndexOf(ArenaRooms, room);
             if (index >= 0) return ArenaName(index);
             RoomMetadata? meta = Metadata.GetRoomById(room, noThrow: true);
-            return meta == null ? Word("-") : ArenaWord(meta.InGameName ?? "");
+            return meta == null ? Word("-") : ArenaWord(LocalText.IsLocalized ? DisplayNames.Room(meta) : meta.InGameName ?? "");
         }
 
         private void Put(int id, string text)

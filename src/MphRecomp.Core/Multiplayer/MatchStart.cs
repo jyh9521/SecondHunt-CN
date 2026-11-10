@@ -88,6 +88,7 @@ namespace MphRecomp.Campaign
                 player.BotLevel = seat.Bot ? System.Math.Clamp(seat.BotLevel, 0, 2) : 0;
                 // (a nameless bot: its character's name for TROOPER / DARK SAMUS, D7, LookAlikes.cs)
                 string? character = LookAlikes.On ? LookAlikes.CharacterName(seat) : null;
+                GameState.GeneratedNicknames[i] = seat.Nickname == null && !seat.Bot;
                 GameState.Nicknames[i] = seat.Nickname ?? (seat.Bot ? character ?? seat.Hunter.ToString() : $"Player{i + 1}");
             }
             // Echoes arenas' weapon crates join the room's entities as it loads (off in LAN matches and old replays)

@@ -1,6 +1,7 @@
 using System;
 using MphRead;
 using MphRead.Entities;
+using MphRead.Text;
 using MphRecomp.Multiplayer;
 using MphRecomp.Multiplayer.Net;
 
@@ -436,6 +437,22 @@ namespace MphRecomp.Multiplayer
                 return role + $"  ({_goneSeats.Count} of {remotes} players left)";
             }
             return role + (_net.PeerAlive ? "" : remotes > 1 ? "  (no word from the other players)" : "  (no word from the other player)");
+        }
+
+        public string DisplayStatusLine()
+        {
+            if (!LocalText.IsLocalized) return StatusLine();
+            string role = _net.IsHost
+                ? LocalText.FormatId("match.net.host", "{0} host, inputs {1}", _net.Kind, _net.InputsReceived)
+                : LocalText.FormatId("match.net.client", "{0} client, snapshots {1}", _net.Kind, _net.SnapshotsReceived);
+            if (TookOver) role += LocalText.Id("match.net.tookover", "  (host left: you host now)");
+            else if (HostMoves > 0) role += LocalText.Id("match.net.moved", "  (host left: a new host took over)");
+            int remotes = _net.IsHost ? _net.RemoteSeats.Count : 1;
+            if (_gone) return role + (!_net.IsHost ? LocalText.Id("match.net.hostleft", "  (the host left)")
+                : LocalText.Id("match.net.peersleft", "  (the other players left)"));
+            if (_goneSeats.Count > 0)
+                return role + LocalText.FormatId("match.net.left", "  ({0} of {1} players left)", _goneSeats.Count, remotes);
+            return role + (_net.PeerAlive ? "" : LocalText.Id("match.net.timeout", "  (no word from the other players)"));
         }
     }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using MphRead;
+using MphRead.Text;
 using OpenTK.Mathematics;
 
 // The PRIME map's split tools (owner 2026-10-14): D-pad up cycles the door-bounded corridor / chamber splits (CorridorMap)
@@ -87,7 +88,9 @@ namespace MphRecomp.Frontend
                 ?? _shown.FirstOrDefault(s => s.Part == part && s.Piece < 0) ?? _playerRoom;
             _forced = _selected; // kept (as a tap keeps it) while the view slides onto its new middle: the look ray would pick a neighbour
             SetTitle();
-            Toast(off ? "SPLITS OFF: WHOLE ROOMS" : all ? "SPLITS: ALL SHOWN" : "SPLITS ON: SHOWN ONCE ENTERED");
+            Toast(off ? LocalText.Id("map.toast.off", "SPLITS OFF: WHOLE ROOMS")
+                : all ? LocalText.Id("map.toast.all", "SPLITS: ALL SHOWN")
+                : LocalText.Id("map.toast.on", "SPLITS ON: SHOWN ONCE ENTERED"));
         }
 
         private void Toast(string text)
@@ -102,21 +105,21 @@ namespace MphRecomp.Frontend
             if (_selected == null) return;
             _reportOn = _selected;
             bool piece = _selected.PieceInfo != null;
-            var menu = new Menu { Title = "REPORT: " + _title };
-            menu.Rows.Add(("SPLIT IS RIGHT", () => Save("right")));
-            if (piece) menu.Rows.Add(("SHOULDN'T BE SPLIT OFF", () => Save("merge")));
-            else menu.Rows.Add(("NEEDS A SPLIT", () => Save("needs split")));
-            if (piece) menu.Rows.Add(("WRONG SHAPE", () => Save("wrong shape")));
-            menu.Rows.Add(("WRONG NAME...", () => _menu = NamesMenu(menu)));
-            menu.Rows.Add(("CANCEL", () => _menu = null));
+            var menu = new Menu { Title = LocalText.FormatId("map.report.title", "REPORT: {0}", _title) };
+            menu.Rows.Add((LocalText.Id("map.report.right", "SPLIT IS RIGHT"), () => Save("right")));
+            if (piece) menu.Rows.Add((LocalText.Id("map.report.merge", "SHOULDN'T BE SPLIT OFF"), () => Save("merge")));
+            else menu.Rows.Add((LocalText.Id("map.report.split", "NEEDS A SPLIT"), () => Save("needs split")));
+            if (piece) menu.Rows.Add((LocalText.Id("map.report.shape", "WRONG SHAPE"), () => Save("wrong shape")));
+            menu.Rows.Add((LocalText.Id("map.report.name", "WRONG NAME..."), () => _menu = NamesMenu(menu)));
+            menu.Rows.Add((LocalText.Id("map.report.cancel", "CANCEL"), () => _menu = null));
             _menu = menu;
         }
 
         // a name for it: type one, or a room near it (this planet's rooms, nearest first)
         private Menu NamesMenu(Menu back)
         {
-            var menu = new Menu { Title = "CALL IT", Back = back };
-            if (TextRequested != null) menu.Rows.Add(("TYPE A NAME...", StartTyping));
+            var menu = new Menu { Title = LocalText.Id("map.report.name.title", "CALL IT"), Back = back };
+            if (TextRequested != null) menu.Rows.Add((LocalText.Id("map.report.name.custom", "TYPE A NAME..."), StartTyping));
             Vector3 at = _reportOn!.Centre;
             var near = new List<(float Dist, string Name)>();
             foreach ((AreaMapModel? model, Vector3 offset) in new[] { (_modelA, Vector3.Zero), (_modelB, _pair >= 0 ? AreaMapModel.HalfOffsets[_pair + 1] : Vector3.Zero) })
@@ -126,8 +129,8 @@ namespace MphRecomp.Frontend
                 {
                     if (part.IsConnector || part.RoomId < 0) continue;
                     RoomMetadata? meta = Metadata.GetRoomById(part.RoomId, noThrow: true);
-                    string? name = meta?.InGameName ?? meta?.Name;
-                    if (name == null) continue;
+                    if (meta == null) continue;
+                    string name = DisplayNames.Room(meta);
                     float d = (Vector3.Clamp(at, part.Min + offset, part.Max + offset) - at).Length;
                     near.Add((d, name.ToUpperInvariant()));
                 }
@@ -136,7 +139,7 @@ namespace MphRecomp.Frontend
             {
                 menu.Rows.Add((name, () => Save("name", name)));
             }
-            menu.Rows.Add(("BACK", () => _menu = back));
+            menu.Rows.Add((LocalText.Id("map.report.back", "BACK"), () => _menu = back));
             return menu;
         }
 
@@ -145,7 +148,7 @@ namespace MphRecomp.Frontend
             _typing = true;
             _typedDone = false;
             _typed = null;
-            TextRequested!("A name for " + _title.ToLowerInvariant(), text =>
+            TextRequested!(LocalText.FormatId("map.report.name.hint", "A name for {0}", _title.ToLowerInvariant()), text =>
             {
                 _typed = text;
                 _typedDone = true;
@@ -238,7 +241,8 @@ namespace MphRecomp.Frontend
                 SetTitle();
             }
             Log?.Invoke($"primemap: report {verdict}{(name != null ? " '" + name + "'" : "")} on {report.Room}/{report.Piece ?? "-"} ({(saved ? ReportPath : "not saved")})");
-            Toast(saved ? "REPORT SAVED" : "REPORT NOT SAVED");
+            Toast(saved ? LocalText.Id("map.report.saved", "REPORT SAVED")
+                : LocalText.Id("map.report.not_saved", "REPORT NOT SAVED"));
         }
 
         private List<Report> ReadReports()
@@ -287,7 +291,7 @@ namespace MphRecomp.Frontend
             Rect(-1, x0, y0 + h - 0.6f, x0 + Width, y0 + h, LabelColour.R, LabelColour.G, LabelColour.B, a);
             if (_typing)
             {
-                Text("TYPING A NAME...", _w / 2, y0 + 4, 2, TextK, LabelColour, a);
+                Text(LocalText.Id("map.report.typing", "TYPING A NAME..."), _w / 2, y0 + 4, 2, TextK, LabelColour, a);
                 return;
             }
             Text(_menu!.Title, _w / 2, y0 + 3, 2, TextK, LabelColour, a);

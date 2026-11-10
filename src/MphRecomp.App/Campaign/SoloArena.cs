@@ -3,6 +3,7 @@ using MphRead;
 using MphRead.Entities;
 using MphRead.Formats;
 using MphRead.Formats.Culling;
+using MphRead.Text;
 using MphRecomp.Multiplayer;
 using OpenTK.Mathematics;
 
@@ -385,7 +386,8 @@ internal sealed partial class CampaignRenderer
         TryPerchStep(p);
         // (C20) faint and pulsing, at the foot of the HUD: queued each step, shown for two
         float alpha = 0.32f + 0.18f * MathF.Sin(_tryHintTick++ * (MathF.Tau / 120));
-        p.QueueHudMessage(128, TryHintY, MphRead.Hud.Align.Center, 200, 8, new ColorRgba(0x7FFF), alpha, 2 / 60f, 0, "press start to exit");
+        p.QueueHudMessage(128, TryHintY, MphRead.Hud.Align.Center, 200, 8, new ColorRgba(0x7FFF), alpha, 2 / 60f, 0,
+            LocalText.Id("hud.practice.exit", "press start to exit"));
     }
 
     const float TryHintY = 180;

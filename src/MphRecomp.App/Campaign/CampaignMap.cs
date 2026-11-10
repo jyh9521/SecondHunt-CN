@@ -138,7 +138,7 @@ internal sealed partial class CampaignRenderer
             var info = new PauseMap.Info
             {
                 Room = meta?.Name ?? "",
-                Title = meta?.InGameName ?? meta?.Name ?? "",
+                Title = DisplayNames.Room(meta),
                 Position = p.Position,
                 Facing = p.FacingVector,
                 Up = p.UpVector,

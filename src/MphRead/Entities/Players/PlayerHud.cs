@@ -1550,7 +1550,7 @@ namespace MphRead.Entities
             _starsInst.PositionX = (posX + 32) / 256f;
             _starsInst.SetIndex(stars * 2 + 1, _scene);
             _scene.DrawHudObject(_starsInst, mode: 2);
-            string nickname = GameState.Nicknames[slot];
+            string nickname = GameState.DisplayNickname(slot);
             DrawText2D(posX + 32, posY - 9, Align.Center, 0, nickname, color, fontSpacing: 8);
         }
 
@@ -2594,7 +2594,7 @@ namespace MphRead.Entities
                 posX += _objShiftX;
                 posY += _objShiftY;
             }
-            string nickname = GameState.Nicknames[_opponentIndex];
+            string nickname = GameState.DisplayNickname(_opponentIndex);
             DrawText2D(posX, posY, Align.Center, 0, nickname);
             HudObjectInstance portrait = _hunterInsts[(int)opponent.Hunter];
             portrait.PositionX = (posX - 16) / 256f;

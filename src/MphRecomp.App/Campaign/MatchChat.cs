@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MphRead;
 using MphRead.Entities;
 using MphRead.Hud;
+using MphRead.Text;
 using MphRecomp.Config;
 using MphRecomp.Multiplayer.Net;
 using MphRecomp.Online;
@@ -206,7 +207,7 @@ internal sealed partial class CampaignRenderer
             string name = line.Name;
             int hash = name.IndexOf('#');
             if (hash > 0) name = name[..hash];
-            string text = HudText($"{name}: {line.Shown}");
+            string text = LocalText.FormatId("chat.hud.line", "{0}: {1}", HudText(name), line.IsPreset ? line.Shown : HudText(line.Text));
             // your own lines dimmer, the others' white
             var color = new ColorRgba(line.Code == me ? 0x5294u : 0x7FFFu);
             p.QueueHudMessage(ChatLineX, ChatLineY, Align.Left, ChatLineWidth, 8, color, 1, ChatLineSeconds, ChatCategory, text);
@@ -223,7 +224,7 @@ internal sealed partial class CampaignRenderer
             float x = 128 + MathF.Cos(a) * 62, y = 96 + MathF.Sin(a) * 46 + i * 0.001f; // (a slot's own height)
             bool picked = i == _chatWheelPick;
             var color = new ColorRgba(picked ? 0x3FEFu : 0x4E73u);
-            p.QueueHudMessage(x, y, Align.Center, 90, 8, color, 1, 2 / 60f, 0, ChatPresets.Text(ChatPresets.Wheel[i]));
+            p.QueueHudMessage(x, y, Align.Center, 90, 8, color, 1, 2 / 60f, 0, ChatPresets.Display(ChatPresets.Wheel[i]));
         }
     }
 
@@ -255,7 +256,7 @@ internal sealed partial class CampaignRenderer
         {
             bool caret = Environment.TickCount64 / 400 % 2 == 0;
             p.QueueHudMessage(ChatLineX, ChatTypeY, Align.Left, ChatLineWidth + 90, 8, new ColorRgba(0x3FEFu), 1, 2 / 60f, 0,
-                $"say: {_chatLine}{(caret ? "_" : " ")}");
+                LocalText.FormatId("chat.hud.type", "say: {0}{1}", _chatLine, caret ? "_" : " "));
         }
     }
 
@@ -268,12 +269,12 @@ internal sealed partial class CampaignRenderer
         }
         if (!MphRecomp.Online.Voice.VoiceSettings.Current.Chat)
         {
-            _matchChatNote = "chat is off in online settings.";
+            _matchChatNote = LocalText.Id("chat.hud.off", "chat is off in online settings.");
             return;
         }
         if (!client.Connected || !client.ServerAtLeast(ChatReq.SinceServer))
         {
-            _matchChatNote = "chat isn't available.";
+            _matchChatNote = LocalText.Id("chat.hud.offline", "chat isn't available.");
             return;
         }
         _matchChatSending = true;
@@ -287,8 +288,13 @@ internal sealed partial class CampaignRenderer
             {
                 // (as the lobby: a new profile's lock and a mute say why, in the server's words)
                 string code = (ex as OnlineException)?.Code ?? "";
-                _matchChatNote = code == "chat_rate" ? "slow down: wait a moment."
-                    : code is "chat_locked" or "chat_muted" ? HudText(ex.Message.ToLowerInvariant()) : "not sent.";
+                _matchChatNote = code switch
+                {
+                    "chat_rate" => LocalText.Id("chat.hud.rate", "slow down: wait a moment."),
+                    "chat_locked" => LocalText.Id("chat.hud.locked", HudText(ex.Message.ToLowerInvariant())),
+                    "chat_muted" => LocalText.Id("chat.hud.muted", HudText(ex.Message.ToLowerInvariant())),
+                    _ => LocalText.Id("chat.hud.failed", "not sent."),
+                };
             }
             finally
             {

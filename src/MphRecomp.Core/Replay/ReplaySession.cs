@@ -142,31 +142,36 @@ namespace MphRecomp.Replay
 
         // refusals known before loading anything: a different sim, a different fixed AI aspect, an arena this device
         // doesn't have (an imported arena not imported here)
-        public static string? CheckBeforeStart(ReplayFile file)
+        public static string? CheckBeforeStart(ReplayFile file, bool display = false)
         {
+            string Explain(string id, string fallback, params object?[] args)
+                => display ? MphRead.Text.LocalText.FormatId(id, fallback, args)
+                    : string.Format(System.Globalization.CultureInfo.InvariantCulture, fallback, args);
             if (file.SimVersion != ReplayFile.CurrentSimVersion)
             {
-                return $"recorded with game logic version {file.SimVersion}; this build plays version {ReplayFile.CurrentSimVersion}";
+                return Explain("replay.error.logic", "recorded with game logic version {0}; this build plays version {1}",
+                    file.SimVersion, ReplayFile.CurrentSimVersion);
             }
             if (file.OldTrooper)
             {
-                return "recorded with an older Trooper; this build's Trooper plays differently";
+                return Explain("replay.error.trooper", "recorded with an older Trooper; this build's Trooper plays differently");
             }
             if (file.OldEchoesWater)
             {
-                return "recorded with Pipeline's older water; this build's water plays differently";
+                return Explain("replay.error.water", "recorded with Pipeline's older water; this build's water plays differently");
             }
             if (file.OldNetInput)
             {
-                return "recorded with another version of the network match input";
+                return Explain("replay.error.input", "recorded with another version of the network match input");
             }
             if (file.AiAspect != Scene.HostAiAspect)
             {
-                return "bot vision differs in this build";
+                return Explain("replay.error.vision", "bot vision differs in this build");
             }
             if (!MatchArenas.IsArena(file.Settings.Arena))
             {
-                return $"the arena {file.Settings.Arena} isn't on this device (import it first)";
+                return Explain("replay.error.arena", "the arena {0} isn't on this device (import it first)",
+                    display ? MphRecomp.Frontend.DisplayNames.Arena(file.Settings.Arena) : file.Settings.Arena);
             }
             return null;
         }

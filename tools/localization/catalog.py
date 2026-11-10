@@ -174,6 +174,69 @@ def unpack(args):
     print(f"{len(menu_text)} matched menu indices, {sum(map(len, tables.values()))} matched table entries")
 
 
+def audit(args):
+    """Require a translation or a reviewed, source-locked exception for every nonempty field."""
+    from collections import Counter
+
+    source, pack, review = load(args.source), load(args.pack), load(args.review)
+    if review["version"] != 1 or source["revision"] != review["revision"]:
+        raise ValueError("review does not cover this ROM revision")
+    seen_exceptions, matched_menu, matched_rows = set(), set(), set()
+    counts, reasons = Counter(), Counter()
+    errors = []
+
+    def check(where, original, translation):
+        if translation is not None:
+            validate(original, translation)
+            counts["localized"] += 1
+        elif not original.strip():
+            counts["blank"] += 1
+        elif (record := review["exceptions"].get(where)) and record["source"] == sha(original):
+            if not record.get("reason"):
+                errors.append(f"missing review reason: {where}")
+            seen_exceptions.add(where)
+            reasons[record["reason"]] += 1
+            counts["reviewed"] += 1
+        else:
+            errors.append(f"uncovered or changed text: {where}")
+
+    menu_localized = 0
+    for index, original in enumerate(source["menu"]):
+        digest = sha(original)
+        translation = pack["menu"].get(digest)
+        if translation is not None:
+            matched_menu.add(digest)
+            menu_localized += 1
+        check(f"menu:{index}", original, translation)
+    for name, rows in source["tables"].items():
+        for key, row in rows.items():
+            translated = pack["tables"].get(name, {}).get(key, {})
+            if translated:
+                if translated.get("source") != sha(row["first"] + "\0" + row["second"]):
+                    errors.append(f"wrong source fingerprint: {name}:{key}")
+                    translated = {}
+                else:
+                    matched_rows.add((name, key))
+            for field in ("first", "second"):
+                check(f"{name}:{key}:{field}", row[field], translated.get(field))
+    stale = review["exceptions"].keys() - seen_exceptions
+    errors.extend(f"stale exception: {where}" for where in sorted(stale))
+    if matched_menu != pack["menu"].keys():
+        errors.append("pack has menu fingerprints not present in the source")
+    if matched_rows != {(name, key) for name, rows in pack["tables"].items() for key in rows}:
+        errors.append("pack has table rows not present in the source")
+    save(args.output, {"revision": source["revision"], "locale": pack["locale"],
+                       "menu": {"localized": menu_localized, "total": len(source["menu"])},
+                       "table_rows": {"localized": len(matched_rows), "total": sum(map(len, source["tables"].values()))},
+                       "field_counts": dict(counts), "review_reasons": dict(reasons), "errors": errors})
+    if errors:
+        raise SystemExit("\n".join(errors))
+    print(f"AMHE{source['revision']}: {menu_localized}/{len(source['menu'])} menu indices; "
+          f"{len(matched_rows)}/{sum(map(len, source['tables'].values()))} table entries; "
+          f"{counts['localized']} localized fields, {counts['reviewed']} reviewed fields, "
+          f"{counts['blank']} blank fields, 0 uncovered")
+
+
 def glyphs(args):
     from PIL import Image, ImageDraw, ImageFont
     from fontTools.ttLib import TTFont
@@ -206,6 +269,7 @@ def main():
         ("export", export, ("rom", "output")),
         ("pack", compile_pack, ("source", "translation", "output")),
         ("unpack", unpack, ("source", "pack", "output")),
+        ("audit", audit, ("source", "pack", "review", "output")),
         ("glyphs", glyphs, ("font", "ui", "pack", "output")),
     ):
         cmd = cmds.add_parser(name)

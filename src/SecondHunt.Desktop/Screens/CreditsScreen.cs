@@ -1,4 +1,5 @@
 using System.Drawing;
+using LocalText = MphRead.Text.LocalText;
 using SecondHunt.Desktop.Ui;
 
 namespace SecondHunt.Desktop.Screens;
@@ -10,36 +11,48 @@ internal sealed class CreditsScreen : PageScreen
 {
     readonly string[] _lines;
     readonly Action _close;
+    string[]? _visualLines;
+    int _layoutWidth;
+    float _layoutScale;
     float _top; // first line shown
 
     // doc: another embedded text instead (OnlineRules: "online.md", docs/ONLINE_RULES_IN_APP.md)
     public CreditsScreen(Action close, string? doc = null)
     {
         _close = close;
-        _lines = (doc != null ? Notices(doc) : Header() + Notices()).Replace("\r\n", "\n").Split('\n');
+        _lines = Document(doc).Replace("\r\n", "\n").Split('\n');
     }
 
-    static string Header() =>
-        $"{BuildFlags.AppName} {BuildFlags.Version} for Windows\n\n"
-        + "A fan-made recompilation project built on MphRead by NoneGiven (MIT licence).\n"
-        + "Metroid Prime Hunters is (c) Nintendo. This app contains no game code or data: it runs from the ROM\n"
-        + "you provide. It is not affiliated with or endorsed by Nintendo.\n\n"
-        + "----------------------------------------------------------------------------------------------\n\n";
+    internal static string Document(string? doc = null)
+    {
+        if (doc == "online.md" && DesktopLocale.Name == "zh-CN") return Notices("locales.zh-CN.online.md");
+        if (doc != null) return Notices(doc);
+        string heading = LocalText.FormatId("credits.heading", "{0} {1} for Windows", BuildFlags.AppName, BuildFlags.Version);
+        string intro = LocalText.Id("credits.intro",
+            "A fan-made recompilation project built on MphRead by NoneGiven (MIT licence).\n"
+            + "Metroid Prime Hunters is (c) Nintendo. This app contains no game code or data: it runs from the ROM\n"
+            + "you provide. It is not affiliated with or endorsed by Nintendo.");
+        string noticeHeading = LocalText.Id("credits.notices", "");
+        return heading + "\n\n" + intro + "\n\n"
+            + "----------------------------------------------------------------------------------------------\n\n"
+            + (noticeHeading.Length > 0 ? noticeHeading + "\n\n" : "") + Notices();
+    }
 
     static string Notices(string name = "notices.md")
     {
         using Stream? s = typeof(CreditsScreen).Assembly.GetManifestResourceStream(name);
-        if (s == null) return "(notices missing from this build)";
+        if (s == null) return LocalText.Id("credits.missing", "(notices missing from this build)");
         using var r = new StreamReader(s);
         return r.ReadToEnd();
     }
 
     int LinesShown => Math.Max(1, (int)((Height - 64 * S) / LineHeight));
+    int LineCount => (_visualLines ?? _lines).Length;
     float LineHeight => 19 * S;
 
     void Scroll(float lines)
     {
-        float max = Math.Max(0, _lines.Length - LinesShown);
+        float max = Math.Max(0, LineCount - LinesShown);
         float top = Math.Clamp(_top + lines, 0, max);
         if (top != _top)
         {
@@ -59,8 +72,8 @@ internal sealed class CreditsScreen : PageScreen
         {
         case OpenTK.Windowing.GraphicsLibraryFramework.Keys.PageDown: Scroll(LinesShown - 2); break;
         case OpenTK.Windowing.GraphicsLibraryFramework.Keys.PageUp: Scroll(-(LinesShown - 2)); break;
-        case OpenTK.Windowing.GraphicsLibraryFramework.Keys.Home: Scroll(-_lines.Length); break;
-        case OpenTK.Windowing.GraphicsLibraryFramework.Keys.End: Scroll(_lines.Length); break;
+        case OpenTK.Windowing.GraphicsLibraryFramework.Keys.Home: Scroll(-LineCount); break;
+        case OpenTK.Windowing.GraphicsLibraryFramework.Keys.End: Scroll(LineCount); break;
         }
     }
 
@@ -72,10 +85,19 @@ internal sealed class CreditsScreen : PageScreen
         float s = S, x = 48 * s, y = 32 * s;
         using Font mono = Font(13, mono: true);
         using var brush = new SolidBrush(Color.FromArgb(0xD8, 0xE8, 0xF0));
-        int first = (int)_top;
-        for (int i = first; i < _lines.Length && y < Height - 16 * s; i++)
+        int width = Math.Max(1, (int)(Width - 2 * x - 8 * s));
+        if (_visualLines == null || _layoutWidth != width || _layoutScale != s)
         {
-            g.DrawString(_lines[i], mono, brush, x, y);
+            _visualLines = _lines.SelectMany(line => LocalText.WrapWide(line, width,
+                part => g.MeasureString(part, mono).Width)).ToArray();
+            _layoutWidth = width;
+            _layoutScale = s;
+            _top = Math.Clamp(_top, 0, Math.Max(0, LineCount - LinesShown));
+        }
+        int first = (int)_top;
+        for (int i = first; i < Math.Min(first + LinesShown, _visualLines.Length); i++)
+        {
+            g.DrawString(_visualLines[i], mono, brush, x, y);
             y += LineHeight;
         }
         using Font hint = Font(12);

@@ -11,7 +11,9 @@ using System.Text;
 using System.Threading;
 using MphRead;
 using MphRead.Entities;
+using MphRead.Text;
 using MphRecomp.Campaign;
+using MphRecomp.Frontend;
 
 namespace MphRecomp.Multiplayer.Net
 {
@@ -72,6 +74,7 @@ namespace MphRecomp.Multiplayer.Net
         public MatchSettings? Settings { get; private set; } // host: the full match; client: MatchClient.ForSeat
         public int RemoteSeat => FirstJoiner?.Seat ?? 1; // host: the first joiner's seat (one-joiner callers)
         public string Status { get; private set; } = "";
+        public string DisplayStatus { get; private set; } = "";
         public event Action? Joined; // raised on the receive thread (host: each new joiner; client: the WELCOME)
         public event Action<string>? StatusChanged;
         // client: the host started the match (START, or its first snapshot)
@@ -220,7 +223,7 @@ namespace MphRecomp.Multiplayer.Net
         private const long HeldAfterMs = 3000;
         private bool IsHeld(Joiner j) => Environment.TickCount64 - j.LastHeard > HeldAfterMs;
         private List<string> HeldNames() => _hostStarted
-            ? _joiners.Where(j => !j.Left && j.Start != null && IsHeld(j)).Select(j => j.Player.Nickname).ToList() : new List<string>();
+            ? _joiners.Where(j => !j.Left && j.Start != null && IsHeld(j)).Select(j => j.Player.Nickname ?? "").ToList() : new List<string>();
         // host: joiners that came back to the running match
         public int Rejoins { get; private set; }
         private int Humans => _template!.Players.Count(p => !p.Bot && !p.Remote);
@@ -299,7 +302,7 @@ namespace MphRecomp.Multiplayer.Net
             s._beaconThread = new Thread(s.BeaconLoop) { IsBackground = true, Name = "MphLanBeacon" };
             s._beaconThread.Start();
             s.Settings = s.Build();
-            s.SetStatus($"hosting \"{name}\" on {LocalAddress()}:{s.Port} -- waiting for players");
+            s.SetStatus("lan.host.wait", "hosting \"{0}\" on {1}:{2} -- waiting for players", name, LocalAddress(), s.Port);
             return s;
         }
 
@@ -413,7 +416,7 @@ namespace MphRecomp.Multiplayer.Net
                 }
                 if (known != null)
                 {
-                    SetStatus($"{nickname} rejoined from {from.Address}");
+                    SetStatus("lan.host.rejoined", "{0} rejoined from {1}", nickname, from.Address);
                 }
             }
             if (known != null)
@@ -455,7 +458,7 @@ namespace MphRecomp.Multiplayer.Net
             if (romKey != RomKey)
             {
                 Send(Refuse($"ROM revision differs (host {RomKey}, you {romKey}): both players need the same one"), from);
-                SetStatus($"refused {from.Address}: ROM {romKey} vs {RomKey}");
+                SetStatus("lan.refuse.rom", "refused {0}: ROM {1} vs {2}", from.Address, romKey, RomKey);
                 return;
             }
             // builds whose matches play differently can't play together (and the host's replay wouldn't play on the
@@ -464,7 +467,8 @@ namespace MphRecomp.Multiplayer.Net
             {
                 Send(Refuse($"game version differs (host plays version {MphRecomp.Replay.ReplayFile.CurrentSimVersion}, "
                     + $"you {simVersion}): update both devices"), from);
-                SetStatus($"refused {from.Address}: game version {simVersion} vs {MphRecomp.Replay.ReplayFile.CurrentSimVersion}");
+                SetStatus("lan.refuse.version", "refused {0}: game version {1} vs {2}", from.Address, simVersion,
+                    MphRecomp.Replay.ReplayFile.CurrentSimVersion);
                 return;
             }
             // an arena this joiner lacks (owner 2026-10-10, N27: it would fail to load it and the match start without it)
@@ -472,7 +476,7 @@ namespace MphRecomp.Multiplayer.Net
             if (lacks != null)
             {
                 Send(Refuse(lacks), from);
-                SetStatus($"refused {from.Address}: no arena {_template!.Arena}");
+                SetStatus("lan.refuse.arena", "refused {0}: no arena {1}", from.Address, _template!.Arena);
                 return;
             }
             Joiner joiner;
@@ -492,7 +496,7 @@ namespace MphRecomp.Multiplayer.Net
                 Settings = Build();
             }
             Send(Welcome(joiner), from);
-            SetStatus($"{nickname} ({hunter}) joined from {from.Address}");
+            SetStatus("lan.host.joined", "{0} ({1}) joined from {2}", nickname, hunter, from.Address);
             Joined?.Invoke();
         }
 
@@ -814,11 +818,11 @@ namespace MphRecomp.Multiplayer.Net
                 s._beaconSocket.Client.Bind(new IPEndPoint(IPAddress.Any, BeaconPort));
                 s._beaconThread = new Thread(s.BeaconListen) { IsBackground = true, Name = "MphLanBeaconListen" };
                 s._beaconThread.Start();
-                s.SetStatus("looking for matches on this network...");
+                s.SetStatus("lan.browse", "looking for matches on this network...");
             }
             catch (SocketException ex)
             {
-                s.SetStatus($"can't listen for hosts ({ex.SocketErrorCode}): join by address instead");
+                s.SetStatus("lan.listen.error", "can't listen for hosts ({0}): join by address instead", ex.SocketErrorCode);
             }
             return s;
         }
@@ -880,7 +884,7 @@ namespace MphRecomp.Multiplayer.Net
             string? character = null, string? skin = null)
         {
             _peer = host;
-            SetStatus($"joining {host}...");
+            SetStatus("lan.joining", "joining {0}...", host);
             var ms = new MemoryStream();
             var w = new BinaryWriter(ms);
             Header(w, MsgJoin);
@@ -902,18 +906,18 @@ namespace MphRecomp.Multiplayer.Net
                 }
                 if (_refused != null)
                 {
-                    SetStatus("refused: " + _refused);
+                    SetStatus("lan.join.refused", "refused: {0}", _refused);
                     _peer = null;
                     return false;
                 }
             }
             if (Settings == null)
             {
-                SetStatus($"no answer from {host}");
+                SetStatus("lan.noanswer", "no answer from {0}", host);
                 _peer = null;
                 return false;
             }
-            SetStatus($"joined {host}: seat {Settings.LocalSeat}");
+            SetStatus("lan.joined", "joined {0}: seat {1}", host, Settings.LocalSeat);
             return true;
         }
 
@@ -999,7 +1003,7 @@ namespace MphRecomp.Multiplayer.Net
                 }
                 catch (Exception ex)
                 {
-                    SetStatus("bad packet: " + ex.Message);
+                    SetStatus("lan.packet.error", "bad packet: {0}", ex.Message);
                 }
             }
         }
@@ -1109,12 +1113,12 @@ namespace MphRecomp.Multiplayer.Net
                     }
                     if (who != null)
                     {
-                        SetStatus($"{who} left");
+                        SetStatus("lan.peer.left", "{0} left", who);
                     }
                 }
                 else if (_peer != null && _peer.Equals(from))
                 {
-                    SetStatus("the other player left");
+                    SetStatus("lan.other.left", "the other player left");
                     _lastHeard = 0;
                     PeerLeft = true;
                 }
@@ -1123,7 +1127,7 @@ namespace MphRecomp.Multiplayer.Net
             if (IsHost && OlderJoin(data, Magic, Protocol) is byte old)
             {
                 Send(Refuse($"this host has a newer version of the game (match protocol {Protocol}, you {old}): update the game", old), from);
-                SetStatus($"refused {from.Address}: protocol {old} vs {Protocol}");
+                SetStatus("lan.refuse.protocol", "refused {0}: protocol {1} vs {2}", from.Address, old, Protocol);
                 return;
             }
             var r = new BinaryReader(new MemoryStream(data));
@@ -1332,10 +1336,14 @@ namespace MphRecomp.Multiplayer.Net
         private static float? ReadOptFloat(BinaryReader r) => r.ReadBoolean() ? r.ReadSingle() : null;
         private static bool? ReadOptBool(BinaryReader r) => r.ReadBoolean() ? r.ReadBoolean() : null;
 
-        private void SetStatus(string status)
+        private void SetStatus(string id, string format, params object?[] values)
         {
-            Status = status;
-            StatusChanged?.Invoke(status);
+            Status = string.Format(System.Globalization.CultureInfo.InvariantCulture, format, values);
+            // The raw status is used by logs and by the join flow's refusal test.
+            // Only the UI uses this formatted display line.
+            var shown = values.Select(v => v is Hunter h ? DisplayNames.Hunter(h) : v).ToArray();
+            DisplayStatus = LocalText.FormatId(id, format, shown);
+            StatusChanged?.Invoke(Status);
         }
 
         // this device's IPv4 address on the local network, for the host screen
@@ -1450,5 +1458,7 @@ namespace MphRecomp.Multiplayer.Net
         public bool HeldFor(string nickname) => Held.Any(n => String.Equals(n, nickname, StringComparison.OrdinalIgnoreCase));
         public long LastSeen;
         public string Label => $"{Name}: {Mode} in {MatchArenas.Find(Arena)?.InGameName ?? Arena} ({Address.Address}, ROM {RomKey})";
+        public string DisplayLabel => !LocalText.IsLocalized ? Label : LocalText.FormatId("lan.host.label",
+            "{0}: {1} in {2} ({3}, ROM {4})", Name, DisplayNames.Mode(Mode), DisplayNames.Arena(Arena), Address.Address, RomKey);
     }
 }

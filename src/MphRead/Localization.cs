@@ -19,6 +19,7 @@ namespace MphRead.Text
         private static RomTextPack? _rom;
         private static string? _romRoot;
         public static ExtraGlyphs? Glyphs { get; private set; }
+        public static bool IsLocalized => _ui != null;
         // Development census: observes untranslated display lookups without changing rendering.
         public static Action<string>? ObserveMissingUi { get; set; }
 
@@ -59,6 +60,17 @@ namespace MphRead.Text
 
         public static string Format(string source, params object?[] values)
             => string.Format(CultureInfo.InvariantCulture, Ui(source), values);
+
+        // Only built-in bot aliases are display text. Human names (including names that
+        // match an alias) and custom character names stay as the player supplied them.
+        public static string MatchNickname(string nickname, Hunter hunter, bool bot, int generatedPlayer = 0)
+        {
+            if (generatedPlayer > 0) return FormatId("match.player.number", "Player{0}", generatedPlayer);
+            if (!bot || !IsLocalized) return nickname;
+            return string.Equals(nickname, hunter.ToString(), StringComparison.OrdinalIgnoreCase)
+                ? Id("hunter." + hunter, nickname)
+                : Id("match.bot." + hunter + "." + nickname.ToLowerInvariant(), nickname);
+        }
 
         public static void SetRom(string? root, RomTextPack? rom)
         {

@@ -289,7 +289,7 @@ namespace MphRecomp.Frontend
             for (int t = 0; t < FrTabs; t++) Show(menu, _frTab[t], FrTabsShown.Contains(t));
             if (count == 0 && focus >= 0) menu.SetState(_frTab[s_frTab], MenuState.Focused);
             int pages = Pages(rows.Count, FrRows);
-            _strings.Set(_frTitleString, pages > 1 ? $"{FriendsTitle} {_frOffset / FrRows + 1}/{pages}" : FriendsTitle);
+            _strings.Set(_frTitleString, PagedTitle(FriendsTitle, _frOffset / FrRows + 1, pages));
         }
 
         // (friend OR rival, vanilla: no ADD RIVAL for a friend; ADD FRIEND on a rival upgrades them)
@@ -643,7 +643,7 @@ namespace MphRecomp.Frontend
             int pages = Pages(rows.Count, FrRows);
             if (pages > 1)
             {
-                float w = _drawMenu!.Font.Measure($"{FriendsTitle} {pages}/{pages}") / 2;
+                float w = _drawMenu!.Font.Measure(PagedTitle(FriendsTitle, pages, pages)) / 2;
                 Arrow(false, 128 - w - 22, ArrowTop + Mw(42), _frPrev);
                 Arrow(true, 128 + w + 12, ArrowTop + Mw(42), _frNext);
             }

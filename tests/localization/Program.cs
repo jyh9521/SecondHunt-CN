@@ -17,6 +17,8 @@ if (args is ["--movie-inventory", string movie, string movieOutput, string movie
     return MediaInventory.SingleMovie(movie, movieOutput, int.Parse(movieStride));
 if (args is ["--ui-inventory", string extracted, string uiReport])
     return UiInventory.Run(extracted, uiReport);
+if (args is ["--ui-inventory", string populatedGame, string populatedReport, string replayData])
+    return UiInventory.Run(populatedGame, populatedReport, replayData);
 if (args.Length is 2 or 3 && args[0] == "--artwork-check")
     return ArtworkCheck.Run(args[1], args.Length == 3 ? args[2] : null);
 if (args is ["--settings-only"])
@@ -206,6 +208,7 @@ try
     Check(LocalText.Glyphs!.Count > 1000 && LocalText.Glyphs.Index('萨') != LocalText.Glyphs.Index('□'), "glyph atlas supplies Chinese characters");
     Check(LocalText.WrapWide("天体档案馆", 16, s => s.Length * 8).SequenceEqual(new[] { "天体", "档案", "馆" }),
         "CJK wraps without spaces");
+    RuntimeLocalization.Check(Paths.FileSystem, Check);
     DesktopLocale.Init("en");
     DesktopGame.Prepare(game);
     Check(ControlHints.ForSetting("maplook", "MAP", "", true) == ControlHints.All["maplook.map"]
@@ -215,6 +218,7 @@ try
         "English mode restores the original generated settings and import labels");
     Check(MenuStrings.Load(Paths.FileSystem).Display(begin) == "BEGIN GAME" && Strings.GetScanEntry(1)!.Value1 == originalLog.Value1,
         "English mode bypasses the installed overlay and invalidates the string cache");
+    RuntimeLocalization.CheckEnglish(Check);
     Console.WriteLine($"PASS: {passed} checks");
 }
 finally { Directory.SetCurrentDirectory(cwd); }

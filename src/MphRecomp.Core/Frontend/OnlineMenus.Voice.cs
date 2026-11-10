@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MphRead.Text;
 using MphRecomp.Multiplayer.Net;
 using MphRecomp.Online;
 using MphRecomp.Online.Voice;
@@ -189,7 +190,7 @@ namespace MphRecomp.Frontend
             string mode = s.Mode switch { VoiceMode.PushToTalk => "push to talk", VoiceMode.OpenMic => "open mic", _ => "voice off" };
             VoiceBar(0, _vcMode, mode, s.Mode == VoiceMode.Off ? OnGrey : Orange, glows);
             VoiceBar(1, _vcStrangers, s.Strangers ? "strangers on" : "strangers off", s.Strangers ? Orange : OnGrey, glows);
-            VoiceBar(2, _vcVolume, $"volume {(int)MathF.Round(s.Volume * 100)}%", Orange, glows);
+            VoiceBar(2, _vcVolume, LocalText.FormatId("online.voice.volume", "volume {0}%", (int)MathF.Round(s.Volume * 100)), Orange, glows);
         }
 
         private void VoiceBar(int k, int item, string label, (float R, float G, float B) colour, Dictionary<int, List<WidgetTri>> glows)

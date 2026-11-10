@@ -1,4 +1,6 @@
 using MphRead;
+using MphRead.Text;
+using MphRecomp.Frontend;
 using MphRecomp.Multiplayer;
 using GameMode = MphRead.GameMode;
 
@@ -38,20 +40,20 @@ internal sealed class MatchLobby
     public IReadOnlyList<Row> Rows() => new Row[]
     {
         new("Mode", () => ModeLabel(Modes[Mode]), d => Mode = Wrap(Mode + d, Modes.Count)),
-        new("Arena", () => { RoomMetadata a = CurrentArena(BotArenas()); return a.InGameName ?? a.Name; }, StepArena),
-        new("Play as", () => Hunters[Hunter], d => Hunter = Wrap(Hunter + d, Hunters.Length)),
+        new("Arena", () => DisplayNames.Room(CurrentArena(BotArenas())), StepArena),
+        new("Play as", () => DisplayNames.Hunter((MphRead.Hunter)Hunter, Hunters[Hunter]), d => Hunter = Wrap(Hunter + d, Hunters.Length)),
         // a match on this device needs at least one bot; in a LAN match the joiner takes seat 1 (the last bot gives way)
         new("Bots", () => Bots.ToString(), d => Bots = Wrap(Bots - 1 + d, 7) + 1), // (P8: 1-7 bots, up to 8 seats)
-        new("Bot level", () => $"{Level + 1} of 3", d => Level = Wrap(Level + d, 3)),
+        new("Bot level", () => LocalText.FormatId("lobby.level", "{0} of 3", Level + 1), d => Level = Wrap(Level + d, 3)),
         new("Time limit", () => Times[Time].Label, d => Time = Wrap(Time + d, Times.Length)),
     };
 
-    public static string ModeLabel(GameMode mode) => mode switch
+    public static string ModeLabel(GameMode mode) => DisplayNames.Mode(mode, mode switch
     {
         GameMode.PrimeHunter => "Prime Hunter",
         _ when mode.ToString().EndsWith("Teams") => mode.ToString()[..^"Teams".Length] + " (teams)",
         _ => mode.ToString()
-    };
+    });
 
     // the census reads the extracted ROM's entity files (the same paths the match screen sets up); this also tells the
     // LAN handshake which ROM revision this is

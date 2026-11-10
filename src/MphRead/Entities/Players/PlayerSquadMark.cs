@@ -1,4 +1,5 @@
 using OpenTK.Mathematics;
+using MphRead.Text;
 
 namespace MphRead.Entities
 {
@@ -126,7 +127,7 @@ namespace MphRead.Entities
             }
             if (newMark)
             {
-                QueueHudMessage(128, 52, 30 / 30f, 0, "TARGET MARKED!");
+                QueueHudMessage(128, 52, 30 / 30f, 0, LocalText.Id("hud.target.marked", "TARGET MARKED!"));
             }
         }
     }

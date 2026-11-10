@@ -6,6 +6,7 @@ using MphRead;
 using MphRead.Rendering;
 using MphRead.Entities;
 using MphRead.Formats;
+using MphRead.Text;
 using MphRecomp.Campaign;
 using MphRecomp.Config;
 using MphRecomp.Frontend;
@@ -683,7 +684,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
             }
             catch (Exception ex)
             {
-                _error = $"start failed: {ex.GetType().Name}: {ex.Message}";
+                _error = LocalText.Id("campaign.error.start", $"start failed: {ex.GetType().Name}: {ex.Message}");
                 Log.Error("MPHCampaign", ex.ToString());
                 StatusSink?.Invoke(_error);
             }
@@ -799,7 +800,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
                 }
                 catch (Exception ex)
                 {
-                    _error = $"sim error: {ex.GetType().Name}: {ex.Message}";
+                    _error = LocalText.Id("campaign.error.sim", $"sim error: {ex.GetType().Name}: {ex.Message}");
                     Log.Error("MPHCampaign", ex.ToString());
                     break;
                 }
@@ -816,7 +817,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
             if (MphRead.Entities.RoomEntity.TransitionFailure is Exception roomLoad)
             {
                 MphRead.Entities.RoomEntity.TransitionFailure = null;
-                _error = $"room load failed: {roomLoad.GetType().Name}: {roomLoad.Message}";
+                _error = LocalText.Id("campaign.error.room", $"room load failed: {roomLoad.GetType().Name}: {roomLoad.Message}");
                 Log.Error("MPHCampaign", "room load failed: " + roomLoad);
             }
             if (_host.Ended && _error == null)
@@ -1320,7 +1321,8 @@ internal sealed partial class CampaignRenderer : IGlScreen
         }
         if (_host == null)
         {
-            return "loading " + _room + "...";
+            string name = LocalText.IsLocalized ? DisplayNames.Room(Metadata.GetRoomByName(_room).Item1, _room) : _room;
+            return LocalText.FormatId("campaign.status.loading", "loading {0}...", name);
         }
         if (_statusMode == 2)
         {
@@ -1612,7 +1614,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
 
     string PauseText()
     {
-        string text = "PAUSED (Start to resume)";
+        string text = LocalText.Id("campaign.status.paused", "PAUSED (Start to resume)");
         if (_gun != null)
         {
             text += $"\nFirst-person gun: {(_primeGun ? $"Prime ({System.IO.Path.GetFileName(_gunDir)}), size {_gun.Scale:0.000}" : "MPH")}"

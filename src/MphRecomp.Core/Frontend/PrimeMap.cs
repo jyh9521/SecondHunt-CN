@@ -610,7 +610,7 @@ namespace MphRecomp.Frontend
             }
             else if (_selected?.PieceInfo != null)
             {
-                t = _selected.PieceInfo.Name;
+                t = DisplayNames.MapPiece(_selected.PieceInfo);
             }
             else if (_selected != null)
             {
@@ -620,8 +620,7 @@ namespace MphRecomp.Frontend
                 }
                 else
                 {
-                    RoomMetadata? meta = Metadata.GetRoomById(_selected.Part.RoomId, noThrow: true);
-                    t = meta?.InGameName ?? meta?.Name ?? _selected.Part.Name;
+                    t = DisplayNames.MapPart(_selected.Part);
                 }
             }
             _title = t.ToUpperInvariant();
@@ -1462,7 +1461,7 @@ namespace MphRecomp.Frontend
             bool universe = _mode is Mode.Universe or Mode.ToUniverse || _pair < 0;
             // the right pane: A to the planet map / back to the room map (Prime 0x2c "World Map" / 0x2d "Level Map"; owner
             // 2026-10-14: "system map", the planets being one star system)
-            string world = universe ? "LEVEL MAP" : "SYSTEM MAP";
+            string world = universe ? LocalText.Id("map.level", "LEVEL MAP") : LocalText.Id("map.system", "SYSTEM MAP");
             bool worldOn = !universe || (_planet >= 0 && AnyRoomVisited(_planet));
             float rw = KeyLabelWidth("A", world);
             _worldRect = (_w - Side - rw, Top - 3, _w - Side, Top + 7);
@@ -1471,27 +1470,30 @@ namespace MphRecomp.Frontend
             if (!universe) DrawSlots(_w - Side - 12, Top + 26, a);
             // the left pane: exit + the legend; slides out left in states 1 and 2
             float lx = Side - 120 * EaseInOut(_leftPane);
-            _exitRect = (lx, Top - 3, lx + 40, Top + 7);
+            string exit = LocalText.Id("map.exit", "EXIT");
+            _exitRect = (lx, Top - 3, lx + Math.Max(40, KeyLabelWidth("B", exit)), Top + 7);
             if (lx > -110)
             {
-                KeyLabel("B", "EXIT", lx, Top + 1, a);
+                KeyLabel("B", exit, lx, Top + 1, a);
                 if (!universe) DrawLegend(lx, Top + 16, a);
             }
             // the Y pane (Prime 0x2b "Key/Legend") and the bottom pane (0x2e-0x30), down out of sight in state 2
             float yy = 192 - 24 + 34 * EaseInOut(_yPane);
-            _legendRect = (YPaneX, yy - 3, YPaneX + KeyLabelWidth("Y", "KEY/LEGEND"), yy + 7);
-            KeyLabel("Y", "KEY/LEGEND", YPaneX, yy, a);
+            string legend = LocalText.Id("map.legend", "KEY/LEGEND");
+            _legendRect = (YPaneX, yy - 3, YPaneX + KeyLabelWidth("Y", legend), yy + 7);
+            KeyLabel("Y", legend, YPaneX, yy, a);
             if (!universe)
             {
                 // the split tools (PrimeMap.Report.cs)
-                float hx = YPaneX + KeyLabelWidth("Y", "KEY/LEGEND") + 12;
-                string splits = "SPLITS " + SplitsState;
-                KeyLabel("D-UP", splits, hx, yy, a);
-                KeyLabel("L3/R3", "REPORT", hx + KeyLabelWidth("D-UP", splits) + 12, yy, a);
+                float hx = YPaneX + KeyLabelWidth("Y", legend) + 12;
+                string splits = LocalText.Id("map.splits." + SplitsState, "SPLITS " + SplitsState);
+                string up = LocalText.Id("map.key.up", "D-UP");
+                KeyLabel(up, splits, hx, yy, a);
+                KeyLabel("L3/R3", LocalText.Id("map.feedback", "REPORT"), hx + KeyLabelWidth(up, splits) + 12, yy, a);
             }
             float by = 192 - 9 + 20 * EaseInOut(_bottomPane);
-            string[] keys = { "R STICK", "L STICK", "L/R" };
-            string[] labels = { "ROTATE", "MOVE", "ZOOM" };
+            string[] keys = { LocalText.Id("map.key.right", "R STICK"), LocalText.Id("map.key.left", "L STICK"), "L/R" };
+            string[] labels = { LocalText.Id("map.turn", "ROTATE"), LocalText.Id("map.move", "MOVE"), LocalText.Id("map.zoom", "ZOOM") };
             const float Gap = 16;
             float total = 0;
             for (int i = 0; i < 3; i++) total += KeyLabelWidth(keys[i], labels[i]) + (i < 2 ? Gap : 0);
@@ -1527,7 +1529,7 @@ namespace MphRecomp.Frontend
                 y += Pitch;
             }
             Rect(-1, x + 0.5f, y + 0.5f, x + Box - 0.5f, y + Box - 0.5f, OpenDoor.X, OpenDoor.Y, OpenDoor.Z, a);
-            Text("OPENED", tx, y, 0, LegendK, LabelColour, a);
+            Text(LocalText.Id("map.opened", "OPENED"), tx, y, 0, LegendK, LabelColour, a);
             y += Pitch;
             foreach ((int name, bool others, int frame) in OtherRows)
             {

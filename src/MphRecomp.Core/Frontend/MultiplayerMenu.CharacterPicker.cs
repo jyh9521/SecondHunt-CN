@@ -341,7 +341,8 @@ namespace MphRecomp.Frontend
 
         // a bot's name in the PLAYERS list and the lobby: its character's for TROOPER / DARK SAMUS (lower case: the font's
         // small capitals, as "sambot"), else the ROM's
-        private string BotWord(Seat seat) => CharacterOf(seat) is { HasOriginal: false } c ? c.Name.ToLowerInvariant() : Word(BotNames[seat.Hunter]);
+        private string BotWord(Seat seat) => CharacterOf(seat) is { HasOriginal: false } c ? c.Name.ToLowerInvariant()
+            : MphRead.Text.LocalText.MatchNickname(Word(BotNames[seat.Hunter]), seat.Hunter, bot: true);
 
         // ... and in the match (its HUD text)
         private static string BotNickname(Seat seat) => CharacterOf(seat) is { HasOriginal: false } c ? c.Name : BotNames[seat.Hunter].ToUpperInvariant();

@@ -69,6 +69,7 @@
     <!-- RECOMP SETTINGS > CREDITS: the third-party notices the app must carry (THIRD_PARTY_NOTICES.md at the repo root) -->
     <EmbeddedResource Include="..\..\THIRD_PARTY_NOTICES.md" LogicalName="notices.md" />
     <EmbeddedResource Include="..\..\docs\ONLINE_RULES_IN_APP.md" LogicalName="online.md" />
+    <EmbeddedResource Include="..\..\docs\ONLINE_RULES_IN_APP.zh-CN.md" LogicalName="locales.zh-CN.online.md" WithCulture="false" />
     <!-- the window's icon (appicon.ico is the exe's; both drawn from the Android launcher icon's design) -->
     <EmbeddedResource Include="appicon64.png" LogicalName="appicon64.png" />
     <EmbeddedResource Include="..\..\locales\zh-CN\ui.json" LogicalName="locales.zh-CN.ui.json" />
@@ -78,6 +79,8 @@
     <EmbeddedResource Include="..\..\locales\zh-CN\artwork-masks.json" LogicalName="locales.zh-CN.artwork-masks.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\artglyphs.bin" LogicalName="locales.zh-CN.artglyphs.bin" />
     <EmbeddedResource Include="..\..\locales\zh-CN\extras.json" LogicalName="locales.zh-CN.extras.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\runtime.json" LogicalName="locales.zh-CN.runtime.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\names.json" LogicalName="locales.zh-CN.names.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\rom.json" LogicalName="locales.zh-CN.rom.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\glyphs.bin" LogicalName="locales.zh-CN.glyphs.bin" />
   </ItemGroup>

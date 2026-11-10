@@ -75,9 +75,10 @@ internal sealed class DesktopApp : IDisposable
         }
         else if (options.Launch is { } launch && launch.TryGetValue("screen", out string? screen))
         {
-            // --screen credits|lobby: one of this host's own screens on its own (dev builds; testing)
+            // --screen credits|online-rules|lobby: one of this host's own screens (dev builds; testing)
             OpenFrontend(18);
             if (screen == "credits") PushOver(new CreditsScreen(() => Defer(PopBack)));
+            else if (screen == "online-rules") PushOver(new CreditsScreen(() => Defer(PopBack), "online.md"));
             else PushOver(new LobbyScreen(DesktopPaths.Game, Path.Combine(DesktopPaths.Root, "lobby.json"),
                 args => Defer(() => StartGame(args)), () => Defer(PopBack)));
         }

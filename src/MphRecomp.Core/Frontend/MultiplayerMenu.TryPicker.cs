@@ -265,7 +265,8 @@ namespace MphRecomp.Frontend
             Fill(tris, layer, TpValueX0, by + TpRowH / 2, TpValueX1, by - TpRowH / 2, br, bg, bb);
             Fill(tris, layer, TpValueX0 + border, by + TpRowH / 2 - border, TpValueX1 - border, by - TpRowH / 2 + border, 6, 4, 2);
             bool active = t.Active();
-            Text(menu, tris, layer, active ? "ACTIVE" : "IDLE", (TpValueX0 + TpValueX1) / 2, by, 0.84f, 255, 255, 255);
+            Text(menu, tris, layer, active ? MphRead.Text.LocalText.Id("practice.bots.active", "ACTIVE")
+                : MphRead.Text.LocalText.Id("practice.bots.idle", "IDLE"), (TpValueX0 + TpValueX1) / 2, by, 0.84f, 255, 255, 255);
             TryArrow(tris, layer, TpValueX0 + 4, by, left: true);
             TryArrow(tris, layer, TpValueX1 - 4, by, left: false);
             // the selected option's hint (C17), then how to close

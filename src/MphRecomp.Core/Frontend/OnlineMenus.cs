@@ -2431,7 +2431,8 @@ namespace MphRecomp.Frontend
         }
 
         // an arena as the menus name it (the room's in-game name; a game from an older build may send the room's)
-        private static string ArenaLabel(string arena) => (MatchArenas.Find(arena)?.InGameName is { Length: > 0 } n ? n : arena).ToLowerInvariant();
+        private static string ArenaLabel(string arena) => (LocalText.IsLocalized ? DisplayNames.Arena(arena)
+            : MatchArenas.Find(arena)?.InGameName is { Length: > 0 } n ? n : arena).ToLowerInvariant();
 
         // ---- pieces ----
 

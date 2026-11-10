@@ -151,6 +151,7 @@ namespace MphRecomp.Frontend
 
         public UiDrawList DrawList { get; }
         public bool IsOpen => _open;
+        public string VisibleTitle => _title[.._typed];
         public bool Detailed { get; private set; }
         public bool Prime { get; set; }
         public Action<int>? PlaySound;
@@ -251,7 +252,8 @@ namespace MphRecomp.Frontend
 
         private void TypeTitle(string title)
         {
-            _title = title;
+            // Translate before typing; the font only sees the individual prefix.
+            _title = MphRead.Text.LocalText.Ui(title);
             _typed = 0;
             _typeFrom = _tick;
         }
@@ -445,8 +447,7 @@ namespace MphRecomp.Frontend
         private string TitleOf(Shown room)
         {
             if (room == _playerRoom) return (_info.Title ?? "").ToUpperInvariant();
-            RoomMetadata? meta = MphRead.Metadata.GetRoomById(room.Part.RoomId, noThrow: true);
-            return (meta?.InGameName ?? meta?.Name ?? room.Part.Name).ToUpperInvariant();
+            return DisplayNames.MapPart(room.Part).ToUpperInvariant();
         }
 
         // ---------------------------------------------------------------- input (60 Hz; vanilla's map steps at 30 Hz)
@@ -736,7 +737,7 @@ namespace MphRecomp.Frontend
             DrawList.Clip = UiRect.None;
             DrawFrame();
             DrawSlots();
-            if (_typed > 0) Text(_title[.._typed], _w / 2, NameTop * _s, 2, _s, 1);
+            if (_typed > 0) Text(VisibleTitle, _w / 2, NameTop * _s, 2, _s, 1);
             // the legend strip
             Rect(-1, 0, top, _w, 192, PanelColour.R, PanelColour.G, PanelColour.B, 1);
             Rect(-1, 0, top, _w, top + 1, RuleColour.R, RuleColour.G, RuleColour.B, 1);
@@ -1113,10 +1114,12 @@ namespace MphRecomp.Frontend
 
         // The controls, on a dark band along the bottom of the map window (owner 2026-10-04: hint text in the map): this
         // mode's pad buttons (MphRead.Android CampaignMap.cs MapInputCore), wrapped to the window's width.
-        private static readonly string[] PrimeHints =
-            { "L STICK: TURN", "R STICK: MOVE", "D-PAD: NEXT ROOM", "A: CENTER", "X: SAMUS", "L / R: ZOOM", "Y: LOOK", "B: CLOSE" };
-        private static readonly string[] HuntersHints =
-            { "L STICK / D-PAD: MOVE", "R STICK: TURN", "L / R: ZOOM", "Y: LOOK", "B: CLOSE" };
+        private static readonly (string Id, string En)[] PrimeHints =
+            { ("left.turn", "L STICK: TURN"), ("right.move", "R STICK: MOVE"), ("next", "D-PAD: NEXT ROOM"),
+                ("center", "A: CENTER"), ("samus", "X: SAMUS"), ("zoom", "L / R: ZOOM"), ("look", "Y: LOOK"), ("close", "B: CLOSE") };
+        private static readonly (string Id, string En)[] HuntersHints =
+            { ("left.move", "L STICK / D-PAD: MOVE"), ("right.turn", "R STICK: TURN"),
+                ("zoom", "L / R: ZOOM"), ("look", "Y: LOOK"), ("close", "B: CLOSE") };
 
         private void DrawHints()
         {
@@ -1126,8 +1129,9 @@ namespace MphRecomp.Frontend
             float avail = (x1 - x0) / k - 8; // in DS pixels at text size 1
             var lines = new List<string>();
             string line = "";
-            foreach (string hint in Prime ? PrimeHints : HuntersHints)
+            foreach ((string id, string en) in Prime ? PrimeHints : HuntersHints)
             {
+                string hint = MphRead.Text.LocalText.Id("map.hint." + id, en);
                 string next = line.Length == 0 ? hint : line + Gap + hint;
                 if (line.Length > 0 && _font.Measure(next) > avail)
                 {

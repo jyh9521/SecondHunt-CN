@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using MphRead;
+using MphRead.Text;
 using MphRecomp.Multiplayer;
 using MphRecomp.Online;
 using MphRecomp.Replay;
@@ -205,11 +206,12 @@ namespace MphRecomp.Frontend
                 Glow(glows, tag, cardX0, btop, cardX1, cardBottom, tag);
             }
             // "as it was <date> (replay)": a bar under the card
-            string when = r.Recorded is DateTime t0 ? t0.ToString("MMM d HH:mm", CultureInfo.InvariantCulture).ToLowerInvariant() + " " : "";
+            string when = FullDate(r.Recorded);
             float stampTop = cardBottom - Mw(28), stampBottom = stampTop - Mw(64);
             Fill(cardX0, stampTop, cardX1, stampBottom, 0, 0, 0, 0.35f, side);
             Box(cardX0, stampTop, cardX1, stampBottom, side);
-            string stamp = $"as it was {when}(replay)";
+            string stamp = when.Length > 0 ? LocalText.FormatId("replay.license.stamp", "as it was {0} (replay)", when)
+                : LocalText.Id("replay.license.no_date", "as it was (replay)");
             float stampSize = MathF.Min(SizeM, (cardX1 - cardX0 - Mw(60)) / MathF.Max(_drawMenu!.Font.Measure(stamp), 1));
             TextS(stamp, (cardX0 + cardX1) / 2, stampTop - (stampTop - stampBottom - 8 * stampSize) / 2, 2, Pale, side, stampSize);
             if (license == null) TextS("no license stats in this replay.", (cardX0 + cardX1) / 2, stampBottom - Mw(30), 2, OnGrey, side, SizeX);
@@ -219,7 +221,7 @@ namespace MphRecomp.Frontend
             if (others) DrawHeadToHead(id.FriendCode!, side);
 
             // SEE CURRENT, then ADD FRIEND / ADD RIVAL (not on this device's own seat)
-            Capsule(Mx(1230), My(500), Mw(580), Mw(90), "see current", true, _rlCurrent, glows, SizeS);
+            Capsule(Mx(1230), My(500), Mw(580), Mw(90), LocalText.Id("replay.license.current", "see current"), true, _rlCurrent, glows, SizeS);
             if (!others) return;
             PlayerCard c = CardOf(id);
             foreach ((int item, float x, string kind) in new[] { (_rlFriend, 1220f, LinkKind.Friend), (_rlRival, 1535f, LinkKind.Rival) })
@@ -253,7 +255,8 @@ namespace MphRecomp.Frontend
                 float w = _drawMenu!.Font.Measure(result) * SizeM;
                 Model(@"results\" + medal, Mx(1824) - w - Mw(62), My(y - 10), Mw(48), Mw(48), side);
             }
-            foreach ((string label, int n) in new[] { ("rounds against", h?.Rounds ?? 0), ("victories against", h?.Victories ?? 0) })
+            foreach ((string label, int n) in new[] { (LocalText.Id("replay.license.rounds", "rounds against"), h?.Rounds ?? 0),
+                (LocalText.Id("replay.license.victories", "victories against"), h?.Victories ?? 0) })
             {
                 y += 50;
                 TextS(label, Mx(1216), My(y), 0, Pale, side, SizeM);

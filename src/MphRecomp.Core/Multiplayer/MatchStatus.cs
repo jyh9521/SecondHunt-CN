@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Text;
 using MphRead;
 using MphRead.Entities;
+using MphRead.Text;
+using MphRecomp.Frontend;
 
 namespace MphRecomp.Multiplayer
 {
@@ -60,6 +62,32 @@ namespace MphRecomp.Multiplayer
                 {
                     sb.Append(" (bot)");
                 }
+            }
+            return sb.ToString();
+        }
+
+        public static string DisplayScoreboard()
+        {
+            if (!LocalText.IsLocalized) return Scoreboard();
+            return FormatDisplay(Mode, State, TimeLeft, Seats());
+        }
+
+        internal static string FormatDisplay(GameMode mode, MatchState state, float timeLeft, IReadOnlyList<SeatStatus> seats)
+        {
+            var sb = new StringBuilder(LocalText.FormatId("match.score.header", "{0} {1}",
+                DisplayNames.Mode(mode), DisplayNames.State(state)));
+            if (timeLeft >= 0) sb.Append($" {(int)timeLeft / 60}:{(int)timeLeft % 60:00}");
+            foreach (SeatStatus seat in seats)
+            {
+                string hunter = DisplayNames.Hunter(seat.Hunter);
+                string name = LocalText.MatchNickname(seat.Nickname, seat.Hunter, seat.Bot,
+                    GameState.GeneratedNicknames[seat.Seat] ? seat.Seat + 1 : 0);
+                sb.Append('\n').Append(LocalText.FormatId("match.score.seat", "#{0} {1} {2}  pts {3}  k {4}  d {5}",
+                    seat.Standing + 1, name, hunter, seat.Points, seat.Kills, seat.Deaths));
+                if (seat.Team >= 0 && MatchSettings.IsTeamMode(mode))
+                    sb.Append(seat.Team == 0 ? LocalText.Id("match.score.orange", "  orange") : LocalText.Id("match.score.green", "  green"));
+                if (seat.Time != 0) sb.Append(LocalText.FormatId("match.score.time", "  t {0:0.0}", seat.Time));
+                if (seat.Bot) sb.Append(LocalText.Id("match.score.bot", " (bot)"));
             }
             return sb.ToString();
         }

@@ -204,7 +204,7 @@ namespace MphRecomp.Frontend
             Show(_gNext, pages > 1);
             if (_importGameRows is { Header: >= 0 } rows)
             {
-                _strings.Set(rows.Header, pages > 1 ? $"{rows.Title} {_tileOffset / GameTiles + 1}/{pages}" : rows.Title);
+                _strings.Set(rows.Header, PagedTitle(rows.Title, _tileOffset / GameTiles + 1, pages));
             }
             int focused = menu.FocusedItem();
             if (focused < 0 || menu.ItemState(focused) == MenuState.Hidden) FocusTile(menu);
@@ -353,7 +353,7 @@ namespace MphRecomp.Frontend
                 if (GamePages > 1 && _importGameRows != null)
                 {
                     // beside the title, whatever its length
-                    string title = $"{_importGameRows.Title} {_tileOffset / GameTiles + 1}/{GamePages}";
+                    string title = PagedTitle(_importGameRows.Title, _tileOffset / GameTiles + 1, GamePages);
                     float gap = menu.Font.Measure(title) / 2 + TitleArrowGap;
                     Arrow(false, 128 - gap - ArrowW, TitleArrowTop, _gPrev);
                     Arrow(true, 128 + gap, TitleArrowTop, _gNext);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using MphRead;
+using MphRead.Text;
 using MphRecomp.Multiplayer;
 using MphRecomp.Multiplayer.Net;
 using MphRecomp.Online;
@@ -272,12 +273,12 @@ namespace MphRecomp.Frontend
             case LicBlockCall:
                 if (Blocked(c))
                 {
-                    Act(new BlockReq { Code = c.Code, Block = false }, _ => $"{name} is unblocked.");
+                    Act(new BlockReq { Code = c.Code, Block = false }, _ => LocalText.FormatId("online.license.unblocked", "{0} is unblocked.", name));
                     break;
                 }
-                Import.Popup?.Ask($"block {name}?\n\nthey can't find you or send you requests, and they leave your friends and rivals.", yes =>
+                Import.Popup?.Ask(LocalText.FormatId("online.license.block", "block {0}?\n\nthey can't find you or send you requests, and they leave your friends and rivals.", name), yes =>
                 {
-                    if (yes) Act(new BlockReq { Code = c.Code, Block = true }, _ => $"{name} is blocked.");
+                    if (yes) Act(new BlockReq { Code = c.Code, Block = true }, _ => LocalText.FormatId("online.license.blocked", "{0} is blocked.", name));
                 });
                 break;
             case LicReportCall:
@@ -303,7 +304,7 @@ namespace MphRecomp.Frontend
                 Import.Popup?.Inform("reporting needs a server update.\n\nblock them to stop seeing them online.");
                 return;
             }
-            Import.Popup?.Ask($"report {name}'s name as offensive?\n\nthe report is kept for review.", yes =>
+            Import.Popup?.Ask(LocalText.FormatId("online.license.report_name", "report {0}'s name as offensive?\n\nthe report is kept for review.", name), yes =>
             {
                 if (yes) Act(new ReportReq { Code = c.Code, Reason = ReportReason.Name }, ok => ok.Done ? "thanks.\n\nthe report was sent."
                     : "you reported this hunter today already.");
@@ -314,16 +315,17 @@ namespace MphRecomp.Frontend
         private void LinkAction(PlayerCard c, string kind)
         {
             string name = OnlineNames.Display(c.Name, c.Tag).ToLowerInvariant();
+            string label = LocalText.Id("online.link.kind." + kind, kind);
             if (kind == LinkKind.Rival && Linked(c, LinkKind.Friend))
             {
                 // friend OR rival (vanilla): a friend is never made a rival
-                Import.Popup?.Inform($"{name} is your friend.\n\na friend can't be a rival too.");
+                Import.Popup?.Inform(LocalText.FormatId("online.license.already_friend", "{0} is your friend.\n\na friend can't be a rival too.", name));
                 return;
             }
             if (kind == LinkKind.Friend && Linked(c, LinkKind.Rival) && !IncomingFrom(c, kind) && !Sent(c, kind))
             {
                 // vanilla: "you have upgraded your rival to a friend" (once both agree, the rival link goes)
-                Import.Popup?.Ask($"ask {name} to be your friend?\n\nonce they say yes, your rival becomes your friend.", yes =>
+                Import.Popup?.Ask(LocalText.FormatId("online.license.upgrade", "ask {0} to be your friend?\n\nonce they say yes, your rival becomes your friend.", name), yes =>
                 {
                     if (yes) AddLink(c, kind);
                 });
@@ -331,18 +333,18 @@ namespace MphRecomp.Frontend
             }
             if (Linked(c, kind))
             {
-                Import.Popup?.Ask($"remove {name} from your {kind}s?", yes =>
+                Import.Popup?.Ask(LocalText.FormatId("online.license.remove", "remove {0} from your {1}s?", name, label), yes =>
                 {
                     if (yes) Act(new RemoveReq { Code = c.Code, Kind = kind }, _ => null);
                 });
             }
             else if (IncomingFrom(c, kind))
             {
-                Act(new AnswerReq { Code = c.Code, Kind = kind, Accept = true }, _ => $"you and {name} are {kind}s now.");
+                Act(new AnswerReq { Code = c.Code, Kind = kind, Accept = true }, _ => LocalText.FormatId("online.license.accepted", "you and {0} are {1}s now.", name, label));
             }
             else if (Sent(c, kind))
             {
-                Import.Popup?.Ask($"take back your {kind} request to {name}?", yes =>
+                Import.Popup?.Ask(LocalText.FormatId("online.license.withdraw", "take back your {1} request to {0}?", name, label), yes =>
                 {
                     if (yes) Act(new RemoveReq { Code = c.Code, Kind = kind }, _ => null);
                 });

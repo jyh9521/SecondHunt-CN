@@ -32,19 +32,25 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 
 - `locales/zh-CN/ui.json` 是应用的 UI 字符串字典；`settings.json` 按稳定 ID
   保存选项提示、键位和选项值，`terms.json` 保存导入卡片的标题、来源和内置资源名称。
-  `extras.json` 保存扩展页面动态句式，保留文件名、分数等运行时参数。`rom.json` 是 UTF-8 覆盖包，
+  `extras.json` 保存扩展页面动态句式，`runtime.json` 保存地图控件、对战、联机和回放的运行时提示，
+  `names.json` 通过原有房间键、角色和模式枚举映射显示名称。`rom.json` 是 UTF-8 覆盖包，
   `glyphs.bin` 是 16×16 字形。启动器完成解包后把覆盖包原子写入
   `data/game/localization/zh-CN.json`。`data/game/files/AMHE*` 的原始文件保留；
   运行时按源文本指纹匹配，不匹配的行回退到原文，而不是套错译文。
 - 菜单渲染优先用译文，脚本仍读原索引及原字符串。十张 ROM 表保留条目 ID、
   前缀、扫描类别和速度，动态变量如 `%s` 和 `&tab0` 也保留。332 条扫描记录对照
   原文逐条核对；设置说明、模组、回放及联机页面含中文界面文案。
+- 地图逐字标题在切分字符串前解析译名，操作提示先翻译、后量宽。对战和回放的显示名与
+  诊断字符串分开；原有房间查找键、玩家自填名称、消息预设编号和回放校验不做翻译。
+  Windows 在线规则用相同的资源加载流程，第三方许可保留原文。
 - 原版贴图和片头嵌字通过[轮廓遮罩与原画恢复](MEDIA-LOCALIZATION.zh-CN.md)
   本地化。覆盖包只带遮罩、字形和版式；原版圆徽、人物、厂商商标和音频保持使用用户的 ROM。
 - 美版 1.0 已用实际解包数据验证。1.1 保留上游的解包支持，共用匹配规则，但
   没有 1.1 样本验收。历史基线的联机服务兼容性没有验收。
-- 验收涵盖 Windows 启动器、菜单、扩展页面、开场影片和首个可游玩房间；不是每个
-  任务、结局、联机状态或可选导入游戏的完整实机通关。厂商标志、人名署名、玩家输入
+- 验收涵盖 Windows 启动器、菜单、扩展页面、开场影片、正式剧情开局、四地与终盘检查点、
+  两个结局的过场及结算、本地人机对战、实际录制的回放和有数据的回放详情页。
+  剧情中后期用开发版检查点定位，不是逐任务通关，也不代替公网联机或可选导入游戏的实机验收。
+  厂商标志、人名署名、玩家输入
   及第三方模组自带文本按原样显示。Windows 安全桌面上的真实 UAC 交互需要现场批准或取消。
 - 本地构建沿用基线依赖。若计划公开分发，还应单独复核 NuGet 审计结果和联网功能。
 
@@ -53,7 +59,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.4
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.5
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -62,6 +68,9 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 ```powershell
 dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c Release -p:MphPublic=true -p:MphJitOnly=true -- 'D:\test\data\game' 'D:\test'
 ```
+
+检查扩展页面时可在 `--ui-inventory <game> <report.json>` 后再传入含实际回放的测试 `data` 目录。
+工具会打开第一条回放，额外检查有数据才显示的详情标签。
 
 ## 继续维护译文
 
@@ -72,14 +81,19 @@ dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c R
 py tools/localization/catalog.py export 'D:\own\hunters.nds' 'D:\work\source.json'
 py tools/localization/catalog.py unpack 'D:\work\source.json' locales/zh-CN/rom.json 'D:\work\translation.json'
 py tools/localization/catalog.py pack 'D:\work\source.json' 'D:\work\translation.json' locales/zh-CN/rom.json --locale zh-CN
+py tools/localization/catalog.py audit 'D:\work\source.json' locales/zh-CN/rom.json locales/zh-CN/rom-review.amhe0.json 'D:\work\coverage.json'
 ```
 
 只纳入译文、源文本的 SHA-256 指纹和字形，不提交 `source.json` 或原始 ROM。
+审计覆盖菜单及十张表的每个非空字段；审核例外绑定索引或表项、字段和源指纹，
+只包括原文署名、绘制时处理的电脑别名、界面会覆盖／隐藏的初值、数字符号和房间内部键。
+新增未覆盖文本、改变已审核的原文或保留过期例外会使审计失败。1.1 如要单独出具验收，
+应使用自己的 1.1 样本建立对应审核文件，而不是套用 1.0 的结论。
 修改译文后重建字形：
 
 ```powershell
 py -m pip install Pillow==12.2.0 fonttools==4.63.0
-py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin --catalog locales/zh-CN/settings.json --catalog locales/zh-CN/terms.json --catalog locales/zh-CN/extras.json
+py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin --catalog locales/zh-CN/settings.json --catalog locales/zh-CN/terms.json --catalog locales/zh-CN/extras.json --catalog locales/zh-CN/runtime.json --catalog locales/zh-CN/names.json
 ```
 
 字形来源：[Noto Sans CJK SC Medium, Sans2.004](https://github.com/notofonts/noto-cjk/blob/Sans2.004/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Medium.otf)，

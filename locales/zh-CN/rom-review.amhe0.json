@@ -1,0 +1,1026 @@
+{
+  "version": 1,
+  "revision": 0,
+  "exceptions": {
+    "menu:7": {
+      "source": "a31a83312b310a6f0aa34b824016d3635dda85025b4e6a46f6c2461d03e66515",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:8": {
+      "source": "a060da611267052709546bbdf1c56d3990e5c20f39c2e44ac82f29618546cf1b",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:9": {
+      "source": "fd02fc7ff6981157e23aa17731d29a20b518788f4c9a745d75bf3cdb30635108",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:10": {
+      "source": "459edb7486b2c00a028b86816b048b76343f8d9975c52f6c79f6760f2f8f7dae",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:13": {
+      "source": "d5edd9994ba14eaf5fb3a20cb6f9be537143b96b01b69c5e87d78f5ab82e3671",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:14": {
+      "source": "dcdb2b711a8ebbbd2062aee64f89f02924df451a331f46358dc27602d1eba9c5",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:15": {
+      "source": "5d4cb6841ad91d9e20ee823a7d693f60dd85d9062020258b4b58a6d85c184812",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:16": {
+      "source": "589db4b5c39e361a3f15410b521046f09912ac4de9610243bb9a2b5a9c5decc4",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:17": {
+      "source": "bf8cf42028339578726bec3d0c8458c30acf675fb592cd3a26e4ae041980fe05",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:18": {
+      "source": "0951335f95b6ef72877227f9c640fa4c9f394b4277449ff9dc653afa8802c49b",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:19": {
+      "source": "061fa6c02b525d5d20aff737d1de4a9773d62b1a1fd3875a10fb0ba4719f1bd5",
+      "reason": "bot_alias_translated_at_draw"
+    },
+    "menu:39": {
+      "source": "d9a847a1a79ab44825bbf8e5720bca771d53d1344d871bf9be1567382a022718",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:40": {
+      "source": "d9a847a1a79ab44825bbf8e5720bca771d53d1344d871bf9be1567382a022718",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:41": {
+      "source": "d9a847a1a79ab44825bbf8e5720bca771d53d1344d871bf9be1567382a022718",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:59": {
+      "source": "3de748075d9a84786d2327591197c0b512508a24cac219dbaca96414ef7e592c",
+      "reason": "original_credit_name"
+    },
+    "menu:61": {
+      "source": "47f798b9d5dbe66f20ab36bd1517953ffcceb929350422f3c6d724859164c629",
+      "reason": "original_credit_name"
+    },
+    "menu:64": {
+      "source": "b8448c66d047d2debec367cb23fd6212e5af89e8fb731dc0819a851a7e2cc417",
+      "reason": "original_credit_name"
+    },
+    "menu:67": {
+      "source": "4a92398c833793b0261b1ce931a64584a6dd074717a887827bfad8755f0363bc",
+      "reason": "original_credit_name"
+    },
+    "menu:68": {
+      "source": "99331ceeda4f54e1a9d0fdd4faa82fbab5d12ef5ae6f70966dd1cecf37f30803",
+      "reason": "original_credit_name"
+    },
+    "menu:70": {
+      "source": "d92699df70e18a68358fcabbef20600a8f55cf67cc5fa171e4c878e2a65d6ce6",
+      "reason": "original_credit_name"
+    },
+    "menu:72": {
+      "source": "a458e57d8ab68a61d8db4041586a3b2d2eb174af5ab377ab9d67d3d06d45b16a",
+      "reason": "original_credit_name"
+    },
+    "menu:74": {
+      "source": "491058232f7f72a4cbeded33c01f006d8dc3974eabe1f50986abf8fe3c1a17c9",
+      "reason": "original_credit_name"
+    },
+    "menu:76": {
+      "source": "1327868e612af8225530fc7b54210ff9a1b0895c1c30266443199045d21ef8cc",
+      "reason": "original_credit_name"
+    },
+    "menu:80": {
+      "source": "e60ac4d58979ff231bb81468a111ac93f29bb447d5138ea3c477ef220ab095ee",
+      "reason": "original_credit_name"
+    },
+    "menu:82": {
+      "source": "c04a0d7a1960e06bb1355f808f7612564a41379ce451f309293a77e86b15e31e",
+      "reason": "original_credit_name"
+    },
+    "menu:101": {
+      "source": "8a8de823d5ed3e12746a62ef169bcf372be0ca44f0a1236abc35df05d96928e1",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:103": {
+      "source": "8a8de823d5ed3e12746a62ef169bcf372be0ca44f0a1236abc35df05d96928e1",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:124": {
+      "source": "2fcb6465ee5cbfa3567355b4f7abe6f03ea08e9283de9c834d1297b1df2c6288",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:125": {
+      "source": "05a9bf223fedf80a9d0da5f73f5c191a665bf4a0a4a3e608f2f9e7d5ff23959c",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:126": {
+      "source": "3eed0f33297699415de55d2d980e60d30869bf6564e2055b62173d368974a149",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:127": {
+      "source": "9a07c3e252c1088eaa34239774fcce0657e41ab606e439d872f6fb6890fbf6c2",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:130": {
+      "source": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:145": {
+      "source": "27d46e0ee176fea8394d8de470a8397948fd60c6cd69cdcd086e37a4d56f6506",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:157": {
+      "source": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:177": {
+      "source": "b5a2c96250612366ea272ffac6d9744aaf4b45aacd96aa7cfcb931ee3b558259",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:264": {
+      "source": "070bd12da39abc825be1a08fc10be31bc41385d2f4f00ee9f0eeccb2a24fefe9",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:265": {
+      "source": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:266": {
+      "source": "17a6d924a3c502eb3ef197adae0506b7c801d8bb5e0020e6abd7876016cb6c16",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:267": {
+      "source": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:268": {
+      "source": "b4bf0a7f7494b3e7ce6a10b6811c95f040f5e0166610776cd74b60295b65cf3a",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:269": {
+      "source": "624b60c58c9d8bfb6ff1886c2fd605d2adeb6ea4da576068201b6c6958ce93f4",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:270": {
+      "source": "92b21299f8a67e6a5f0ca4d634f4cb3727bea3689992c169172bbb5a1a2c0664",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:271": {
+      "source": "d59eced1ded07f84c145592f65bdf854358e009c5cd705f5215bf18697fed103",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:272": {
+      "source": "de44b756dd6272f9fdcf216a20414622886ccd319e990223c56641b01b1d8b74",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:273": {
+      "source": "4f10901763c03526fa737c7289df8d552022fbdb847b389bc4b0c1019cd5293a",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:274": {
+      "source": "86378c5abf91f815115837c050ca6308a368f1c0eaf01cbc64f0fe3d8a130c35",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:275": {
+      "source": "65a0a5c47868c2efb65ee615022f8fc089e2f96169f20197c975254c1ca2072d",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:286": {
+      "source": "25eedccc31d0bcf5087ab55038a8408a8d0c4ae5c4bfbd4a140d03659b2c060b",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:287": {
+      "source": "47ea62826f7f2d7e7460c8b099fb43715faedefab9a8d630a5e3a6a813f964a5",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:288": {
+      "source": "405a69cf3731615d254588e42bee67df3ac38e03837bfaada335ce5ef3fef193",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:289": {
+      "source": "25eedccc31d0bcf5087ab55038a8408a8d0c4ae5c4bfbd4a140d03659b2c060b",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:294": {
+      "source": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:295": {
+      "source": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:296": {
+      "source": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:309": {
+      "source": "e897d842a3876ade98a6a6f347a403d442f597d9201e25db1ee4269ab1ccea25",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:315": {
+      "source": "429c4459e2af485f209683840788208b3bf49d4ef22af60b0161476ba9ca2e93",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:316": {
+      "source": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:317": {
+      "source": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:318": {
+      "source": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:319": {
+      "source": "a246d46ce331ef1f0be97e25806efece5de2a6dfc11b23e68bff06f932255189",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:320": {
+      "source": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:321": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:322": {
+      "source": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:323": {
+      "source": "a6aca504165fefef22da3d8aa030f8c45a7480a94f95b1a5a111c05148b57268",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:324": {
+      "source": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:325": {
+      "source": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:326": {
+      "source": "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:327": {
+      "source": "55b5c51f8670181b0454a698c930ee641890c5c80b1e7da87e39a768aa8231ac",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:328": {
+      "source": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:329": {
+      "source": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:330": {
+      "source": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:332": {
+      "source": "84399398b7bb751c5a39dd0802f05125dd08098112196400a64250d383ff1492",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:333": {
+      "source": "c0604b11e7c032a2894f23479590eb6720f032af343909adb7f5df33195f206d",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:334": {
+      "source": "d74385f93cdb2cd492dbb9417f9a62b1d9ee3544fa3704398a95110d6061c0c6",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:343": {
+      "source": "0481efbd76b90804f26fc429ad2f76888ac68112074e4946b989c86bef30d733",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:345": {
+      "source": "1ad7009e8a246fb402158b52363ac4813fc14eec12f2e239fafc330e001f19aa",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:384": {
+      "source": "32e48995f98ce3b76f2d3f5e2d2acddfeff6650b7b18628cfa739bfef4a03312",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:385": {
+      "source": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:386": {
+      "source": "084b3f5b5c31cc5601f8eb28eeb380c8cb25952778a084fb176f7c955308d544",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:387": {
+      "source": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:388": {
+      "source": "616773e3e26e21ed938989a128e8e4640db09b9493af2e73c5f2d1c14463cf05",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:392": {
+      "source": "10f7f6b8715b5b8071c4d2c4871a440032c4f053b401697236c3a19ce503a4bc",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:415": {
+      "source": "8c1f1046219ddd216a023f792356ddf127fce372a72ec9b4cdac989ee5b0b455",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:416": {
+      "source": "a88a7902cb4ef697ba0b6759c50e8c10297ff58f942243de19b984841bfe1f73",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:417": {
+      "source": "8b940be7fb78aaa6b6567dd7a3987996947460df1c668e698eb92ca77e425349",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:435": {
+      "source": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:443": {
+      "source": "8c1f1046219ddd216a023f792356ddf127fce372a72ec9b4cdac989ee5b0b455",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:444": {
+      "source": "cd70bea023f752a0564abb6ed08d42c1440f2e33e29914e55e0be1595e24f45a",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:452": {
+      "source": "9c9f114c312e70cacfd73e1f673ad2dc027660d15979a5bbe41badd2ea1a9e17",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:453": {
+      "source": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:454": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:457": {
+      "source": "848c9bbf4bcfdc8d3e86b7506dbe7bce7163aa4ee9865ca5cf692deb960b6200",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:458": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:459": {
+      "source": "2e4fecd347583f282eb459bf3ecc0367d5d680cc0d81286a9110acc558fd5b19",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:460": {
+      "source": "ad57366865126e55649ecb23ae1d48887544976efea46a48eb5d85a6eeb4d306",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:461": {
+      "source": "3b9aa142fefa44aab83ab1c0909f6929fd53656b895ec2fc0e47d412ea62ba54",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:462": {
+      "source": "6d751a53d68eff411766b79c3fdd2ff89b850ec433f48313bd37e9cb99a79661",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:463": {
+      "source": "0db81a64703d9d20fd20e0ae0eeccf16857d7c5e5f937b9cd8d31cf0fe3d87a5",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:464": {
+      "source": "6392b5e4b1f1a0e361b6fc9d8e3ea5027dd75a3930c4fcd52153051d7a2c8577",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:465": {
+      "source": "4d3195ee3a50861ade5cdfcfadf13fef8772235cd7d05ae997eeb42ee6e3cb05",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:466": {
+      "source": "b0189935e42dfb50bfa230adc5cf3560fb22b96fc0f2d2b67150007c84251109",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:467": {
+      "source": "91a2d145ce4ee3a73ce21366d0b8bc56b63f19b60face0ca35112971ab8ac9fd",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:468": {
+      "source": "25b9c4aae738c3bbe74b70322d6fcf6109f36b65a9303929574e322f3ae92a43",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:469": {
+      "source": "02ca92c01207e3379717be8af4b851fe30a62196624dd8665bdc106e83fca2d2",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:470": {
+      "source": "d9e695765b1b07cf09224f68d9c89766b72eb121fa87468e94207c999a8d5147",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:471": {
+      "source": "14de6a136783e90747eb70887e014977485a4153ba1bb2a61a9e6926b7e9f336",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:472": {
+      "source": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:475": {
+      "source": "bd0e11abcaf91b113900065bbf2c6d9427a302b85585841a532d9fe521767302",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:476": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:477": {
+      "source": "91164a3e9aac3d3834c7c09fc940e57b022cfe6156303553651ce70ca9d0e143",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:483": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:484": {
+      "source": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:485": {
+      "source": "8c1f1046219ddd216a023f792356ddf127fce372a72ec9b4cdac989ee5b0b455",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:486": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:487": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:488": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:562": {
+      "source": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:563": {
+      "source": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:564": {
+      "source": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:565": {
+      "source": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:566": {
+      "source": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:567": {
+      "source": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:568": {
+      "source": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:569": {
+      "source": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:570": {
+      "source": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:571": {
+      "source": "19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:573": {
+      "source": "fc11d6f28e59d3cc33c0b14ceb644bf0902ebd63d61218dffe9e7dac7c254542",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:574": {
+      "source": "7b346904f63cc07f1d8cc2d88d7dae08a3f088a0e4159d5214c27a6571a51eb4",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:575": {
+      "source": "7b346904f63cc07f1d8cc2d88d7dae08a3f088a0e4159d5214c27a6571a51eb4",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:576": {
+      "source": "7b346904f63cc07f1d8cc2d88d7dae08a3f088a0e4159d5214c27a6571a51eb4",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:579": {
+      "source": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:580": {
+      "source": "38083c7ee9121e17401883566a148aa5c2e2d55dc53bc4a94a026517dbff3c6b",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:581": {
+      "source": "ceaa28bba4caba687dc31b1bbe79eca3c70c33f871f1ce8f528cf9ab5cfd76dd",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:583": {
+      "source": "38664c18ac729755a555afacc038f67ed5b12470dcf3017686df9d2acda1d8fa",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:584": {
+      "source": "cc06536a3f990c8de2838396ee20adca6f0db1f9dfdb50323ae544447221af40",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:585": {
+      "source": "ce7a5925ed0dc765007183cb4dfe1799c56d290907b77de93154db263ead2f75",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:586": {
+      "source": "423462ffa79fb01d7060aa79ce85a09bf744862d5ff57d8e448a7a57a20c0c5d",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:587": {
+      "source": "086b754bc7b939d87b1f9cc4be9cfac3feb23a6906417cd72eee6c624c002ac2",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:588": {
+      "source": "fde7787a17d803ea6091d1a82014028d8c8328902d58023476ef3ed1ea150cd0",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:589": {
+      "source": "22b9164243909913ce166df53cb3f067c7dc2d6d60d461811b65163123b02d6a",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:593": {
+      "source": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:596": {
+      "source": "341a66fe9750f5ee9b016bb2a79386a2a6a4b61d2975ce0d09114f10b3970e95",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:597": {
+      "source": "401133a5a31266432a69f7be1858b12a1c9334b94a3d2402e0894085b83aa55a",
+      "reason": "numeric_or_symbol"
+    },
+    "menu:598": {
+      "source": "5fa00fdba1e1281be80aadd63e446d49c2b9ddae33a4d687e2307706bb7b9384",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:599": {
+      "source": "34d7405734d56d123382922facf9efb301939b1122e8b46451cf5ce321dc7971",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:600": {
+      "source": "85f34e5536d9f3c8266ff3ba58b072c8bc874644f2134a783a217185de61d480",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:601": {
+      "source": "1dc5e2e838521d9354c20afc338b0de6e1088655c1b098ea01e1ac3000036267",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:602": {
+      "source": "3f95b98583bd646f08228f427068a934365c7fa3a6bd87f3e3f7ad33b135af14",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:603": {
+      "source": "79752a36bbc17ab0d3e3172057fead4b7a26c15b9769349db4ef28c5ba253ad4",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:604": {
+      "source": "31569b8a3e459d341f6c251c22195a7eed26bdbff5c260cf0e396c603556c1bb",
+      "reason": "overwritten_or_hidden_rom_template"
+    },
+    "menu:716": {
+      "source": "3973e022e93220f9212c18d0d0c543ae7c309e46640da93a4a0314de999f5112",
+      "reason": "numeric_or_symbol"
+    },
+    "LocationNames.bin:R001:first": {
+      "source": "1d168112d7b19acca81d85e1f21ef71de2f34f98bc7a9c33a3f82fe34510de16",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R002:first": {
+      "source": "c87327fbeeaa473109c19c2569b332707a579f1e7f75215842c7c37b8c45a725",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R003:first": {
+      "source": "139cfdc3d3817af85259f1266a6e14abe291db559390cc44fb205fe814745404",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R004:first": {
+      "source": "fb58f02b47ffef6dc7e2145b8296afa7f1ff412ba828449aafd44965d8ff7e50",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R005:first": {
+      "source": "ae21c4acd2f8fbb6cd849d1e8754fbb5cdc628bea64f97e3dca66023f5657ba3",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R006:first": {
+      "source": "2bac2bf8c6ad6174ad0ce883be0ee4e3930fcdbb6b8ec32fb93300a4f6fd13f5",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R007:first": {
+      "source": "e30560aba1d149296504dccd8ff40317174fafcaf97bcc9dd83b7393a21133aa",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R008:first": {
+      "source": "1f5f6aa9b213cfd36c33f7edbb3c7bea22fb1cc5854da38f3fbd556258fa71b3",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R009:first": {
+      "source": "3d57526bb0528165377ec9f5562990cf345de59a8234b4423a5e5d6b3f9f06ec",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R010:first": {
+      "source": "5593b65e0cec2073b244fec13acd51f13a46803943c5c00bd6241c1afc0a83dc",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R011:first": {
+      "source": "580bc66a53ad0b2ee8a4a8fe15d834539e2913836c49adc3f122c50bca15d350",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R012:first": {
+      "source": "5ab8073e58dfaa4f9df8c7eeb28ecd7f17188a54dc528720b4089aae667e809c",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R013:first": {
+      "source": "4ccfd7d77b8945b4433e3d8d0b72f3d367516f10ab43da643f8a91444583e748",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R014:first": {
+      "source": "4a4011c9b31b11e1d8d4bafdfa93e98dbd4dffcd322b54b9fda55a652b300890",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R015:first": {
+      "source": "44fa6800a13d01b78cbc26db050d14ab1ad323cb3c7caee87a465b4a384e39eb",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R016:first": {
+      "source": "1add3f2e93c4e4a111bd89e91b2841cb49247c016883a544c43e53d24cabcacc",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R017:first": {
+      "source": "2479b91f9a83efb8f7e92cade038bcadbba5bf37ab0d8cfa972e639f98d1892a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R018:first": {
+      "source": "3794192d6ecabc6ccb727e4e7371fb95d19578f2715e4eb5f573f941903c02c2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R019:first": {
+      "source": "e77ad3420f73b9586f608740138b86bb2afb77ec8616232a85e8f330a1c8f94a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R020:first": {
+      "source": "8c37cde8cc43619fe3f1e437175cfaa0e53699f801adf079def882e2f745f6a7",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R021:first": {
+      "source": "269f5614fa37a50bbd71acad5dfb3cd9aa3098354285882c672e82dd175e50da",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R022:first": {
+      "source": "6f7f5afc5afd5aac08e2220cc644a563aba1c204a357a3dfe00c70269720d6a2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R023:first": {
+      "source": "960c531e0a279541a869e37b6e09bec88da3a3cda1e37cf9e418ff5afc11aaf2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R024:first": {
+      "source": "a71ab5a57ed18c886415ad75fdc7944a9fd18248698368d6a130ffff0dbdcfd2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R025:first": {
+      "source": "3bb6d1dcbedcf86221dedf63caa17779c119704251ee38bd8c6f381742daf55a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R026:first": {
+      "source": "97962ecba3aae76564883bae19acf91567c6b4374de532765e9faece95607031",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R027:first": {
+      "source": "da464f7ddbc3d799da8d52a48948bd30059b4dea3e071b48aea6b7b45164f8c5",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R028:first": {
+      "source": "a4475bec3d46b62b142b26ac6377a3f9905a882c7a770cd0c55aeeb9b77c8b13",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R029:first": {
+      "source": "579ff4737df6280c42a555c7e576703ef2a4184852946e04295fdb940bb8ef4b",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R030:first": {
+      "source": "c63aac0150c227e91721a1d3c4687368c69e69ac623a093711d2147b07569ea1",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R031:first": {
+      "source": "dcd740163b46adb0500a5c3d8c5926601023209a4e2f9725641d965550c9e1d2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R032:first": {
+      "source": "d15d5ddb81faee3a244f014571f89bf7907663df91db7349ae16ec68e3f10163",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R033:first": {
+      "source": "a3519a4fef0b74ca54dfb3038a5d76c7eaab8a02d3ab594eaf9169a536a1cb82",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R101:first": {
+      "source": "1d168112d7b19acca81d85e1f21ef71de2f34f98bc7a9c33a3f82fe34510de16",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R102:first": {
+      "source": "c87327fbeeaa473109c19c2569b332707a579f1e7f75215842c7c37b8c45a725",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R103:first": {
+      "source": "ef1b0739e2c1acf45c975684e4d228bf433e551d1f8904cc73c44a0b163104ed",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R104:first": {
+      "source": "61a540696854423fed2abdd3fa80f90aa5a19bde486d9a5072ac642fe1d941ca",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R105:first": {
+      "source": "b12fcf40b0bb98747b1c0ec14b8d0b156b50f5b845371a68aa69e8155faff4ff",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R106:first": {
+      "source": "b22a5335f1094e3671059990c9ed0af0fcdaca2a122070ba03a9c96eb97b060e",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R107:first": {
+      "source": "884678f03605346eebc084e3602654672ebe2e0749b8f3de475e9a96b420c3fb",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R108:first": {
+      "source": "b8ef16a86447a86c7ccf22d3b27950c6b75e5606466d2a063c8124d9826c2710",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R109:first": {
+      "source": "50bb1f3e7f544057d878fc27e0f356574e9ddfc94e15d2b3a69cc590954d1ec4",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R110:first": {
+      "source": "af6bcf1ffcf3831d1242b6fd2aceb8863be20bf0164568fb7d26ef9133485375",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R111:first": {
+      "source": "12951bf7f56abc936bc58bb4951c44d02023e7c5a8a88f1f03e391db366fabfb",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R112:first": {
+      "source": "b756b93a46c117fc1d956d8e7c0ce5a38dd92ddbfce30a66c93a5ac49d7d1795",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R113:first": {
+      "source": "3f195af26eb9926f0717acc78baaf4117d98aa0b769666fb961a7c187b8ea3fd",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R114:first": {
+      "source": "bf784261bb6b6bd6c3c971c64238b0263f8078d4012c16d91e28a63b78746001",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R115:first": {
+      "source": "7a8ab457467f2b7a087a9e3daba6ce240976fd7087a20c087d4845af55e63047",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R116:first": {
+      "source": "7595d0c432a46cdc603c8ec561f32e08fd1630d495ce9687a20584102097c246",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R117:first": {
+      "source": "37725d8265bb6f273202b67ad063780aa81048ea60f5e0a5701a024b23aa42de",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R118:first": {
+      "source": "4837ca0d68e5bdf309c2918daf3f52761a3abdf297661f668a5990df672be0ee",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R119:first": {
+      "source": "b6dd9669710b4c0828cde662f82fc160d7e745c920ab91eca4ca9c0d859abc09",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R120:first": {
+      "source": "39e879a78296c835cbfe478acb9a7f898397dba6c0345274b0167a300e7fc097",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R121:first": {
+      "source": "12123c5725332be2118ff86417c2a61998539f8f82d4b628796eb81248ac7133",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R122:first": {
+      "source": "a5780649807e05423037b04ec2e23bdeefdc95a91a0ee362ad55b12bdaa7bd4e",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R123:first": {
+      "source": "139cfdc3d3817af85259f1266a6e14abe291db559390cc44fb205fe814745404",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R124:first": {
+      "source": "fb58f02b47ffef6dc7e2145b8296afa7f1ff412ba828449aafd44965d8ff7e50",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R125:first": {
+      "source": "ae21c4acd2f8fbb6cd849d1e8754fbb5cdc628bea64f97e3dca66023f5657ba3",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R126:first": {
+      "source": "a71ab5a57ed18c886415ad75fdc7944a9fd18248698368d6a130ffff0dbdcfd2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R127:first": {
+      "source": "3bb6d1dcbedcf86221dedf63caa17779c119704251ee38bd8c6f381742daf55a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R128:first": {
+      "source": "97962ecba3aae76564883bae19acf91567c6b4374de532765e9faece95607031",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R129:first": {
+      "source": "da464f7ddbc3d799da8d52a48948bd30059b4dea3e071b48aea6b7b45164f8c5",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R201:first": {
+      "source": "1d168112d7b19acca81d85e1f21ef71de2f34f98bc7a9c33a3f82fe34510de16",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R202:first": {
+      "source": "c87327fbeeaa473109c19c2569b332707a579f1e7f75215842c7c37b8c45a725",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R203:first": {
+      "source": "07bbe92d4a6f77c13e2d48dabdc59f72b6a155a108461022eb24f66e639faaa6",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R204:first": {
+      "source": "1585e65583f0306973105b9b51b1d5621265759f1e2b790ce51df0bf68dee0d5",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R205:first": {
+      "source": "e5bc8772f97b7b86abfa0c949b771179276a48ed653da7a1b7983feaeb9df09b",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R206:first": {
+      "source": "63fc5242be54613f8ee6239ac12a2ee1ad13182295a29d592700c5a391e2c679",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R207:first": {
+      "source": "556831a8203672a0dd9f86e49abb14cf6afc7158ea63a98c571bd373213f92a6",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R208:first": {
+      "source": "9162d592afc47e9c991719df203c3c67a8fa1a79c28dd0736bf2ef04b53da6de",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R209:first": {
+      "source": "5aa1b0a17ccd2f39c063ff1d3bb24fc5f2d681189c776e75015c992298ae2f21",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R210:first": {
+      "source": "04f027559f317b4427ae043084ba92afb67427c3510cb372a5e9e5030a666e86",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R211:first": {
+      "source": "9c2bffa451dc0f2a78df1b4c084dfcb30e9a6c2e587fcd32c3fcf66e4e682790",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R212:first": {
+      "source": "ed6f19d9379ae8de035f2d90b0a0048c898352c73cb27b3dd6ba7833a9eb0b0f",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R213:first": {
+      "source": "934d09a4a77b5bc6503ccd0bec63165a920ad6f0e33935ca50de0030c37983ec",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R214:first": {
+      "source": "43ec66836fddbc8d938f945494226557e33a169d6c4301029fa2b2e2732361b4",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R215:first": {
+      "source": "139cfdc3d3817af85259f1266a6e14abe291db559390cc44fb205fe814745404",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R216:first": {
+      "source": "fb58f02b47ffef6dc7e2145b8296afa7f1ff412ba828449aafd44965d8ff7e50",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R217:first": {
+      "source": "ae21c4acd2f8fbb6cd849d1e8754fbb5cdc628bea64f97e3dca66023f5657ba3",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R218:first": {
+      "source": "a71ab5a57ed18c886415ad75fdc7944a9fd18248698368d6a130ffff0dbdcfd2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R219:first": {
+      "source": "3bb6d1dcbedcf86221dedf63caa17779c119704251ee38bd8c6f381742daf55a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R220:first": {
+      "source": "97962ecba3aae76564883bae19acf91567c6b4374de532765e9faece95607031",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R301:first": {
+      "source": "1d168112d7b19acca81d85e1f21ef71de2f34f98bc7a9c33a3f82fe34510de16",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R302:first": {
+      "source": "c87327fbeeaa473109c19c2569b332707a579f1e7f75215842c7c37b8c45a725",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R303:first": {
+      "source": "8bc2e87715f82149993de4359f0925b32205220655a4a10909218524839080e8",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R304:first": {
+      "source": "23ab64f21d15d4fdcf4291fb6d27d23efe3303969f1dde816143d9beb997b046",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R305:first": {
+      "source": "d029f830531351796e46ea76e3f1de18d6171d17fc1ea27416d1d1351843a5f9",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R306:first": {
+      "source": "5e0aa99e93d4c9afa90afca7c4ba4ea327691ee6fd14a9d95384898d76040602",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R307:first": {
+      "source": "5613dca707722c4b641d2b4a745ffadc955d999bc43784aee843b54b9aa5fea4",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R308:first": {
+      "source": "08923996051fddc3a151690d8bca6dcb9fc28ba0ccf4cc569c8df0dabca0ff95",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R309:first": {
+      "source": "48cb2569758de2385cffa4ee57a2ce53a0d1ffa71936f5d82c4c940f0a54cc2c",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R310:first": {
+      "source": "87eb177430b84024be1435f91097d4be56160c2f25a92c17e4b481ae4b8154e7",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R311:first": {
+      "source": "aac77b0f582c949959054650af703942e6e0fe8d98b6eb947ba4e7c273c34e35",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R312:first": {
+      "source": "c038548d1b95910eaf69c6bccb9c03f49a209832a7674623f14767850e4acb54",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R313:first": {
+      "source": "c88ffbdf7a0cc156fee6723b88de04b749be2e2ab7326b00b89f50d8bfe04b74",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R314:first": {
+      "source": "d188498474a5975a573834640b5ca2a3e73d436661c3e756352a62a5b57c70d1",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R315:first": {
+      "source": "139cfdc3d3817af85259f1266a6e14abe291db559390cc44fb205fe814745404",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R316:first": {
+      "source": "fb58f02b47ffef6dc7e2145b8296afa7f1ff412ba828449aafd44965d8ff7e50",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R317:first": {
+      "source": "ae21c4acd2f8fbb6cd849d1e8754fbb5cdc628bea64f97e3dca66023f5657ba3",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R318:first": {
+      "source": "a71ab5a57ed18c886415ad75fdc7944a9fd18248698368d6a130ffff0dbdcfd2",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R319:first": {
+      "source": "3bb6d1dcbedcf86221dedf63caa17779c119704251ee38bd8c6f381742daf55a",
+      "reason": "room_lookup_key"
+    },
+    "LocationNames.bin:R320:first": {
+      "source": "97962ecba3aae76564883bae19acf91567c6b4374de532765e9faece95607031",
+      "reason": "room_lookup_key"
+    },
+    "ShipOnGround.bin:O003:first": {
+      "source": "e189ad4496ca6b09cd71a13bf53e53f771d1c074a0b27f522800561579f35ad4",
+      "reason": "numeric_or_symbol"
+    },
+    "ShipOnGround.bin:O004:first": {
+      "source": "e12a7e051731cf1dbeefa2142a8e1abb1eb5898e2cbe4aa522120829a5588dc7",
+      "reason": "numeric_or_symbol"
+    }
+  }
+}

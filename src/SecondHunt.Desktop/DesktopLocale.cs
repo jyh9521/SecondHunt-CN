@@ -29,7 +29,7 @@ internal static class DesktopLocale
         LocalizedArtwork.Current = null;
         if (Name == English) { LocalText.Configure(null, null); return; }
         var identified = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (string resource in new[] { "settings.json", "terms.json", "extras.json" })
+        foreach (string resource in new[] { "settings.json", "terms.json", "extras.json", "runtime.json", "names.json" })
             foreach (var pair in LoadCatalogue(resource))
                 identified.Add(pair.Key, pair.Value);
         using Stream glyph = Resource("glyphs.bin");

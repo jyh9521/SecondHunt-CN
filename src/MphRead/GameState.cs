@@ -59,6 +59,9 @@ namespace MphRead
         public static bool TransitionAltForm { get; set; }
         public static int ActivePlayers { get; set; } = 0;
         public static string[] Nicknames { get; } = new string[PlayerEntity.SlotCapacity] { "Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8" };
+        public static bool[] GeneratedNicknames { get; } = new bool[PlayerEntity.SlotCapacity]; // display metadata, not match state
+        public static string DisplayNickname(int slot) => LocalText.MatchNickname(Nicknames[slot], PlayerEntity.Players[slot].Hunter,
+            PlayerEntity.Players[slot].IsBot, GeneratedNicknames[slot] ? slot + 1 : 0);
         public static int[] Stars { get; } = new int[PlayerEntity.SlotCapacity];
         public static int[] Standings { get; } = new int[PlayerEntity.SlotCapacity];
         public static int[] TeamStandings { get; } = new int[PlayerEntity.SlotCapacity];

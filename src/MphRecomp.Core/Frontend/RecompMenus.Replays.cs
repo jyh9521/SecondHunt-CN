@@ -444,7 +444,12 @@ namespace MphRecomp.Frontend
         {
             if (!r.PlaysHere)
             {
-                Import.Popup?.Inform("this replay can't play here.\n\n" + r.Refused!.ToLowerInvariant());
+                string raw = r.Refused!.ToLowerInvariant();
+                Import.Log?.Invoke("replay: " + r.Refused);
+                string reason = r.Header is ReplayFile file
+                    ? ReplayPlayer.CheckBeforeStart(file, display: true) ?? LocalText.Id("replay.error.resources", raw)
+                    : LocalText.Id("replay.error.read", raw);
+                Import.Popup?.Inform(LocalText.FormatId("replay.detail.refused", "this replay can't play here.\n\n{0}", reason));
                 return;
             }
             if (PlayReplay == null)
@@ -535,7 +540,8 @@ namespace MphRecomp.Frontend
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                Import.Popup?.Inform("couldn't change that replay.\n\n" + ex.Message.ToLowerInvariant());
+                Import.Log?.Invoke("replay: " + ex);
+                Import.Popup?.Inform(LocalText.Id("replay.detail.edit_error", "couldn't change that replay.\n\n" + ex.Message.ToLowerInvariant()));
             }
             ListReplays();
             if (_stepMenu?.Page?.Index == s_detailPage && OpenInfo is ReplayInfo r)
@@ -564,16 +570,19 @@ namespace MphRecomp.Frontend
         // a renamed replay's own name; else "battle - combat hall"
         private static string DetailTitle(ReplayInfo r)
         {
-            if (r.Header == null) return r.Title.ToLowerInvariant();
-            return Renamed(r) ? r.Title.ToLowerInvariant() : LocalText.FormatId("replay.default.title", "{0} - {1}", LocalText.Ui(ModeName(r.Header.Settings.Mode)), LocalText.Ui(r.Arena.ToLowerInvariant()));
+            if (r.Header == null || Renamed(r)) return ReplayUserTitle(r);
+            string arena = LocalText.IsLocalized ? DisplayNames.Arena(r.Header.Settings.Arena) : r.Arena.ToLowerInvariant();
+            return LocalText.FormatId("replay.default.title", "{0} - {1}", ModeName(r.Header.Settings.Mode), arena);
         }
+
+        private static string ReplayUserTitle(ReplayInfo r) => LocalText.IsLocalized ? r.Title : r.Title.ToLowerInvariant();
 
         // the recorder names a replay "<Mode> <arena>" (ReplayLibrary); anything else is the player's own name for it
         private static bool Renamed(ReplayInfo r) => r.Header != null
             && !r.Title.Equals($"{r.Header.Settings.Mode} {r.Arena}", StringComparison.OrdinalIgnoreCase)
             && !r.Title.Equals($"{r.Header.Settings.Mode} {r.Header.Settings.Arena}", StringComparison.OrdinalIgnoreCase);
 
-        private static string ModeName(GameMode mode) => mode switch
+        private static string ModeName(GameMode mode) => DisplayNames.Mode(mode, mode switch
         {
             GameMode.BattleTeams => "team battle",
             GameMode.SurvivalTeams => "team survival",
@@ -582,13 +591,20 @@ namespace MphRecomp.Frontend
             GameMode.DefenderTeams => "team defender",
             GameMode.PrimeHunter => "prime hunter",
             _ => mode.ToString().ToLowerInvariant()
-        };
+        });
 
         private static string Length(int seconds) => $"{seconds / 60}:{seconds % 60:00}";
 
         private static string Fit(string text, int max) => text.Length <= max ? text : text[..(max - 3)].TrimEnd() + "...";
 
-        private static string Day(DateTime? t) => t is DateTime d ? d.ToString("MMM d", CultureInfo.InvariantCulture).ToLowerInvariant() : "";
+        private static string Day(DateTime? t) => t is DateTime d
+            ? LocalText.FormatId("replay.date.day", "{0}", d.ToString("MMM d", CultureInfo.InvariantCulture).ToLowerInvariant(), d.Month, d.Day)
+            : "";
+
+        private static string FullDate(DateTime? t) => t is DateTime d
+            ? LocalText.FormatId("replay.date.full", "{0}", d.ToString("MMM d HH:mm", CultureInfo.InvariantCulture).ToLowerInvariant(),
+                d.Month, d.Day, d.Hour, d.Minute)
+            : "";
 
         // ---- drawing (FrontendSession.Build, after the page's own triangles) ----
 
@@ -647,7 +663,7 @@ namespace MphRecomp.Frontend
                 Hunters(info, BarX0 + IconDx, top - IconDy, IconD, IconPitch, tag);
                 Names(info, BarX0 + IconDx, top - IconDy, IconD, IconPitch, tag);
                 // mode (or the player's name for it), result + length, date + PLAY
-                string what = info.Header == null ? "can't be read" : Renamed(info) ? info.Title.ToLowerInvariant() : ModeName(info.Header.Settings.Mode);
+                string what = info.Header == null ? "can't be read" : Renamed(info) ? ReplayUserTitle(info) : ModeName(info.Header.Settings.Mode);
                 Text(Fit(what, info.Pinned ? 16 : 18), TextX, top - 3.2f, 0, Orange, tag);
                 if (info.Pinned) Star(ColumnRight - StarSize, top - 2.3f, StarSize, tag); // a favorite
                 Result(info, TextX, top - 13.3f, 9.7f, tag);
@@ -684,16 +700,16 @@ namespace MphRecomp.Frontend
             if (r == null) return;
             int tag = _dPlay;
             Picture(r, PicX, PicTop, PicW, PicH, PicFrame, tag);
-            string when = r.Recorded is DateTime t ? t.ToString("MMM d HH:mm", CultureInfo.InvariantCulture).ToLowerInvariant() : "";
-            Text("date", FactsX, FactsTop, 0, Pale, tag);
-            Text(when, FactsRight, FactsTop, 1, White, tag);
-            Text("length", FactsX, FactsTop - FactsPitch, 0, Pale, tag);
-            Text(Length(r.Seconds) + (r.Complete ? "" : " (ended early)"), FactsRight, FactsTop - FactsPitch, 1, White, tag);
-            Text("result", FactsX, FactsTop - 2 * FactsPitch, 0, Pale, tag);
+            Text(LocalText.Id("replay.detail.date", "date"), FactsX, FactsTop, 0, Pale, tag);
+            Text(FullDate(r.Recorded), FactsRight, FactsTop, 1, White, tag);
+            Text(LocalText.Id("replay.detail.length", "length"), FactsX, FactsTop - FactsPitch, 0, Pale, tag);
+            Text(r.Complete ? Length(r.Seconds) : LocalText.FormatId("replay.date.incomplete", "{0} (ended early)", Length(r.Seconds)),
+                FactsRight, FactsTop - FactsPitch, 1, White, tag);
+            Text(LocalText.Id("replay.detail.result", "result"), FactsX, FactsTop - 2 * FactsPitch, 0, Pale, tag);
             if (!r.PlaysHere) Text("can't play here", FactsRight, FactsTop - 2 * FactsPitch, 1, White, tag);
             else if (r.LocalPlace is int) Result(r, FactsRight - ResultWidth(r) - 10.9f - 2.4f, FactsTop - 2 * FactsPitch + 1.6f, 10.9f, tag);
             Pill(FactsX, BigPillTop, BigPillW, BigPillH, r.PlaysHere, _dPlay, glows);
-            string[] labels = { "favorite", "rename", "delete" };
+            string[] labels = { LocalText.Id("replay.detail.favorite", "favorite"), "rename", "delete" };
             int[] items = { _dFavorite, _dRename, _dDelete };
             for (int j = 0; j < 3; j++)
             {
@@ -717,7 +733,8 @@ namespace MphRecomp.Frontend
                 float x = PlayerX0 + PlayerPitch * i;
                 Icon(seats[i], x, PlayerTop, PlayerIcon, i == r.LocalSeat, tag);
                 Text(HunterWord(seats[i]), x + 36.4f, PlayerTop - 6.9f, 0, White, tag);
-                string who = i == r.LocalSeat ? "you" : seats[i].Bot ? "bot" : (SeatName(r, i) ?? seats[i].Nickname ?? "").ToLowerInvariant();
+                string who = i == r.LocalSeat ? LocalText.Id("replay.detail.you", "you")
+                    : seats[i].Bot ? LocalText.Id("replay.detail.bot", "bot") : (SeatName(r, i) ?? seats[i].Nickname ?? "").ToLowerInvariant();
                 // (drawn as the page's: the layout places an item by its middle, and seat 1's reaches into the back arrow's corner)
                 bool tappable = LicenseOf(r, i) != null;
                 float room = PlayerPitch - 36.4f - 4, size = Math.Clamp(room / MathF.Max(_drawMenu!.Font.Measure(who), 1), SizeX, 1);

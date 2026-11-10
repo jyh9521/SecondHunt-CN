@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using MphRead;
 using MphRead.Entities;
+using MphRead.Text;
 using MphRecomp.Campaign;
 using MphRecomp.Config;
 using MphRecomp.Frontend;
@@ -66,7 +67,7 @@ internal sealed partial class CampaignRenderer
             string? path = which == "newest" ? (ReplayDataDir is string dir ? ReplayLibrary.Newest(dir) : null) : which;
             if (path == null)
             {
-                _error = "REPLAY: no replays yet -- play a match against bots first";
+                _error = LocalText.Id("replay.error.empty", "REPLAY: no replays yet -- play a match against bots first");
                 return true;
             }
             // (its checks wait for StartMatchReplayed: the imported arenas are only known once the game's files are)
@@ -89,7 +90,7 @@ internal sealed partial class CampaignRenderer
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            _error = "REPLAY REFUSED: " + ex.Message;
+            _error = LocalText.FormatId("replay.error.read", "REPLAY REFUSED: {0}", ex.Message);
             Log.Warn("MPHReplay", $"can't read {which}: {ex.Message}");
         }
         return true;
@@ -105,14 +106,15 @@ internal sealed partial class CampaignRenderer
             // so a replay of one was refused as "not on this device" (Odin 2026-10-08 01:01)
             if (ReplayPlayer.CheckBeforeStart(_replayPlayer.File) is string refused)
             {
-                _error = "REPLAY REFUSED: " + refused;
+                _error = LocalText.FormatId("replay.error.refused", "REPLAY REFUSED: {0}",
+                    ReplayPlayer.CheckBeforeStart(_replayPlayer.File, display: true) ?? refused);
                 Log.Warn("MPHReplay", $"refused {_replayPath}: {refused}");
                 return null;
             }
             CampaignHost played = _replayPlayer.Start(collectDrawItems: true, viewWidth: width, viewHeight: height);
             if (_replayPlayer.CheckAfterStart() is string why)
             {
-                _error = "REPLAY REFUSED: " + why;
+                _error = LocalText.FormatId("replay.error.resources", "REPLAY REFUSED: {0}", why);
                 Log.Warn("MPHReplay", "refused: " + why);
                 return played;
             }
@@ -158,7 +160,8 @@ internal sealed partial class CampaignRenderer
         {
             // the steps ran out before the match ended: a recording cut short (the match was left early)
             _replayDone = true;
-            _error = $"REPLAY OVER at {ReplayClock(_replayPlayer.Position)}: the recording ends here (the match was left early)";
+            _error = LocalText.FormatId("replay.error.early", "REPLAY OVER at {0}: the recording ends here (the match was left early)",
+                ReplayClock(_replayPlayer.Position));
             Log.Info("MPHReplay", $"played to the end of an incomplete recording: {_replayPlayer.Position} steps, every one exact");
             return;
         }
@@ -204,8 +207,9 @@ internal sealed partial class CampaignRenderer
         {
             // _error stops the sim and the drawing before this step is shown (CampaignRenderer.Render)
             _replayDone = true;
-            _error = $"REPLAY STOPPED at {ReplayClock(_replayPlayer.FailedAt)}: from here it wouldn't play exactly as "
-                + "recorded on this build and device";
+            _error = LocalText.FormatId("replay.error.different",
+                "REPLAY STOPPED at {0}: from here it wouldn't play exactly as recorded on this build and device",
+                ReplayClock(_replayPlayer.FailedAt));
             Log.Warn("MPHReplay", $"step {_replayPlayer.FailedAt} of {_replayPlayer.File.Steps.Count} differs from the recording");
         }
     }
@@ -655,11 +659,13 @@ internal sealed partial class CampaignRenderer
     {
         if (_replayPlayer != null)
         {
-            string state = _replayDone ? "" : _seekTarget >= 0 ? "  SEEKING" : _replayHeld ? "  PAUSED" : "  " + ReplaySpeedText;
+            string state = _replayDone ? "" : "  " + (_seekTarget >= 0 ? LocalText.Id("replay.hud.seeking", "SEEKING")
+                : _replayHeld ? LocalText.Id("replay.hud.paused", "PAUSED") : ReplaySpeedText);
             string cam = ReplayCamText.Length > 0 ? "  " + ReplayCamText : "";
-            return $"\nREPLAY {ReplayClock(_replayPlayer.Position)} / {ReplayClock(_replayPlayer.File.Steps.Count)}{state}{cam}, every step exact";
+            return "\n" + LocalText.FormatId("replay.hud.status", "REPLAY {0} / {1}{2}{3}, every step exact",
+                ReplayClock(_replayPlayer.Position), ReplayClock(_replayPlayer.File.Steps.Count), state, cam);
         }
-        return _replayRecorder != null ? "\nrecording" : "";
+        return _replayRecorder != null ? "\n" + LocalText.Id("replay.hud.recording", "recording") : "";
     }
 
     static string ReplayClock(int step)
@@ -686,8 +692,8 @@ internal sealed partial class CampaignRenderer
     int WatchedSeat => _replaySeat >= 0 ? _replaySeat : _replayPlayer?.File.Settings.LocalSeat ?? 0;
     bool WatchingOwnView => _replayCam == ReplayCamKind.FirstPerson && WatchedSeat == (_replayPlayer?.File.Settings.LocalSeat ?? 0);
 
-    string ReplayCamText => _replayCam == ReplayCamKind.Free ? "FREE CAM"
-        : WatchingOwnView ? "" : $"watching {ReplaySeatName(WatchedSeat)}";
+    string ReplayCamText => _replayCam == ReplayCamKind.Free ? LocalText.Id("replay.hud.free", "FREE CAM")
+        : WatchingOwnView ? "" : LocalText.FormatId("replay.hud.watch", "watching {0}", ReplaySeatName(WatchedSeat));
 
     string ReplaySeatName(int seat)
     {
@@ -697,8 +703,13 @@ internal sealed partial class CampaignRenderer
             return id.Tag > 0 ? $"{id.Name}#{id.Tag:0000}" : id.Name;
         }
         var players = _replayPlayer?.File.Settings.Players;
-        return players != null && seat >= 0 && seat < players.Count && players[seat].Nickname is string n && n.Length > 0
-            ? n : $"seat {seat + 1}";
+        if (players != null && seat >= 0 && seat < players.Count)
+        {
+            var p = players[seat];
+            if (p.Nickname is { Length: > 0 } n) return LocalText.MatchNickname(n, p.Hunter, p.Bot);
+            if (p.Bot) return DisplayNames.Hunter(p.Hunter);
+        }
+        return LocalText.FormatId("replay.hud.seat", "seat {0}", seat + 1);
     }
 
     // UpdateThirdPerson: true when this placed the view (HostView); the caller's own camera logic is skipped that step
@@ -898,9 +909,14 @@ internal sealed partial class CampaignRenderer
         float scrubH = 11 * u, scrubTop = pillTop - 6 * u - scrubH;
         float mid = pillTop + pillH / 2;
 
-        string cam = _replayCam switch { ReplayCamKind.Free => "FREE CAM", ReplayCamKind.ThirdPerson => "THIRD PERSON", _ => "FIRST PERSON" };
-        string who = _replayCam == ReplayCamKind.Free ? "FREE CAM"
-            : ReplaySeatName(WatchedSeat).ToUpperInvariant();
+        string cam = _replayCam switch
+        {
+            ReplayCamKind.Free => LocalText.Id("replay.hud.free", "FREE CAM"),
+            ReplayCamKind.ThirdPerson => LocalText.Id("replay.hud.third", "THIRD PERSON"),
+            _ => LocalText.Id("replay.hud.first", "FIRST PERSON"),
+        };
+        string who = _replayCam == ReplayCamKind.Free ? LocalText.Id("replay.hud.free", "FREE CAM") : ReplaySeatName(WatchedSeat);
+        if (!LocalText.IsLocalized) who = who.ToUpperInvariant();
         string speed = ReplaySpeedText.ToUpperInvariant();
         float camW = Math.Max(font.MeasureCanvas("THIRD PERSON", text), font.MeasureCanvas(cam, text)) + 12 * u;
         float transportW = btn * 3;
@@ -933,12 +949,14 @@ internal sealed partial class CampaignRenderer
         Rect(list, at - 1.3f * u, bt - 3 * u, at + 1.3f * u, bb + 3 * u, HudWhite, 1);
         if (_seekTarget >= 0)
         {
-            Label(font, list, "SEEKING", (bx0 + bx1) / 2, scrubTop - 16 * u, 8 * u, small, HudPale, 1);
+            Label(font, list, LocalText.Id("replay.hud.seeking", "SEEKING"), (bx0 + bx1) / 2, scrubTop - 16 * u, 8 * u, small, HudPale, 1);
         }
         // how to reach the buttons: over the time pills (the marks have the bar's own width)
-        font.EmitCanvas(K("D-PAD LEFT / RIGHT + A: PICK", "ARROWS + ENTER: PICK"), left, scrubTop - 8 * u,
+        font.EmitCanvas(K(LocalText.Id("replay.hud.pick.pad", "D-PAD LEFT / RIGHT + A: PICK"),
+            LocalText.Id("replay.hud.pick.key", "ARROWS + ENTER: PICK")), left, scrubTop - 8 * u,
             0, small, HudPale.R, HudPale.G, HudPale.B, 0.75f, list);
-        font.EmitCanvas(K("START: MENU", "ESC: MENU"), left + clusterW, scrubTop - 8 * u,
+        font.EmitCanvas(K(LocalText.Id("replay.hud.menu.pad", "START: MENU"),
+            LocalText.Id("replay.hud.menu.key", "ESC: MENU")), left + clusterW, scrubTop - 8 * u,
             1, small, HudPale.R, HudPale.G, HudPale.B, 0.75f, list);
 
         // the watched player's kills (an orange diamond) and deaths (a white cross) along the bar, Fortnite style

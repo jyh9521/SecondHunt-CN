@@ -1,6 +1,8 @@
 using System;
 using MphRead;
+using MphRead.Text;
 using MphRecomp.Campaign;
+using MphRecomp.Frontend;
 using MphRecomp.Multiplayer;
 using MphRecomp.Multiplayer.Net;
 
@@ -74,7 +76,7 @@ internal sealed partial class CampaignRenderer
             }
             catch (Exception ex)
             {
-                renderer._error = "match setup: " + ex.Message;
+                renderer._error = LocalText.FormatId("match.error.setup", "match setup: {0}", ex.Message);
                 Log.Error("MPHMatch", ex.ToString());
             }
             return;
@@ -86,7 +88,7 @@ internal sealed partial class CampaignRenderer
             OnlineMatch? online = OnlineMatch.Current;
             if (online?.Net.Settings == null)
             {
-                renderer._error = "online match: the connection from the launcher is gone -- host or join again";
+                renderer._error = LocalText.Id("match.error.online", "online match: the connection from the launcher is gone -- host or join again");
                 return;
             }
             renderer._netSession = online.Net;
@@ -107,7 +109,7 @@ internal sealed partial class CampaignRenderer
             LanSession? session = LanSession.Current;
             if (session?.Settings == null)
             {
-                renderer._error = "LAN match: the connection from the launcher is gone -- host or join again";
+                renderer._error = LocalText.Id("match.error.lan", "LAN match: the connection from the launcher is gone -- host or join again");
                 return;
             }
             renderer._netSession = session; // LAN: the match camera setting, third person too (owner 2026-10-17; CampaignLaunch)
@@ -122,10 +124,13 @@ internal sealed partial class CampaignRenderer
             MphRead.GameMode gameMode = Enum.Parse<MphRead.GameMode>(mode!.Replace(" ", ""), ignoreCase: true);
             string arenaName = args.Get("arena") ?? "Combat Hall";
             // the arena table is plain metadata (no ROM access), so it can be resolved before the ROM paths are set
-            RoomMetadata arena = MatchArenas.Find(arenaName) ?? throw new ArgumentException($"no arena {arenaName}");
+            RoomMetadata arena = MatchArenas.Find(arenaName)
+                ?? throw new ArgumentException(LocalText.FormatId("match.error.arena", "no arena {0}", arenaName));
             int bots = int.TryParse(args.Get("bots"), out int b) ? b : 3;
             int level = int.TryParse(args.Get("botlevel"), out int l) ? l : 1;
             MatchSettings settings = MatchSettings.Quick(gameMode, arena.Name, renderer._hunter, bots, level);
+            // Quick local matches have no user-supplied name. The engine's raw default is still Player1.
+            settings.Players[settings.LocalSeat].Nickname = null;
             if (float.TryParse(args.Get("time"), System.Globalization.NumberStyles.Float,
                 System.Globalization.CultureInfo.InvariantCulture, out float time)) settings.TimeLimitSeconds = time;
             if (int.TryParse(args.Get("points"), out int points)) settings.PointGoal = points;
@@ -135,7 +140,7 @@ internal sealed partial class CampaignRenderer
         }
         catch (Exception ex)
         {
-            renderer._error = "match setup: " + ex.Message;
+            renderer._error = LocalText.FormatId("match.error.setup", "match setup: {0}", ex.Message);
             Log.Error("MPHMatch", ex.ToString());
         }
     }
@@ -185,8 +190,8 @@ internal sealed partial class CampaignRenderer
         double now = _clock.Elapsed.TotalSeconds;
         if (_matchResults == null)
         {
-            string why = _netDriver?.PeerGone == true && !_netSession!.IsHost ? "THE HOST LEFT\n" : "";
-            _matchResults = why + "MATCH OVER\n\n" + MatchStatus.Scoreboard();
+            string why = _netDriver?.PeerGone == true && !_netSession!.IsHost ? LocalText.Id("match.result.hostleft", "THE HOST LEFT") + "\n" : "";
+            _matchResults = why + LocalText.Id("match.result.title", "MATCH OVER") + "\n\n" + MatchStatus.DisplayScoreboard();
             _matchContinue = false;
             _matchEndedAt = now;
             _matchShownSecond = -1;
@@ -230,7 +235,8 @@ internal sealed partial class CampaignRenderer
             if (left != _matchShownSecond)
             {
                 _matchShownSecond = left;
-                ShipSink?.Invoke(_matchResults + $"\n\nA / B / Start / tap: back to the menu ({left})");
+                ShipSink?.Invoke(_matchResults + "\n\n"
+                    + LocalText.FormatId("match.result.back", "A / B / Start / tap: back to the menu ({0})", left));
             }
         }
         return true;
@@ -252,9 +258,10 @@ internal sealed partial class CampaignRenderer
             return _paused ? PauseText() : "";
         }
         RoomMetadata? meta = Metadata.GetRoomById(_host.RoomId);
-        string net = _netDriver != null ? "\n" + _netDriver.StatusLine() : ReplayStatusLine() + SoloStatusLine();
+        string net = _netDriver != null ? "\n" + _netDriver.DisplayStatusLine() : ReplayStatusLine() + SoloStatusLine();
         // the gun-adjust pause's lines (L3 + R3) show in a match too, above the scoreboard
         string pause = _paused ? "\n" + PauseText() : "";
-        return $"{meta?.InGameName}  {_fps:0} fps  sim {_simMs:0.0} ms  draw {_drawMs:0.0} ms{net}{pause}\n" + MatchStatus.Scoreboard();
+        return LocalText.FormatId("match.status.render", "{0}  {1:0} fps  sim {2:0.0} ms  draw {3:0.0} ms",
+            DisplayNames.Room(meta), _fps, _simMs, _drawMs) + net + pause + "\n" + MatchStatus.DisplayScoreboard();
     }
 }

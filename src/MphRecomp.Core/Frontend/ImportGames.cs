@@ -351,7 +351,7 @@ namespace MphRecomp.Frontend
                 ItemImportStatus.HashMismatch when OnlyFromOriginal(item) => LocalText.FormatId("import.item.original", "{0}: {1}", ItemName(item), OnlyFromOriginalText(gameId)),
                 ItemImportStatus.HashMismatch => LocalText.FormatId("import.item.disc_mismatch", "{0}: your disc isn't the version this was made from ({1}). ", ItemName(item), LocalText.Ui(ExpectedDisc(gameId, item)))
                     + LocalText.Ui("other versions aren't supported yet."),
-                ItemImportStatus.Failed => LocalText.FormatId("import.item.error", "{0} failed: {1}", ItemName(item), LocalText.Ui(Lower(item.Message))),
+                ItemImportStatus.Failed => LocalText.FormatId("import.item.error", "{0} failed: {1}", ItemName(item), Diagnostic(item.Message)),
                 _ => LocalText.FormatId("import.item.one", "{0}: {1}. a: import just this one.", ItemName(item), LocalText.Ui(what)),
             };
         }
@@ -591,7 +591,7 @@ namespace MphRecomp.Frontend
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
                 {
                     Log?.Invoke($"import: wii key from {picked.Name} refused ({ex.Message})");
-                    Popup!.Inform(LocalText.FormatId("import.key.wii.error", "{0} isn't a key file: {1}.", Lower(picked.Name), LocalText.Ui(Lower(ex.Message))));
+                    Popup!.Inform(LocalText.FormatId("import.key.wii.error", "{0} isn't a key file: {1}.", Lower(picked.Name), Diagnostic(ex.Message)));
                 }
             }));
         }
@@ -631,7 +631,7 @@ namespace MphRecomp.Frontend
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
                 {
                     Log?.Invoke($"import: switch keys from {picked.Name} refused ({ex.Message})");
-                    Popup!.Inform(LocalText.FormatId("import.key.switch.error", "{0} isn't a prod.keys file: {1}.", Lower(picked.Name), LocalText.Ui(Lower(ex.Message))));
+                    Popup!.Inform(LocalText.FormatId("import.key.switch.error", "{0} isn't a prod.keys file: {1}.", Lower(picked.Name), Diagnostic(ex.Message)));
                 }
             }));
         }
@@ -742,7 +742,7 @@ namespace MphRecomp.Frontend
                 {
                     Log?.Invoke("import: delete failed: " + ex);
                     Changed?.Invoke();
-                    Popup?.Inform(LocalText.FormatId("import.delete.error", "{0} couldn't all be deleted: {1}", what, LocalText.Ui(Lower(ex.Message))));
+                    Popup?.Inform(LocalText.FormatId("import.delete.error", "{0} couldn't all be deleted: {1}", what, Diagnostic(ex.Message)));
                 }
             });
         }
@@ -773,12 +773,12 @@ namespace MphRecomp.Frontend
             int n = UpdateCount(gameId);
             if (n == 0)
             {
-                if (!notice) Popup!.Inform("nothing needs an update: everything imported is up to date.");
+                if (!notice) Popup!.Inform(LocalText.Ui("nothing needs an update: everything imported is up to date."));
                 return;
             }
             bool suits = UpdateGames(gameId).Any(id => Game(id)?.Items.Any(i => NeedsUpdate(i) && i.Kind == "hd") == true);
-            string question = n == 1 ? "1 item needs an update. update it now?" : LocalText.FormatId("import.update.ask", "{0} items need updates. update them all now?", n);
-            Popup!.Ask(question + (suits ? " the suits take a few minutes." : ""), yes =>
+            string question = n == 1 ? LocalText.Ui("1 item needs an update. update it now?") : LocalText.FormatId("import.update.ask", "{0} items need updates. update them all now?", n);
+            Popup!.Ask(question + (suits ? LocalText.Ui(" the suits take a few minutes.") : ""), yes =>
             {
                 if (!yes) return;
                 _updating = true;
@@ -834,8 +834,8 @@ namespace MphRecomp.Frontend
             List<string> answers = _updateAnswers.ToList();
             if (last != null) answers.Add(last);
             _updateAnswers.Clear();
-            string answer = left == 0 && last == null ? (_updateTotal == 1 ? "updated." : LocalText.FormatId("import.update.done", "all {0} updated.", _updateTotal))
-                : answers.Count > 0 ? String.Join(" ", answers) : "nothing was updated.";
+            string answer = left == 0 && last == null ? (_updateTotal == 1 ? LocalText.Ui("updated.") : LocalText.FormatId("import.update.done", "all {0} updated.", _updateTotal))
+                : answers.Count > 0 ? String.Join(" ", answers) : LocalText.Ui("nothing was updated.");
             Log?.Invoke("import: update all: " + answer);
             Changed?.Invoke();
             Popup?.Inform(answer);
@@ -913,7 +913,8 @@ namespace MphRecomp.Frontend
                 catch (Exception ex)
                 {
                     Log?.Invoke("import: mph's samus model unreadable: " + ex);
-                    Popup!.Inform("the suits are fitted on this game's own samus, and her model couldn't be read: " + Lower(ex.Message));
+                    Log?.Invoke("import: suit source model unreadable: " + ex);
+                    Popup!.Inform(LocalText.Id("import.model.error", "the suits are fitted on this game's own samus, and her model couldn't be read: " + Lower(ex.Message)));
                     return;
                 }
             }
@@ -1081,7 +1082,7 @@ namespace MphRecomp.Frontend
                     ItemImportStatus.Complete => LocalText.FormatId("import.run.one.done", "{0} imported.", ItemName(it)),
                     ItemImportStatus.HashMismatch when OnlyFromOriginal(it) => LocalText.FormatId("import.run.one.original", "{0} wasn't imported: {1}", ItemName(it), OnlyFromOriginalText(_runGames[0])),
                     ItemImportStatus.HashMismatch => LocalText.FormatId("import.run.one.wrong", "{0} wasn't imported: your disc isn't the version it was made from. other versions aren't supported yet.", ItemName(it)),
-                    _ => LocalText.FormatId("import.run.one.fail", "{0} failed: {1}", ItemName(it), LocalText.Ui(Lower(it.Message))),
+                    _ => LocalText.FormatId("import.run.one.fail", "{0} failed: {1}", ItemName(it), Diagnostic(it.Message)),
                 };
             }
             if (wrong == n && original == 0)
@@ -1104,32 +1105,36 @@ namespace MphRecomp.Frontend
         private static string Names(List<ImportItemInfo> items)
         {
             var names = items.Select(ItemName).ToList();
-            return names.Count == 1 ? names[0] : String.Join(", ", names.Take(names.Count - 1)) + " and " + names[^1];
+            return names.Count == 1 ? names[0] : String.Join(LocalText.Id("import.names.separator", ", "), names.Take(names.Count - 1))
+                + LocalText.Id("import.names.last", " and ") + names[^1];
         }
+
+        private static string Diagnostic(string detail) => LocalText.Id("import.diagnostic", Lower(detail));
 
         private string Failure(Exception ex)
         {
             switch (ex)
             {
             case OperationCanceledException:
-                return "import stopped. nothing from it was kept.";
+                return LocalText.Ui("import stopped. nothing from it was kept.");
             case WiiKeyRequiredException:
-                return "this disc image is encrypted and needs your wii's key file: set it on the wii key file row. .rvz and .wia images need none.";
+                return LocalText.Ui("this disc image is encrypted and needs your wii's key file: set it on the wii key file row. .rvz and .wia images need none.");
             case SwitchKeyRequiredException { Firmware: string fw }:
-                return "your switch keys are older than this game"
-                    + (fw.Length > 0 ? $": it needs keys from switch system version {fw} or newer" : "")
-                    + ". update your switch, dump its prod.keys again and set them on the switch keys box.";
+                return fw.Length > 0
+                    ? LocalText.FormatId("import.key.switch.firmware", "your switch keys are older than this game: it needs keys from switch system version {0} or newer. update your switch, dump its prod.keys again and set them on the switch keys box.", fw)
+                    : LocalText.Id("import.key.switch.old", "your switch keys are older than this game. update your switch, dump its prod.keys again and set them on the switch keys box.");
             case SwitchKeyRequiredException:
-                return "this game file is encrypted and needs your switch's prod.keys, dumped from your own switch: set it on the switch keys box.";
+                return LocalText.Ui("this game file is encrypted and needs your switch's prod.keys, dumped from your own switch: set it on the switch keys box.");
             case FileNotFoundException or UnauthorizedAccessException or DirectoryNotFoundException:
                 WriteSource(_runKey, null); // forget it: the next press asks for the disc again
                 return LocalText.FormatId("import.run.open.error", "{0} can't be opened any more. pick your disc again.", Lower(_runName));
             case InvalidDataException:
                 WriteSource(_runKey, null); // not this game's disc (or no disc image at all): ask for the disc next time
-                return Lower(ex.Message) + ".";
+                Log?.Invoke("import: " + ex);
+                return LocalText.Id("import.run.bad_source", Lower(ex.Message) + ".");
             default:
                 Log?.Invoke("import: " + ex);
-                return "the import failed: " + Lower(ex.Message);
+                return LocalText.Id("import.run.exception", "the import failed: " + Lower(ex.Message));
             }
         }
     }

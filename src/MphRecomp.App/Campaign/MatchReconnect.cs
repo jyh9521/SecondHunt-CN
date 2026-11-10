@@ -1,6 +1,7 @@
 using MphRead;
 using MphRead.Entities;
 using MphRead.Hud;
+using MphRead.Text;
 using MphRecomp.Multiplayer.Net;
 
 namespace MphRecomp.App;
@@ -18,12 +19,14 @@ internal sealed partial class CampaignRenderer
         NetMatchSession net = m.Net;
         if (net.Reconnecting)
         {
-            p.QueueHudMessage(128, ReconnectY, Align.Center, 200, 8, new ColorRgba(0x7FFF), 1, 0.25f, 0, "reconnecting...");
+            p.QueueHudMessage(128, ReconnectY, Align.Center, 200, 8, new ColorRgba(0x7FFF), 1, 0.25f, 0,
+                LocalText.Id("match.net.reconnecting", "reconnecting..."));
         }
         else if (net.Reconnects != _reconnectsShown)
         {
             _reconnectsShown = net.Reconnects;
-            p.QueueHudMessage(128, ReconnectY, Align.Center, 200, 8, new ColorRgba(0x3FEF), 1, 2f, 0, "back in the match");
+            p.QueueHudMessage(128, ReconnectY, Align.Center, 200, 8, new ColorRgba(0x3FEF), 1, 2f, 0,
+                LocalText.Id("match.net.reconnected", "back in the match"));
         }
     }
 }

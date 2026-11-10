@@ -2226,7 +2226,7 @@ namespace MphRead.Entities
                             else
                             {
                                 // todo: update license
-                                string nickname = GameState.Nicknames[attacker.SlotIndex];
+                                string nickname = GameState.DisplayNickname(attacker.SlotIndex);
                                 // %s's HEADSHOT KILLED YOU! / %s KILLED YOU!
                                 string message = Strings.GetHudMessage(flags.TestFlag(DamageFlags.Headshot) ? 236 : 237);
                                 QueueHudMessage(128, 70, 140, 90 / 30f, 2, message.Replace("%s", nickname));
@@ -2306,7 +2306,7 @@ namespace MphRead.Entities
                                 if (attacker == Main) HostLicenseStreakEnd?.Invoke();
                                 if (attacker == Main)
                                 {
-                                    string nickname = GameState.Nicknames[SlotIndex];
+                                    string nickname = GameState.DisplayNickname(SlotIndex);
                                     string message = Strings.GetHudMessage(240); // YOU KILLED A TEAMMATE, (%s)!
                                     QueueHudMessage(128, 70, 140, 60 / 30f, 2, message.Replace("%s", nickname));
                                 }
@@ -2317,7 +2317,7 @@ namespace MphRead.Entities
                                 {
                                     // todo: update license info
                                     HostLicenseKill?.Invoke(flags, beamType);
-                                    string nickname = GameState.Nicknames[SlotIndex];
+                                    string nickname = GameState.DisplayNickname(SlotIndex);
                                     // YOUR HEADSHOT KILLED %s! / YOU KILLED %s!
                                     string message = Strings.GetHudMessage(flags.TestFlag(DamageFlags.Headshot) ? 239 : 238);
                                     QueueHudMessage(128, 70, 140, 60 / 30f, 2, message.Replace("%s", nickname));
@@ -2351,7 +2351,7 @@ namespace MphRead.Entities
                                     }
                                     else
                                     {
-                                        string nickname = GameState.Nicknames[attacker.SlotIndex];
+                                        string nickname = GameState.DisplayNickname(attacker.SlotIndex);
                                         message = Strings.GetHudMessage(255); // %s KILLED 5 IN A ROW!
                                         message = message.Replace("%s", nickname);
                                     }
@@ -2371,7 +2371,7 @@ namespace MphRead.Entities
                                         {
                                             _soundSource.QueueStream(VoiceId.VOICE_PRIME, delay: 1);
                                         }
-                                        string nickname = GameState.Nicknames[attacker.SlotIndex];
+                                        string nickname = GameState.DisplayNickname(attacker.SlotIndex);
                                         string message = Strings.GetHudMessage(241); // %s is the new prime hunter!
                                         QueueHudMessage(128, 70, 140, 90 / 30f, 2, message.Replace("%s", nickname));
                                     }

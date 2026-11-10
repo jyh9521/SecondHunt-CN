@@ -1363,5 +1363,11 @@
   "Not saved.": "未保存。",
   "MISSION COMPLETE": "任务完成",
   "0 of 0": "0 / 0",
-  "waiting...": "正在等待……"
+  "waiting...": "正在等待……",
+  "nothing was updated.": "没有更新任何资源。",
+  "import stopped. nothing from it was kept.": "已取消导入，本次导入未保留任何资源。",
+  "this disc image is encrypted and needs your wii's key file: set it on the wii key file row. .rvz and .wia images need none.": "此光盘映像需要 Wii 密钥，请在「Wii 密钥文件」中选择文件。.rvz 和 .wia 映像不需要密钥。",
+  "this game file is encrypted and needs your switch's prod.keys, dumped from your own switch: set it on the switch keys box.": "此游戏文件需要你从自己的 Switch 导出的 prod.keys，请在「Switch 密钥」中选择文件。",
+  "stopping. nothing from this import is kept.": "正在取消导入，本次导入不会保留任何资源。",
+  "rumble\npak": "振动卡"
 }

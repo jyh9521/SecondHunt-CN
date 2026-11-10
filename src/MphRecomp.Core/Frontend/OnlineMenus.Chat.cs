@@ -282,8 +282,10 @@ namespace MphRecomp.Frontend
         {
             long until = ChatMatch?.Client.ChatMutedUntil ?? 0;
             if (until <= DateTimeOffset.UtcNow.ToUnixTimeSeconds()) return null;
-            return until == long.MaxValue ? "your typed chat is muted.\n\nquick messages still work."
-                : $"your typed chat is muted until {DateTimeOffset.FromUnixTimeSeconds(until).ToLocalTime():MMM d, HH:mm}.\n\nquick messages still work.".ToLowerInvariant();
+            if (until == long.MaxValue) return LocalText.Ui("your typed chat is muted.\n\nquick messages still work.");
+            DateTimeOffset t = DateTimeOffset.FromUnixTimeSeconds(until).ToLocalTime();
+            return LocalText.FormatId("online.chat.muted_until", "your typed chat is muted until {0}.\n\nquick messages still work.",
+                $"{t:MMM d, HH:mm}".ToLowerInvariant(), t.Month, t.Day, t.Hour, t.Minute);
         }
 
         // a quick message (preset >= 0) or a typed line, on the game's connection; the server's echo is what shows it
@@ -495,7 +497,7 @@ namespace MphRecomp.Frontend
             if (note == null && ChatMutedText() != null) note = "your typed chat is muted: quick messages still work.";
             if (note == null && left > 0)
             {
-                note = $"typed chat reaches friends only for now: {left} more online match{(left == 1 ? "" : "es")} to open it.";
+                note = LocalText.FormatId("online.chat.friends_only", "typed chat reaches friends only for now: {0} more online match{1} to open it.", left, left == 1 ? "" : "es");
             }
             if (note != null) TextS(FitWidth(note, Mw(1020), SizeX), Mx(610), My(858), 2, Pale, tag, SizeX);
             // QUICK MESSAGES
@@ -506,7 +508,7 @@ namespace MphRecomp.Frontend
             {
                 (float x, float y) = PresetAt(k);
                 Bar(Mx(x), My(y), Mx(x + 305), My(y + 62), _chPreset[k], glows);
-                TextS(FitWidth(ChatPresets.All[k].ToLowerInvariant(), Mw(285), SizeX), Mx(x + 152), My(y + 19), 2, White, _chPreset[k], SizeX);
+                TextS(FitWidth(ChatPresets.Display(k).ToLowerInvariant(), Mw(285), SizeX), Mx(x + 152), My(y + 19), 2, White, _chPreset[k], SizeX);
             }
             DrawChatVoice(glows); // (OnlineMenus.Voice.cs)
         }
@@ -516,7 +518,8 @@ namespace MphRecomp.Frontend
             PlayerCard? c = _reportCard;
             if (c == null) return;
             int tag = _rpTitle;
-            TextS("report " + OnlineNames.Display(c.Name, c.Tag).ToLowerInvariant() + " for:", Mx(130), My(250), 0, White, tag, SizeS);
+            TextS(LocalText.FormatId("online.chat.report.title", "report {0} for:", OnlineNames.Display(c.Name, c.Tag).ToLowerInvariant()),
+                Mx(130), My(250), 0, White, tag, SizeS);
             for (int r = 0; r < ReportReasons.Length; r++)
             {
                 (float x0, float top, float x1, float bottom) = SettingsRowRect(r + 1);
