@@ -14,18 +14,25 @@ namespace MphRead.Text
     public static class LocalText
     {
         private static IReadOnlyDictionary<string, string>? _ui;
+        private static IReadOnlyDictionary<string, string>? _identified;
         private static RomTextPack? _rom;
         private static string? _romRoot;
         public static ExtraGlyphs? Glyphs { get; private set; }
 
-        public static void Configure(IReadOnlyDictionary<string, string>? ui, ExtraGlyphs? glyphs)
+        public static void Configure(IReadOnlyDictionary<string, string>? ui, ExtraGlyphs? glyphs,
+            IReadOnlyDictionary<string, string>? identified = null)
         {
             _ui = ui;
+            _identified = identified;
             Glyphs = glyphs;
         }
 
         public static string Ui(string source)
             => _ui != null && _ui.TryGetValue(source, out string? translated) ? translated : source;
+
+        // For generated UI, a stable ID is independent of edits to the English wording.
+        public static string Id(string id, string fallback)
+            => _identified != null && _identified.TryGetValue(id, out string? translated) ? translated : Ui(fallback);
 
         public static string Format(string source, params object?[] values)
             => string.Format(CultureInfo.InvariantCulture, Ui(source), values);
@@ -173,6 +180,10 @@ namespace MphRead.Text
             }
             if (!_indices.ContainsKey('□')) throw new InvalidDataException("Locale glyph atlas lacks a fallback.");
         }
+
+        // Unicode halfwidth forms use half the pen advance; the centred bitmap is
+        // positioned within that space (no downsampling of a small mark).
+        public static int Width(char c) => c is >= '\uFF61' and <= '\uFF9F' ? Advance / 2 : Advance;
 
         public int Index(char c) => _indices.TryGetValue(c, out int i) ? i : _indices['□'];
     }

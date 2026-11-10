@@ -27,12 +27,21 @@ internal static class DesktopLocale
             _ => throw new ArgumentException($"Unknown locale: {requested}. Use zh-CN or en.")
         };
         if (Name == English) { LocalText.Configure(null, null); return; }
-        using Stream ui = Resource("ui.json");
+        var identified = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (string resource in new[] { "settings.json", "terms.json" })
+            foreach (var pair in LoadCatalogue(resource))
+                identified.Add(pair.Key, pair.Value);
         using Stream glyph = Resource("glyphs.bin");
         using var glyphBytes = new MemoryStream();
         glyph.CopyTo(glyphBytes);
-        LocalText.Configure(JsonSerializer.Deserialize<Dictionary<string, string>>(ui)
-            ?? throw new InvalidDataException("Missing UI catalogue."), new ExtraGlyphs(glyphBytes.ToArray()));
+        LocalText.Configure(LoadCatalogue("ui.json"), new ExtraGlyphs(glyphBytes.ToArray()), identified);
+    }
+
+    private static Dictionary<string, string> LoadCatalogue(string name)
+    {
+        using Stream stream = Resource(name);
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(stream)
+            ?? throw new InvalidDataException($"Missing locale catalogue: {name}");
     }
 
     // Parse the built-in pack before changing the install. The installed copy has no ROM

@@ -24,7 +24,7 @@ namespace MphRead.Entities
         {
             float width = 0;
             for (int i = 0; i < line.Length; i++)
-                width += line[i] > 255 ? ExtraGlyphs.Advance : font.Widths[LocaleGlyph(line, ref i, font)];
+                width += line[i] > 255 ? ExtraGlyphs.Width(line[i]) : font.Widths[LocaleGlyph(line, ref i, font)];
             return width;
         }
 
@@ -56,16 +56,17 @@ namespace MphRead.Entities
                     char ch = line[i];
                     bool wide = ch > 255;
                     int glyph = wide ? glyphs.Index(ch) : LocaleGlyph(line, ref i, font);
+                    int advance = wide ? ExtraGlyphs.Width(ch) : font.Widths[glyph];
                     if (ch != ' ' && (align != Align.PadCenter || characterOffset < visibleLength))
                     {
                         HudObjectInstance instance = wide ? extra : _textInst;
-                        instance.PositionX = x / 256f;
+                        instance.PositionX = (x + (wide ? (advance - ExtraGlyphs.Advance) / 2f : 0)) / 256f;
                         instance.PositionY = (y + (wide ? 0 : font.Offsets[glyph])) / 192f;
                         if (color.HasValue) instance.SetData(glyph, color.Value, _scene);
                         else instance.SetData(glyph, palette, _scene);
                         _scene.DrawHudObject(instance, mode: align == Align.Left ? 2 : 0);
                     }
-                    x += wide ? ExtraGlyphs.Advance : font.Widths[glyph];
+                    x += advance;
                 }
                 start += n + 1;
                 if (start < text.Length) y += spacingY;

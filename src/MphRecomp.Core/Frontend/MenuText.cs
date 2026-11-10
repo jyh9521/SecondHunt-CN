@@ -182,9 +182,9 @@ namespace MphRecomp.Frontend
             float width = 0;
             for (int i = 0; i < line.Length; i++)
             {
-                bool extra = line[i] > 255;
+                char c = line[i];
                 int glyph = Glyph(line, ref i);
-                width += extra ? ExtraGlyphs.Advance : Advance(glyph);
+                width += c > 255 ? ExtraGlyphs.Width(c) : Advance(glyph);
             }
             return width;
         }
@@ -237,20 +237,21 @@ namespace MphRecomp.Frontend
                 float penX = align == 1 ? x - width : align == 2 ? x - MathF.Floor(width / 2) : x;
                 for (int i = 0; i < line.Length; i++)
                 {
-                    bool space = line[i] == ' ', extra = line[i] > 255;
-                    int glyph = Glyph(line, ref i);
+                    char c = line[i];
+                    bool extra = c > 255;
+                    int glyph = Glyph(line, ref i), advance = extra ? ExtraGlyphs.Width(c) : Advance(glyph);
                     var (texture, offset, u0, v0, u1, v1) = Sprite(glyph, extra);
-                    if (!space && texture >= 0)
+                    if (c != ' ' && texture >= 0)
                     {
-                        float gy = top - offset;
-                        var p0 = new UiVertex(penX, gy, u0, v0, r, g, b, a);
-                        var p1 = new UiVertex(penX + Cell, gy, u1, v0, r, g, b, a);
-                        var p2 = new UiVertex(penX + Cell, gy - Cell, u1, v1, r, g, b, a);
-                        var p3 = new UiVertex(penX, gy - Cell, u0, v1, r, g, b, a);
+                        float gy = top - offset, gx = penX + (extra ? (advance - Cell) / 2f : 0);
+                        var p0 = new UiVertex(gx, gy, u0, v0, r, g, b, a);
+                        var p1 = new UiVertex(gx + Cell, gy, u1, v0, r, g, b, a);
+                        var p2 = new UiVertex(gx + Cell, gy - Cell, u1, v1, r, g, b, a);
+                        var p3 = new UiVertex(gx, gy - Cell, u0, v1, r, g, b, a);
                         output.Add(new WidgetTri { A = p0, B = p1, C = p2, Z = z, TextureId = texture });
                         output.Add(new WidgetTri { A = p0, B = p2, C = p3, Z = z, TextureId = texture });
                     }
-                    penX += extra ? ExtraGlyphs.Advance : Advance(glyph);
+                    penX += advance;
                 }
                 top -= lineHeight;
             }
@@ -269,15 +270,16 @@ namespace MphRecomp.Frontend
                 float penX = align == 1 ? x - width : align == 2 ? x - width / 2 : x;
                 for (int i = 0; i < line.Length; i++)
                 {
-                    bool space = line[i] == ' ', extra = line[i] > 255;
-                    int glyph = Glyph(line, ref i);
+                    char c = line[i];
+                    bool extra = c > 255;
+                    int glyph = Glyph(line, ref i), advance = extra ? ExtraGlyphs.Width(c) : Advance(glyph);
                     var (texture, offset, u0, v0, u1, v1) = Sprite(glyph, extra);
-                    if (!space && texture >= 0)
+                    if (c != ' ' && texture >= 0)
                     {
-                        float glyphTop = lineTop + offset * scale;
-                        list.Quad(texture, penX, glyphTop, penX + Cell * scale, glyphTop + Cell * scale, u0, v0, u1, v1, r, g, b, a);
+                        float glyphTop = lineTop + offset * scale, gx = penX + (extra ? (advance - Cell) * scale / 2 : 0);
+                        list.Quad(texture, gx, glyphTop, gx + Cell * scale, glyphTop + Cell * scale, u0, v0, u1, v1, r, g, b, a);
                     }
-                    penX += (extra ? ExtraGlyphs.Advance : Advance(glyph)) * scale;
+                    penX += advance * scale;
                 }
                 lineTop += lineHeight;
             }

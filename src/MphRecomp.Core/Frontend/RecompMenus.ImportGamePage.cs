@@ -391,7 +391,8 @@ namespace MphRecomp.Frontend
             // (Prime 4: its game file or a RomFS folder)
             bool folder = Import.FolderOnly(_importGame) || _gameSource?.Folder == true;
             if (!shown) ScaledText(folder || _switchKeys ? "your files" : "your disc", GX(StripX + 140), GY(StripY + 20), 0, Orange, tag, 1);
-            string second = _gameSource == null ? row.Platform + (folder ? " romfs folder" : _switchKeys ? " game file" : " disc")
+            string second = _gameSource == null
+                ? ImportGames.DisplayMedia(row, row.Platform + (folder ? " romfs folder" : _switchKeys ? " game file" : " disc"))
                 : FitWidth(_gameSource.Name.ToLowerInvariant(), GL(NameWidth), 0.62f);
             ScaledText(second, GX(StripX + 140), GY(StripY + (shown ? 88 : 80)), 0, _gameSource == null ? Pale : White, tag, 0.62f);
             Box(GX(PickX), GY(PickY), GX(PickX + PickW), GY(PickY + PickH), _gPick);

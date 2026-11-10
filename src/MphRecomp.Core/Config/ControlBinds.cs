@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MphRead.Text;
 
 // The control customizer's model (OPTIONS > CONTROLS, also opened from the gunship's OPTIONS; RecompMenus.Controls.cs): the
 // game functions a player can move to other buttons, their default buttons -- the layouts the app has always had, the
@@ -138,6 +139,16 @@ namespace MphRecomp.Config
         };
 
         public static Function[] Functions(bool keys) => keys ? KeyFunctions : PadFunctions;
+
+        public static string DisplayLabel(Function function) =>
+            LocalText.Id("controls.bind." + function.Id + ".label", function.Label.Replace('\n', ' '));
+
+        public static string DisplayHint(Function function, bool keys) =>
+            LocalText.Id("controls.bind." + function.Id + (keys ? ".keys.hint" : ".pad.hint"), function.Description);
+
+        public static string DisplayButton(string button) => IsCombo(button)
+            ? string.Join("+", Parts(button).Select(DisplayButton))
+            : LocalText.Id("controls.button." + button, Short(button));
 
         private static Dictionary<string, string[]> BindsOf(RecompSettings s, bool keys) => keys ? s.KeyBinds : s.PadBinds;
 

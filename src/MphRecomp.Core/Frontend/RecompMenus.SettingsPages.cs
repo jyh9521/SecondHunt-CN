@@ -213,13 +213,9 @@ namespace MphRecomp.Frontend
             foreach (RowModel row in rows)
             {
                 if (row.Describe != null) continue;
-                string key = row.Label.Replace("\n", "").Replace(" ", ""), own = row.Description;
+                string key = ControlHints.Key(row.Label), own = row.Description;
                 Func<string> value = row.Value;
-                // (".public": a public build's own wording, e.g. the hud without the mini map)
-                row.Describe = () => RecompSettings.PublicBuild
-                    && ControlHints.All.TryGetValue(key + "." + value().ToLowerInvariant() + ".public", out string? h) ? h
-                    : ControlHints.All.TryGetValue(key + "." + value().ToLowerInvariant(), out h) ? h
-                    : ControlHints.All.TryGetValue(key, out h) ? h : own;
+                row.Describe = () => ControlHints.ForSetting(key, value(), own, RecompSettings.PublicBuild);
             }
             return rows;
         }

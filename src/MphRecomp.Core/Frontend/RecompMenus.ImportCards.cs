@@ -63,10 +63,11 @@ namespace MphRecomp.Frontend
 
         private static string[] TitleLines(ImportGames.GameRow row)
         {
-            if (row.Id == ImportGames.TrilogyId) return new[] { "metroid prime", "trilogy" };
             string t = row.Title.ToLowerInvariant();
             int colon = t.IndexOf(": ", StringComparison.Ordinal);
-            return t.Length > 13 && colon > 0 ? new[] { t[..(colon + 1)], t[(colon + 2)..] } : new[] { t };
+            string fallback = row.Id == ImportGames.TrilogyId ? "metroid prime\ntrilogy"
+                : t.Length > 13 && colon > 0 ? t[..(colon + 1)] + "\n" + t[(colon + 2)..] : t;
+            return ImportGames.DisplayCardTitle(row, fallback).Split('\n');
         }
 
         // RecompMenus.Install, after the import pages: the cards on IMPORT GAMES' page
@@ -250,7 +251,7 @@ namespace MphRecomp.Frontend
                 return true;
             }
             _importGame = row.Id;
-            _importGameRows.Title = row.Title;
+            _importGameRows.Title = ImportGames.DisplayTitle(row);
             menu.GoTo(_importGameRows.Page);
             return true;
         }
@@ -333,10 +334,14 @@ namespace MphRecomp.Frontend
             else
             {
                 string[] lines = TitleLines(info.Row);
-                for (int i = 0; i < lines.Length && i < 2; i++) ScaledText(lines[i], mid, y - TitlePitch * i, 2, soon ? Grey : Orange, tag, 0.8f);
+                for (int i = 0; i < lines.Length && i < 2; i++)
+                {
+                    float scale = Math.Min(0.8f, (CardW - 2 * PlateInset) / Math.Max(1, _drawMenu!.Font.Measure(lines[i])));
+                    ScaledText(lines[i], mid, y - TitlePitch * i, 2, soon ? Grey : Orange, tag, scale);
+                }
                 y -= TitleBlock;
             }
-            ScaledText(Platform(info.Row), mid, y, 2, Pale, tag, 0.5f);
+            ScaledText(ImportGames.DisplayMedia(info.Row, Platform(info.Row)), mid, y, 2, Pale, tag, 0.5f);
             y -= PlatformPitch;
 
             // what the disc makes: three to a row, each row centred

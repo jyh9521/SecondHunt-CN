@@ -246,7 +246,8 @@ namespace MphRecomp.Frontend
                 bool scan = false, zoom = false;
                 foreach (ControlBinds.Function f in functions)
                 {
-                    e.Add(new Entry { Kind = EntryKind.Bind, Label = f.Label.Replace('\n', ' '), Bind = f.Id, Description = f.Description });
+                    e.Add(new Entry { Kind = EntryKind.Bind, Label = ControlBinds.DisplayLabel(f),
+                        Bind = f.Id, Description = ControlBinds.DisplayHint(f, keys) });
                     // (C25, owner 2026-10-17: a small hint after scan and zoom, that the two can share a button)
                     bool both = scan && zoom;
                     scan |= f.Id == ControlBinds.Scan;
@@ -957,7 +958,7 @@ namespace MphRecomp.Frontend
                         }
                         else
                         {
-                            Cell(sp.ValueX0, top, sp.ValueX1, bottom, row.Value(), White, sp.Value[s], glows, tag);
+                            Cell(sp.ValueX0, top, sp.ValueX1, bottom, row.DisplayValue(), White, sp.Value[s], glows, tag);
                             if (!row.Action && !off)
                             {
                                 SmallArrow(false, sp.ValueX0 + 3, top - (SecH - SecArrowH) / 2, tag);
@@ -986,7 +987,7 @@ namespace MphRecomp.Frontend
                         {
                             bool waiting = _captureId == id && _captureSlot == c;
                             string now = ControlBinds.Slot(_settings, keys, id, c);
-                            string text = waiting ? "press" : now.Length > 0 ? ControlBinds.Short(now) : "-";
+                            string text = waiting ? "press" : now.Length > 0 ? ControlBinds.DisplayButton(now) : "-";
                             int item = c == 0 ? sp.Cell0[s] : sp.Cell1[s];
                             Cell(c == 0 ? SecC0X0 : SecC1X0, top, c == 0 ? SecC0X1 : SecC1X1, bottom, text,
                                 waiting ? Cyan : now.Length > 0 ? White : OnGrey, item, glows, item);
@@ -1032,7 +1033,7 @@ namespace MphRecomp.Frontend
                 }
                 else if (f.Row != null)
                 {
-                    desc = f.Row.Hint;
+                    desc = MphRead.Text.LocalText.Ui(f.Row.Hint);
                     if (HasReset(f) && !keys) desc += " " + ControlHints.For("resetline");
                 }
             }

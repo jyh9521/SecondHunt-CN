@@ -1,4 +1,5 @@
 using System;
+using MphRead.Text;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -111,6 +112,11 @@ namespace MphRecomp.Frontend
         }
 
         public static GameRow Row(string gameId) => GameRows.First(g => g.Id == gameId);
+
+        // Display names must not replace the IDs/titles used to recognize a disc.
+        public static string DisplayTitle(GameRow game) => LocalText.Id("game." + game.Id + ".title", game.Title);
+        public static string DisplayCardTitle(GameRow game, string fallback) => LocalText.Id("game." + game.Id + ".card", fallback);
+        public static string DisplayMedia(GameRow game, string fallback) => LocalText.Id("game." + game.Id + ".media", fallback);
 
         // IMPORT GAMES offers the suits, morph balls, characters and Echoes arenas, not the first-person arm cannons, in
         // every build (owner 2026-10-07 ~12:45: public builds; ~21:20, Reports R8: "exclude arm cannons in first person
@@ -263,6 +269,9 @@ namespace MphRecomp.Frontend
             return s.EndsWith("Ball", StringComparison.Ordinal) ? s[..^4] : s;
         }
 
+        public static string DisplayAsset(string name, string fallback) =>
+            LocalText.Id("asset." + GroupOf(name).ToLowerInvariant(), fallback);
+
         private static int SuitOrder(string group)
         {
             int i = Array.IndexOf(Suits, group);
@@ -282,7 +291,7 @@ namespace MphRecomp.Frontend
         public static string ItemLabel(ImportItemInfo item)
         {
             // Echoes' multiplayer arenas ("sidehopper\nstation") and their music (Core Import/Echoes, CR2)
-            if (item.Kind == "music") return "arena\nmusic";
+            if (item.Kind == "music") return LocalText.Id("asset.echoesarenamusic", "arena\nmusic");
             if (item.Kind == SongsTileKind) return "music";
             if (IsSong(item))
             {
@@ -292,11 +301,14 @@ namespace MphRecomp.Frontend
                 int half = (w.Length + 1) / 2;
                 return w.Length < 2 ? title : String.Join(" ", w.Take(half)) + "\n" + String.Join(" ", w.Skip(half));
             }
-            string group = item.Kind == "arenas" ? MphRecomp.Arenas.EchoesArena.Find(item.Name)?.InGameName.ToLowerInvariant() ?? item.Name : GroupOf(item.Name);
-            string suit = item.Kind == "arenas" ? group : SuitName(group);
-            if (item.Kind == "guns") return suit + "\narm cannon";
-            if (group == "Samus") return "morph\nball";
-            if (IsBall(item)) return suit + "\nmorph ball";
+            string group = GroupOf(item.Name);
+            string suit = item.Kind == "arenas"
+                ? MphRecomp.Arenas.EchoesArena.Find(item.Name)?.InGameName.ToLowerInvariant() ?? item.Name : SuitName(group);
+            string label = DisplayAsset(item.Name, suit);
+            if (item.Kind == "guns") return label + "\n" + LocalText.Ui("arm cannon");
+            if (group == "Samus") return LocalText.Id("asset.samusball", "morph\nball");
+            if (IsBall(item)) return label + "\n" + LocalText.Ui("morph ball");
+            if (label != suit) return label;
             string[] words = suit.Split(' ');
             int first = (words.Length + 1) / 2;
             return String.Join(" ", words.Take(first)) + (words.Length > 1 ? "\n" + String.Join(" ", words.Skip(first)) : "");

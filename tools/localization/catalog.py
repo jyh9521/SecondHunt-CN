@@ -182,6 +182,8 @@ def glyphs(args):
     cmap = TTFont(args.font).getBestCmap()
     ui, rom = load(args.ui), load(args.pack)
     texts = list(ui.values()) + list(rom["menu"].values())
+    for path in args.catalog:
+        texts.extend(load(path).values())
     texts += [v for tab in rom["tables"].values() for entry in tab.values()
               for k, v in entry.items() if k != "source"]
     chars = sorted({c for text in texts for c in text if ord(c) > 127} | {"□"})
@@ -211,6 +213,8 @@ def main():
             cmd.add_argument(path, type=Path)
         if name == "pack":
             cmd.add_argument("--locale", required=True)
+        if name == "glyphs":
+            cmd.add_argument("--catalog", action="append", type=Path, default=[])
         cmd.set_defaults(handler=handler)
     args = parser.parse_args()
     args.handler(args)

@@ -2,11 +2,29 @@ using System.Security.Cryptography;
 using System.Text;
 using MphRead;
 using MphRead.Text;
+using MphRecomp.Config;
 using MphRecomp.Frontend;
 using SecondHunt.Desktop;
 using AccessAction = SecondHunt.Desktop.DesktopStorage.AccessAction;
 
 Console.OutputEncoding = Encoding.UTF8;
+// The shipped launcher sets these at startup; the test runs its libraries directly.
+RecompSettings.PublicBuild = true;
+RecompSettings.DesktopHost = true;
+if (args is ["--settings-only"])
+{
+    DesktopLocale.Init("zh-CN");
+    string hint = LocalText.Ui(ControlHints.For("maplook.map"));
+    Console.WriteLine("MAP_HINT=" + hint);
+    const string expected = "暂停地图使用原版房间模型。在地图中按 Y 切换。";
+    if (hint != expected)
+    {
+        Console.Error.WriteLine("FAIL: the selected Map Look value did not produce its Chinese hint.");
+        return 1;
+    }
+    Console.WriteLine("PASS: selected Map Look hint is translated.");
+    return CheckSettingsCatalogue() ? 0 : 1;
+}
 if (args.Length != 2 || !Directory.Exists(args[0]) || !Directory.Exists(args[1]))
 {
     Console.Error.WriteLine("usage: SecondHunt.LocalizationTests <extracted-game-dir> <fixture-parent>");
@@ -118,7 +136,7 @@ try
     Check(chineseMenu.Display(begin) == "runtime value", "runtime values override original ROM menu translations");
     var originalLog = originals[StringTables.ScanLog].First(x => x.Id == "L001");
     var log = Strings.GetScanEntry(1)!;
-    Check(log.Value1 == "扫描目镜" && log.String1 == "扫描目镜"
+    Check(log.Value1 == "扫描面罩" && log.String1 == "扫描面罩"
         && log.Speed == originalLog.Speed && log.Category == originalLog.Category,
         "scan log renders Unicode and preserves metadata");
     var msg = Strings.GetEntry('M', 5, StringTables.GameMessages)!;
@@ -128,6 +146,26 @@ try
         && Strings.GetEntry('S', 21, StringTables.HudMessagesMP)!.Value1 == "究极猎人规则"
         && LocalText.Ui("METROID") == "密特罗德" && LocalText.Ui("PRIME") == "究极",
         "Metroid and Prime use the requested Chinese terminology");
+    Check(Strings.GetEntry('M', 1, StringTables.GameMessages)!.Value1 == "猎人舰艇"
+        && Strings.GetEntry('H', 4, StringTables.WeaponNames)!.Value1 == "赛拉克斯"
+        && Strings.GetScanEntry(8)!.Value2.Contains("萨姆斯･亚兰"),
+        "canonical terms occur in the real dialogue, weapons and scan-log tables");
+    var fonts = new MenuFont(new UiTextureCache());
+    Check(LocalText.Glyphs!.Index('･') != LocalText.Glyphs.Index('□')
+        && fonts.Measure("萨姆斯･亚兰") == 5 * ExtraGlyphs.Advance + ExtraGlyphs.Advance / 2,
+        "halfwidth middle dot has its own glyph and half-cell advance");
+    Check(CheckSettingsCatalogue(), "settings and import display catalogues resolve");
+    var imports = new ImportGames(Path.Combine(root, "imports"));
+    var items = ImportGames.GameRows.Where(g => g.Id != ImportGames.TrilogyId)
+        .SelectMany(g => imports.Game(g.Id)?.Items ?? throw new InvalidOperationException(g.Id)).ToArray();
+    string[] unknown = items.Where(i => !ImportGames.ItemLabel(i).Any(c => c is >= '\u3400' and <= '\u9fff'))
+        .Select(i => i.Id).ToArray();
+    Check(items.Length > 0 && unknown.Length == 0, $"all {items.Length} public import cards localized: {string.Join(", ", unknown)}");
+    Check(ImportGames.DisplayAsset("MP2VariaSuit", "P2 VAR") == "防护服"
+        && ImportGames.DisplayAsset("custom-export", "CUSTOM") == "CUSTOM",
+        "built-in costume choices use the import glossary, unknown exports keep their own label");
+    Check(RecompSettings.MusicSources.All(x => AudioOptions.QualityDescription(x).Contains("即时生效")),
+        "legacy audio quality uses the current choice's localized hint");
     var room = Strings.GetEntry('R', 103, StringTables.LocationNames)!;
     Check(room.Value1 == "Unit2_land" && room.Value2 == "天体档案馆入口", "display name changes, room key does not");
     int menuHits = Enumerable.Range(0, englishMenu.RomCount).Count(i => englishMenu[i] != MenuStringsForDisplay(i));
@@ -152,9 +190,50 @@ try
         "CJK wraps without spaces");
     DesktopLocale.Init("en");
     DesktopGame.Prepare(game);
+    Check(ControlHints.ForSetting("maplook", "MAP", "", true) == ControlHints.All["maplook.map"]
+        && ImportGames.DisplayTitle(ImportGames.Row("mp4")) == "PRIME 4: BEYOND"
+        && ImportGames.DisplayAsset("MP2VariaSuit", "P2 VAR") == "P2 VAR"
+        && AudioOptions.QualityDescription("hq") == AudioOptions.OriginalQualityDescription,
+        "English mode restores the original generated settings and import labels");
     Check(MenuStrings.Load(Paths.FileSystem).Display(begin) == "BEGIN GAME" && Strings.GetScanEntry(1)!.Value1 == originalLog.Value1,
         "English mode bypasses the installed overlay and invalidates the string cache");
     Console.WriteLine($"PASS: {passed} checks");
 }
 finally { Directory.SetCurrentDirectory(cwd); }
 return 0;
+
+static bool CheckSettingsCatalogue()
+{
+    static bool HasHan(string text) => text.Any(c => c is >= '\u3400' and <= '\u9fff');
+    string[] missing = ControlHints.All.Keys.Where(k => !HasHan(ControlHints.For(k))).ToArray();
+    if (missing.Length > 0)
+    {
+        Console.Error.WriteLine("Missing localized hint IDs: " + string.Join(", ", missing));
+        return false;
+    }
+    int binds = 0;
+    foreach (bool keys in new[] { false, true })
+        foreach (ControlBinds.Function f in ControlBinds.Functions(keys))
+        {
+            if (!HasHan(ControlBinds.DisplayHint(f, keys)) || !HasHan(ControlBinds.DisplayLabel(f)))
+            {
+                Console.Error.WriteLine($"Untranslated {f.Id} (keys={keys})");
+                return false;
+            }
+            binds++;
+        }
+    string alternate = ControlHints.ForSetting("maplook", "DETAILED", "unused", true);
+    string mapped = ControlHints.ForSetting("maplook", "MAP", "unused", true);
+    bool ok = mapped == "暂停地图使用原版房间模型。在地图中按 Y 切换。"
+        && alternate.Contains("实际形状")
+        && ControlHints.ForSetting("importgames", "OPEN", "unused", true).Contains("高清装甲")
+        && ControlHints.DisplayValue("map\nlook", "MAP") == "原版模型"
+        && ControlBinds.DisplayButton("Mouse.Right+LeftShift") == "鼠标右键+左 Shift"
+        && ImportGames.DisplayTitle(ImportGames.Row("mp2")) == "密特罗德 究极2 黑暗回声"
+        && ImportGames.DisplayTitle(ImportGames.Row("mp3")) == "密特罗德 究极3 腐蚀"
+        && ImportGames.DisplayTitle(ImportGames.Row("mp4")) == "密特罗德 究极4 穿越未知"
+        && ImportGames.GameRows.All(g => HasHan(ImportGames.DisplayTitle(g)));
+    Console.WriteLine(ok ? $"SETTINGS: {ControlHints.All.Count} hints, {binds} device/action pairs, 5 import titles localized."
+        : "FAIL: a runtime setting value or canonical import title did not resolve.");
+    return ok;
+}

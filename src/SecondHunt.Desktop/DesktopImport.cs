@@ -1,5 +1,6 @@
 using MphRecomp.App.Platform;
 using MphRecomp.Frontend;
+using MphRead.Text;
 
 namespace SecondHunt.Desktop;
 
@@ -17,13 +18,13 @@ internal static class DesktopImport
     {
         if (request.Kind == ImportPickKind.Folder) return PickFolder(request);
         string patterns = String.Join(";", request.Extensions.Select(e => "*" + e));
-        string what = request.Kind == ImportPickKind.WiiKey ? "Wii key file"
-            : request.Kind == ImportPickKind.SwitchKeys ? "Switch prod.keys file"
-            : System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(request.Title.ToLowerInvariant()) + " disc image";
+        string what = request.Kind == ImportPickKind.WiiKey ? LocalText.Ui("Wii key file")
+            : request.Kind == ImportPickKind.SwitchKeys ? LocalText.Ui("Switch prod.keys file")
+            : LocalText.Format("{0} disc image", DisplayTitle(request));
         using var dialog = new System.Windows.Forms.OpenFileDialog
         {
-            Title = $"Select your {what}",
-            Filter = $"{what} ({patterns})|{patterns}|All files (*.*)|*.*",
+            Title = LocalText.Format("Select your {0}", what),
+            Filter = $"{what} ({patterns})|{patterns}|{LocalText.Ui("All files (*.*)")}|*.*",
             CheckFileExists = true,
             RestoreDirectory = true,
         };
@@ -32,13 +33,16 @@ internal static class DesktopImport
         return new ImportPicked(dialog.FileName, Path.GetFileName(dialog.FileName));
     }
 
+    private static string DisplayTitle(ImportPickRequest request) =>
+        ImportGames.DisplayTitle(ImportGames.Row(request.GameId));
+
     // a game imported from its files (Prime 4: the RomFS folder of the player's own dump), read where it is
     static ImportPicked? PickFolder(ImportPickRequest request)
     {
-        string title = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(request.Title.ToLowerInvariant());
+        string title = DisplayTitle(request);
         using var dialog = new System.Windows.Forms.FolderBrowserDialog
         {
-            Description = $"Select your {title} RomFS folder (the folder holding Preload, or the one above it)",
+            Description = LocalText.Format("Select your {0} RomFS folder (the folder holding Preload, or the one above it)", title),
             UseDescriptionForTitle = true,
             ShowNewFolderButton = false,
         };

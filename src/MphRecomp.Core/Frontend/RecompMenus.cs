@@ -119,6 +119,8 @@ namespace MphRecomp.Frontend
             public Func<string>? Describe; // in place of Description: the hint of the option it's on (CONTROLS, C17)
             public string Hint => Describe?.Invoke() ?? Description;
             public Func<string> Value = () => "";
+            public Func<string>? ValueDisplay;
+            public string DisplayValue() => ValueDisplay?.Invoke() ?? ControlHints.DisplayValue(Label, Value());
             public Action<int> Step = _ => { };
             public Action? Alt; // X
             public Action? Remove; // Y (the customizer: take one button away)
@@ -319,10 +321,11 @@ namespace MphRecomp.Frontend
             catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException) { return MphRecomp.Multiplayer.Characters.Original; }
         }
 
-        private string MenuArtValue()
+        private string MenuArtValue(bool display = false)
         {
             string c = MenuArtChoice();
-            return MphRecomp.Multiplayer.Characters.IsOriginal(c) ? "ORIGINAL" : c == MultiplayerMenu.ShuffleChoice ? "SHUFFLE" : SuitValue(c);
+            return MphRecomp.Multiplayer.Characters.IsOriginal(c) ? "ORIGINAL" : c == MultiplayerMenu.ShuffleChoice ? "SHUFFLE"
+                : display ? ImportGames.DisplayAsset(c, SuitValue(c)) : SuitValue(c);
         }
 
         private void OpenMenuArt()
@@ -501,7 +504,8 @@ namespace MphRecomp.Frontend
                 {
                     Label = "menu\nart",
                     Description = "samus behind the menus: one of your imported suits, shuffle (another one each time the game starts), or original (the ds picture).",
-                    Value = MenuArtValue,
+                    Value = () => MenuArtValue(),
+                    ValueDisplay = () => MenuArtValue(display: true),
                     Step = _ => OpenMenuArt(),
                     Action = true
                 },
@@ -550,15 +554,8 @@ namespace MphRecomp.Frontend
                     // all four are the game's own sequences (GameAudio.cs MusicMode); a change applies live, mid-song
                     // (SetQuality). 3 lines at wrap 230 (FE_WRAP).
                     // the value box holds ~7 letters, so hq + fixes + tone shows as HQ+TONE; its full name is here
-                    Description = "orig: the ds. orig+fix: no clicks or clipping. hq+fix: smoother. "
-                        + "hq+tone: hq + fixes + the ds's treble. changes live.",
-                    Value = () => _settings.Music switch
-                    {
-                        "plain" => "ORIG",
-                        "hq" => "HQ+FIX",
-                        "hqtone" => "HQ+TONE",
-                        _ => "ORIG+FIX",
-                    },
+                    Description = AudioOptions.OriginalQualityDescription,
+                    Value = () => AudioOptions.QualityLabel(_settings.Music),
                     Step = s => _settings.Music = Next(RecompSettings.MusicSources, _settings.Music, s)
                 },
                 // dev builds only (owner 2026-10-05: the DS's control types kept for dual-screen Thor testing)
@@ -617,6 +614,7 @@ namespace MphRecomp.Frontend
                         + (RecompSettings.PublicBuild ? "her model (third person and morph ball), mph's arm cannon; original is mph's own."
                             : "her model (third person and morph ball) and arm cannon; original is mph's own."),
                     Value = () => SuitValue(ShownSuit()),
+                    ValueDisplay = () => ImportGames.DisplayAsset(ShownSuit(), SuitValue(ShownSuit())),
                     Step = s => _settings.SamusSuit = Next(_suits.ToArray(), ShownSuit(), s)
                 },
                 new()
@@ -1877,7 +1875,7 @@ namespace MphRecomp.Frontend
             {
                 RowModel? m = r < shown ? p.Rows[p.Offset + r] : null;
                 _strings.Set(p.Label[r], m?.Label ?? "");
-                _strings.Set(p.Value[r], m?.Value() ?? "");
+                _strings.Set(p.Value[r], m?.DisplayValue() ?? "");
                 _strings.Set(p.Desc[r], m?.Hint ?? "");
             }
         }

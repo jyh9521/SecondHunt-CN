@@ -2,7 +2,9 @@
 
 中文游戏名为《密特罗德究极：猎人》。术语统一为 **Metroid → 密特罗德**、
 **Prime → 究极**（如「究极猎人」「究极倍率」）。`Ultimate Power` 是另一个词，
-译为「终极力量」。程序名、文件名、游戏代码和联机字段不随翻译改动。
+译为「终极力量」。项目采用「萨姆斯･亚兰」（半角中点）、「赛拉克斯」和「舰艇」。
+任天堂简中证据和未核实项目的处理见[术语核对](TERMINOLOGY.zh-CN.md)。
+程序名、文件名、游戏代码和联机字段不随翻译改动。
 
 ## 使用
 
@@ -28,7 +30,9 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 这里没有混入那些改动。Android 默认流程、ROM 文件格式、存档格式和房间 ID
 均未改。新分支没有被推送或发布。
 
-- `locales/zh-CN/ui.json` 是应用的 UI 字符串字典；`rom.json` 是 UTF-8 覆盖包，
+- `locales/zh-CN/ui.json` 是应用的 UI 字符串字典；`settings.json` 按稳定 ID
+  保存选项提示、键位和选项值，`terms.json` 保存导入卡片的标题、来源和内置资源名称。
+  `rom.json` 是 UTF-8 覆盖包，
   `glyphs.bin` 是 16×16 字形。启动器完成解包后把覆盖包原子写入
   `data/game/localization/zh-CN.json`。`data/game/files/AMHE*` 的原始文件保留；
   运行时按源文本指纹匹配，不匹配的行回退到原文，而不是套错译文。
@@ -47,7 +51,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.2
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.3
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -73,7 +77,7 @@ py tools/localization/catalog.py pack 'D:\work\source.json' 'D:\work\translation
 
 ```powershell
 py -m pip install Pillow==12.2.0 fonttools==4.63.0
-py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin
+py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin --catalog locales/zh-CN/settings.json --catalog locales/zh-CN/terms.json
 ```
 
 字形来源：[Noto Sans CJK SC Medium, Sans2.004](https://github.com/notofonts/noto-cjk/blob/Sans2.004/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Medium.otf)，

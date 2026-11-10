@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MphRead.Text;
 
 // CONTROLS' hint texts (owner 2026-10-17: "instead of having the hint text explain all options, it should
 // just explain the one that is selected"), one table so the owner's edits land in one place: a key per row, ".<option>"
@@ -46,6 +47,12 @@ namespace MphRecomp.Frontend
             // SECOND HUNT SETTINGS (owner 2026-10-17: "reorganize the whole second hunt settings menu in the same way/style",
             // RecompMenus.SettingsPages.cs): each row's "<label>.<value>" (the label without spaces: "menu
             // screens" = "menuscreens"), or "<label>" when its values don't change the hint; a row with neither keeps its own
+            ["importgames.public"] = "make hd suits and morph balls from your own metroid prime game discs.",
+            ["importgames"] = "make hd suits, morph balls and arm cannons from your own metroid prime game discs.",
+            ["samussuit.orig"] = "the original hunters suit in third person and morph ball.",
+            ["samussuit"] = "the selected samus suit in third person and morph ball.",
+            ["crashlog.open"] = "opens the directory containing the latest crash report.",
+            ["crashlog.share"] = "shares the latest crash report.",
             ["menuscreens.one"] = "both ds screens' menus together on one screen.",
             ["menuscreens.two"] = "the two ds screens' menus side by side.",
             ["menuart.original"] = "the ds picture of samus behind the menus.",
@@ -100,8 +107,24 @@ namespace MphRecomp.Frontend
             ["statustext.off"] = "no status text in gameplay.",
         };
 
-        // the hint for `key` (with ".keys" for the keyboard and mouse when it has its own)
+        private static string? Lookup(string key) =>
+            All.TryGetValue(key, out string? source) ? LocalText.Id("settings.hint." + key, source) : null;
+
+        // The keyboard variant falls back to the same hint as the controller.
         public static string For(string key, bool keys = false) =>
-            keys && All.TryGetValue(key + ".keys", out string? k) ? k : All.TryGetValue(key, out string? s) ? s : "";
+            (keys ? Lookup(key + ".keys") : null) ?? Lookup(key) ?? "";
+
+        public static string Key(string label) => label.Replace("\n", "").Replace(" ", "").ToLowerInvariant();
+
+        public static string ForSetting(string key, string value, string fallback, bool publicBuild)
+        {
+            string choice = key + "." + value.ToLowerInvariant();
+            return (publicBuild ? Lookup(choice + ".public") : null)
+                ?? Lookup(choice) ?? (publicBuild ? Lookup(key + ".public") : null)
+                ?? Lookup(key) ?? LocalText.Ui(fallback);
+        }
+
+        public static string DisplayValue(string label, string value) =>
+            LocalText.Id("settings.value." + Key(label) + "." + value.ToLowerInvariant(), value);
     }
 }
