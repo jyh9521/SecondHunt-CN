@@ -1,252 +1,126 @@
-<p align="center">
-  <img src="docs/images/second-hunt-banner.jpg" width="720" alt="Second Hunt">
-</p>
+# Second Hunt-CN｜密特罗德究极：猎人
 
-<p align="center">
-  <a href="https://github.com/BountyHunterKanden/SecondHunt/releases/latest"><img src="https://img.shields.io/github/v/release/BountyHunterKanden/SecondHunt?include_prereleases&label=latest&style=flat-square&labelColor=000000&color=E66308" alt="Latest release"></a>
-  <a href="https://discord.gg/WkvJ5ddjye"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Fv10%2Finvites%2FWkvJ5ddjye%3Fwith_counts%3Dtrue&query=%24.approximate_presence_count&suffix=%20online&label=Discord&logo=discord&logoColor=white&style=flat-square&labelColor=000000&color=E66308" alt="Discord: players online"></a>
-</p>
+[![Windows x64](https://img.shields.io/badge/Windows-x64-E66308?style=flat-square)](https://github.com/jyh9521/SecondHunt-CN/releases/tag/0.3.5-zh.8)
+[![Release](https://img.shields.io/github/v/release/jyh9521/SecondHunt-CN?label=Release&style=flat-square&color=E66308)](https://github.com/jyh9521/SecondHunt-CN/releases)
 
-> If you are seeing this read me from a launcher like Quiver and you like Second Hunt, please consider 
-> giving our repo a star on GitHub. It will help the game get noticed and increase the online player base!
-> Thank you!
+[下载 Windows x64 ZIP](https://github.com/jyh9521/SecondHunt-CN/releases/download/0.3.5-zh.8/SecondHunt-CN-0.3.5-zh.8-windows-x64.zip) · [SHA-256 校验文件](https://github.com/jyh9521/SecondHunt-CN/releases/download/0.3.5-zh.8/SecondHunt-CN-0.3.5-zh.8-windows-x64.zip.sha256) · [版本说明](https://github.com/jyh9521/SecondHunt-CN/releases/tag/0.3.5-zh.8) · [原项目](https://github.com/BountyHunterKanden/SecondHunt)
 
-**Second Hunt is _Metroid Prime Hunters_ rebuilt as a native game for Android and Windows.** The full DS campaign and
-multiplayer in true widescreen at 60 fps, with dual-stick controls (or keyboard and mouse on PC), LAN and online play
-for up to 8 players, and new hunters, arenas and music made from your own Metroid Prime discs.
+这是 [Second Hunt](https://github.com/BountyHunterKanden/SecondHunt) 的 Windows 简体中文分支。Second Hunt 基于 [MphRead](https://github.com/NoneGiven/MphRead) 重建了 NDS《密特罗德究极：猎人》，不用模拟器就能玩原作剧情和多人模式，也支持宽屏、双摇杆手柄及键鼠。
 
-Second Hunt aims to modernize and add new features and content to the original Hunters experience. New weapons, playable characters, maps, and additional music are all already available and more is planned, all from user provided, legally obtained roms.
+**当前简中版为 `0.3.5-zh.8`。** Windows 汉化源码及构建文档在 [`zh-cn-windows` 分支](https://github.com/jyh9521/SecondHunt-CN/tree/zh-cn-windows)，默认分支的首页也同步这份说明；下载请使用上方本仓库的发布包。
 
-**Second Hunt contains no game data.** You need your own _Metroid Prime Hunters_ (USA) ROM, version 1.0 or 1.1. It's a
-fan project, a fork of [MphRead](https://github.com/NoneGiven/MphRead), and isn't affiliated with or endorsed by
-Nintendo.
+**发布包不含游戏本体、ROM、解包资源、存档或测试数据。** 汉化在你提供的 ROM 解包后自动应用，不改写 ROM 或原版解包文件。此仓库不发布 Android 汉化包。
 
-<p align="center"><a href="https://github.com/BountyHunterKanden/SecondHunt/releases/latest"><img src="docs/images/hy-download.png" width="480" alt="Download the latest release"></a><br>Android APK or Windows zip</p>
+## 我想……
 
-<p align="center"><a href="https://github.com/BountyHunterKanden/SecondHunt/releases/latest"><img src="docs/images/reel.webp" width="640" alt="Second Hunt gameplay"></a></p>
+| 我想做什么 | 从哪里开始 |
+| --- | --- |
+| 第一次玩简中版 | 下载上方的 ZIP；[首次启动](#首次启动) |
+| 升级旧版、保留存档 | [老用户升级与保留存档](#老用户升级与保留存档) |
+| 核对下载、切回英文 | [校验和回退](#校验和回退) |
+| 从源码构建、改译文或查术语 | [本地化与构建](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/LOCALIZATION.zh-CN.md) · [术语表](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/TERMINOLOGY.zh-CN.md) |
+| 看贴图和过场是怎么处理的 | [图像与影片汉化](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/MEDIA-LOCALIZATION.zh-CN.md) |
 
-> <a href="https://discord.gg/WkvJ5ddjye"><img src="docs/images/hunters-outpost.png" width="48" height="48" align="left" alt="Hunters Outpost"></a> <a href="https://discord.gg/WkvJ5ddjye"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Fv10%2Finvites%2FWkvJ5ddjye%3Fwith_counts%3Dtrue&query=%24.approximate_presence_count&suffix=%20online&label=Discord&logo=discord&logoColor=white&style=flat-square&labelColor=000000&color=E66308" alt="Discord: players online"></a>
-> **Join the Hunters Outpost Discord** for Second Hunt support or to discuss and play Second Hunt and related
-> projects with other players! [Click here to join!](https://discord.gg/WkvJ5ddjye)
+## 首次启动
 
-<a name="contents"></a>
-<p><a href="#contents"><img src="docs/images/hy-h2-contents.webp" width="100%" alt="Contents"></a></p>
+1. 把整个 ZIP 解压到可写目录，例如 `D:\Games\Second Hunt`，运行 `SecondHunt.exe`。包已包含运行时，不要只单独取出 EXE。
+2. 选择或拖入自己的美版《密特罗德究极：猎人》`.nds`（AMHE 1.0 或 1.1；已实测 1.0）。
+3. **首次导入美版 ROM 后，程序会自动解包，再自动应用简体中文，最后进入中文游戏。** 不需要手动替换汉化文件，也不会改写原 ROM 或原版解包文件。
+4. 解包结果保存在 `SecondHunt.exe` 同级的 `data\game`。以后启动会复用这份数据，正常情况下不必再次选择 ROM 或重新解包。
 
+装在 `Program Files` 时，仅在需要创建 `data` 且权限不足时请求 UAC；游戏本体仍以普通权限运行。
 
-- [Getting started](#getting-started)
-- [Features](#features)
-- [Known issues](#known-issues)
-- [Help and bug reports](#help-and-bug-reports)
-- [Credits](#credits)
+**「导入游戏」不是用来启动其他《究极》作品的。** 它从你选择的其他作品文件中导入支持的装甲、角色或竞技场等内容。只玩《猎人》不需要导入任何额外资源。
 
-More pages: [Features](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/FEATURES.md) ·
-[Controls](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/CONTROLS.md) ·
-[Installing and updating](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/INSTALLING.md) ·
-[Known issues and plans](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/KNOWN_ISSUES.md) ·
-[MphRead to-do list](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/MPHREAD_TODO.md) ·
-[Acknowledgements](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/ACKNOWLEDGEMENTS.md)
+## 老用户升级与保留存档
 
-<a name="getting-started"></a>
-<p><a href="#getting-started"><img src="docs/images/hy-h2-getting-started.webp" width="100%" alt="Getting started"></a></p>
+**先退出游戏，再备份旧版的整个 `data` 文件夹。** 备份放在旧安装目录之外，确认新版能读取原有进度前，不要删除旧目录或备份。
 
+### 从旧便携版升级
 
-**Android** (Android 8.0 or newer with OpenGL ES 3.0. A controller is recommended, but touch works too.)
-1. Download the `.apk` from [Releases](https://github.com/BountyHunterKanden/SecondHunt/releases/latest).
-2. Open it on your device. Android will ask you to allow installs from your browser or file manager.
-3. On first launch, pick your ROM file. Second Hunt unpacks it once, and after that it goes straight into the game.
+1. 将 `0.3.5-zh.8` 的完整 ZIP 解压到一个新目录，不要混用旧版的 EXE 和 DLL。
+2. **首次启动新版之前**，把旧版 `SecondHunt.exe` 旁的整个 `data` 文件夹复制到新版 EXE 旁。最终应为 `新版目录\data\saves`，而不是 `新版目录\data\data\saves`。不要用空的新 `data` 反向覆盖旧数据。
+3. 运行新版。已有的有效美版解包数据会直接复用，程序会自动刷新汉化覆盖包；存档、设置、模组等仍从复制过来的 `data` 读取。
+4. 检查原有存档和设置，再决定是否移除旧安装目录。要回退时，使用旧程序及升级前的数据备份。
 
-**Windows** (Windows 10 or 11, 64-bit, with OpenGL 3.3, and a keyboard and mouse or a controller)
-1. Download the `.zip` from [Releases](https://github.com/BountyHunterKanden/SecondHunt/releases/latest) and unzip it
-   anywhere you can write to (not Program Files).
-2. Open `SecondHunt.exe`. If Windows says it protected your PC, click More info, then Run anyway.
-3. On first launch, pick your ROM file or drop it on the window.
-4. For LAN and online matches, allow Second Hunt through Windows Firewall when it asks.
+| EXE 旁的路径 | 内容与保留方式 |
+| --- | --- |
+| `data\saves` | 剧情进度等存档，务必备份和保留 |
+| `data\recomp_settings.json`、`data\window.json` | 游戏设置、窗口设置，随整个 `data` 一起复制 |
+| `data\game` | 已解包 ROM 与汉化覆盖包，保留后无需重新导入 |
+| `data\mods`、`data\hd`、`data\replays` | 已有模组、导入资源和回放，存在时一并保留 |
+| `data\movies_seen.json` 等文件 | 影片观看记录等状态，复制整个 `data` 可一并保留 |
 
-Then, if you like, import your _Metroid Prime_ discs for HD suits, new hunters, _Echoes_ arenas and music (OPTIONS >
-SECOND HUNT SETTINGS > IMPORT GAMES).
+### 从旧版 LocalAppData 目录迁移
 
-Updates install from inside the game. The main menu asks when a new version is out, and your saves and settings are
-kept. Firewall help, portable mode and more are on the
-[installing page](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/INSTALLING.md).
+如果旧版数据位于 `%LOCALAPPDATA%\Second Hunt`，请先备份该目录，再启动新解压的版本。首次启动会将有效解包数据、存档、设置及可迁移资源复制到 EXE 旁的 `data`；**不覆盖目标中已有的对应文件或目录，也不删除旧目录**。若新版已创建同名数据，请先退出游戏并分别备份两份数据，再选择需要保留的一整份，避免混合覆盖。
 
-<a name="features"></a>
-<p><a href="#features"><img src="docs/images/hy-h2-features.webp" width="100%" alt="Features"></a></p>
+如果一直使用 `--data <目录>` 指定数据位置，升级后继续指向原目录即可；更新前仍应备份该目录。简中版停用了上游自动更新，请从本仓库 Release 手动升级。
 
+## 这一版改了什么
 
-<a name="echoes-arenas-with-echoes-own-lighting"></a>
-<p><a href="#echoes-arenas-with-echoes-own-lighting"><img src="docs/images/hy-h3-echoes-arenas-with-echoes-own-lighting.png" width="100%" alt="Echoes arenas, with Echoes' own lighting"></a></p>
+- 汉化启动器、设置及说明、剧情对话、扫描记录、地图、对战 HUD、扩展导入页和回放等界面。
+- 片头猎人档案卡和标题贴图沿原字形处理：恢复字下底图再排中文，保留原画与光效，不用矩形色块盖住画面。
+- 改善游戏内 HUD 与扫描文字的可读性，统一系统提示标点；补齐对战侧栏、地图大小和联机诊断等动态文案。
+- 修复标题图中被截断的 ®，以及影片库点击后立即跳过的问题；影片缺失时显示中文提示。
+- 译名优先使用任天堂官方简中，未找到官方译名的沿用[项目术语](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/TERMINOLOGY.zh-CN.md)，例如「黑暗回声」「腐蚀」。厂商标识、署名、玩家输入及模组自己的文字保留原样。
 
+**实测样本是美版 1.0（AMHE0）**：57 项检查通过，遍历 98 个菜单入口及 7 种已填值的对战规则；26 个影片条目可连续解码，首部影片完整播放 82.9 秒后正常返回。此前已跑过正式版开局和本地人机对战，并从检查点验证两个结局的过场与结算；同一条回放的 823 步全部校验一致。1.1、公网联机和需要另备游戏文件的导入没有逐一实测；更多细节见[验收与依赖说明](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/LOCALIZATION.zh-CN.md#技术和验收边界)。
 
-Fight in _Metroid Prime 2: Echoes_ arenas made from your own disc: Sidehopper Station, Spires, Crossfire Chaos,
-Pipeline, Spider Complex and Shooting Gallery. They're drawn the way _Echoes_ draws them, in HD, with its real
-lighting, materials, effects, glass, water and skies. They play like _Echoes_ too, with double jump, Gravity Boost in
-Pipeline's water, jump pads that replace morph ball cannons, and _Echoes_' multiplayer music.
+## 校验和回退
 
-**Shooting Gallery's turret works just like _Echoes_.** Climb in and rain fire on the arena, or roll into the slot
-behind it in any alt form and blow it up.
+把 ZIP 和 `.zip.sha256` 放在同一目录，在 PowerShell 中运行下面的命令，确认两行的 SHA-256 一致：
 
-<p align="center">
-  <img src="docs/images/shooting-gallery-turret.webp" width="400" alt="Manning the Shooting Gallery turret">
-  <img src="docs/images/turret-orbit.webp" width="400" alt="Spire rolls into the turret's slot and blows it up">
-</p>
+```powershell
+Get-FileHash -Algorithm SHA256 -LiteralPath '.\SecondHunt-CN-0.3.5-zh.8-windows-x64.zip'
+Get-Content -LiteralPath '.\SecondHunt-CN-0.3.5-zh.8-windows-x64.zip.sha256'
+```
 
-**Mining Plaza is a brand new arena.** It was never a multiplayer map. Second Hunt turns the Mining Plaza room from
-_Echoes_' campaign into a full arena, with its doors sealed shut, new pickups and a chain of three jump pads across the
-plaza.
+要恢复英文，在 `SecondHunt.exe` 旁新建 `locale.txt`，内容写 `en`，然后重启；删除这个文件即恢复中文。切换语言不会清除存档。
 
-<a name="new-hunters"></a>
-<p><a href="#new-hunters"><img src="docs/images/hy-h3-new-hunters.png" width="100%" alt="New hunters"></a></p>
+## 开发与反馈
 
+切换到 [`zh-cn-windows` 源码分支](https://github.com/jyh9521/SecondHunt-CN/tree/zh-cn-windows) 后，使用 .NET 9 SDK 构建，详见[复现构建](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/LOCALIZATION.zh-CN.md#复现构建)。译文、字形与遮罩在该分支的 `locales/zh-CN`，可复用的提取和验证工具在 `tools/localization`。反馈时请附版本、ROM 修订号、出问题的页面或房间、复现步骤和截图或日志，不用附 ROM 或存档。
 
-- **The Trooper** from _Metroid Prime_: a Space Pirate with four skins, a wall cling and a Scout Drone alt form. His
-  Pirate Blaster marks a target with a full burst (Squad Mark), showing them through walls to him and his team.
-- **Dark Samus** from _Echoes_ or _Corruption_, with her final form from _Echoes_, **Overcharged Dark Samus**, as a skin
-  with its own morph ball. No Dark Samus imported? Pick Limoki's low-poly Dark Samus.
-- **HD Samus suits** from every Prime game you import, the beta Phazon Suit included, and **Sylux in his _Metroid Prime 4:
-  Beyond_ suit**
-- Playing with someone who hasn't imported a hunter? They still see you as a stand-in: the Trooper in his skin's
-  colors, Dark Samus as Limoki's low-poly Dark Samus, and HD Samus or _Beyond_ Sylux as the original MPH Samus
-  or Sylux.
+## 上游与许可
 
-<p align="center">
-  <img src="docs/images/trooper.webp" width="400" alt="The Trooper wall clinging and firing the Pirate Blaster">
-  <img src="docs/images/hunters.webp" width="400" alt="Dark Samus from Echoes, Overcharged Dark Samus, Dark Samus from Corruption and Limoki's low-poly Dark Samus">
-  <br>
-  <img src="docs/images/sylux-flourish.webp" width="400" alt="Sylux in his Metroid Prime 4: Beyond suit, showing off">
-</p>
+感谢 BountyHunterKanden 的 Second Hunt、NoneGiven 的 MphRead 及原项目贡献者。Windows 简中发行版的 `zh-cn-windows` 源码分支以 [Second Hunt 的 MIT 基线 `41452f2`](https://github.com/BountyHunterKanden/SecondHunt/tree/41452f2d053fcfa679e33c00a73d120a53f59e61) 为基础，未合并上游后续许可版本。该分支的源码及署名见 [LICENSE](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/LICENSE) 和 [NOTICE-fork](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/NOTICE-fork.md)；第三方组件和字体见 [第三方许可](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/THIRD_PARTY_NOTICES.md) 与 [Noto 字体许可](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/locales/zh-CN/OFL-Noto-CJK.txt)。本项目与任天堂无隶属关系。
 
-<a name="online-for-up-to-8-players"></a>
-<p><a href="#online-for-up-to-8-players"><img src="docs/images/hy-h3-online-for-up-to-8-players.png" width="100%" alt="Online, for up to 8 players"></a></p>
+<details>
+<summary>原项目致谢（英文原文）</summary>
 
+## Credits
 
-- **8 players in every mode**, any mix of people and bots. Matches of 4 or fewer play exactly like the original.
-- **Crossplay** between Android and Windows on Second Hunt's own servers. FIND GAME groups you with other players and
-  everyone votes on the arena, or you can browse open games or host your own with your rules and bots.
-- **Friends and parties**, voice chat (push to talk or always on) and text chat, a live scoreboard with everyone's ping,
-  and automatic rejoin if your connection drops
-- **LAN and bot matches** in every mode and arena. Bots run on the game's own bot code, take jump pads, ledges and
-  drop-downs, and the new hunters fight as bots too.
-- **The Gaming Hub is back**: the old Nintendo WFC pages for _Hunters_, rebuilt in the game, with leaderboards and
-  everyone's license stats
-- **Hunter License**, rank and stats like the original. Bring your license over from your DS save, and pick your color
-  while seeing your hunter in each one.
-- **STREAMING** switches hide your IP address, name and friend code on screen
+Second Hunt is built on **MphRead** by NoneGiven (MIT, see `LICENSE` and `NOTICE-fork.md`). Third-party libraries and
+their licenses are listed in `THIRD_PARTY_NOTICES.md`, which the app also shows under SECOND HUNT SETTINGS > credits.
 
-<a name="and-more"></a>
-<p><a href="#and-more"><img src="docs/images/hy-h3-and-more.png" width="100%" alt="And more"></a></p>
+From MphRead's README:
 
+### Acknowledgements
 
-- **The whole campaign**, from the opening to Gorea, with the game's own menus, gunship, cutscenes, scans and both
-  endings. After your first clear, play it as any hunter, the Trooper included. Bring your DS save over, or export
-  yours back out.
-- **Replays** of your last ten matches, online ones included, with instant seeking, any player's view and a free
-  camera. Send them to friends or save them as files.
-- **Music from every Prime game** you import, picked song by song for matches, menus and the lobby, and HQ music that
-  takes out the DS's clicks and clipping
-- **Controls for today's hardware**: dual sticks, full rebinding, a weapon ring on L2, gyro aim, a touch overlay,
-  stylus aim like the DS, and SDL3 controllers on Windows (Switch Pro included)
-- **Looks and options**: field of view up to 130, AIM VIEW (the view follows your aim instantly, or trails it like the
-  DS), HUD sway and opacity, a hit direction indicator, the campaign radar from the DS touch screen, third person, the
-  two DS screens merged into one, clean redrawn HUD lines, and the option to skip the boot logos
-- **Plays like the original**: gameplay values are the DS game's, and anything that behaves differently is checked
-  against it and fixed
+A significant portion of this project's code was based on the file format information or source code from several other projects.
 
-<a name="in-the-works"></a>
-<p><a href="#in-the-works"><img src="docs/images/hy-h3-in-the-works.png" width="100%" alt="In the works"></a></p>
+- **dsgraph** - The original MPH model viewer, on which all other projects are built.
+- **[Chemical's model format](https://gitlab.com/ch-mcl/metroid-prime-hunters-file-document/-/blob/master/Model/BinModel.md)** - Documentation of the model format.
+- **[McKay42's mph-model-viewer](https://github.com/McKay42/mph-model-viewer)** - COLLADA export method.
+- **[McKay42's mph-arc-extractor](https://github.com/McKay42/mph-arc-extractor)** - ARC file format information.
+- **[Barubary's dsdecmp](https://github.com/Barubary/dsdecmp)** - LZ10 compression routines.
+- **[loveemu's swav2wav](https://github.com/loveemu/loveemu-lab)** - SWAV conversion function.
+- **[Gericom's ffmpeg patch](https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2021-March/277774.html)** - ActImagine VX movie file format information.
+- **[CharlesVanEeckhout's actimagine decoder](https://github.com/CharlesVanEeckhout/actimagine)** - Further understanding of VX video decoding, based on the above ffmpeg patch.
+- **[CyberBotX's NCSF](https://github.com/CyberBotX/NCSF)** - Source code for the NCSF converter and player for Nintendo DS sequenced music.
 
+(Note from Second Hunt: MphRead's VX movie decoder, and the sequencer in the NCSF-based music player, have since been
+replaced with clean-room code that gives the same pictures and sound. See [docs/cleanroom](docs/cleanroom).)
 
-- **_First Hunt_**, the demo that came with the DS, as its own mode from your own cart: its menus, the Regulator and
-  Morph Ball rooms, Survivor and its multiplayer arenas
-- **Zero Suit Samus**, with her own Paralyzer beam that stuns, and an army crawl for her alt form
-- **Dark Samus's Hyper Mode**, with the Hyper Ball and Hyper Beam
-- **The Spider Ball for every hunter** on _Echoes_' spider tracks, and the Grapple Beam
-- **High frame rates**, 120 fps and up, with smooth frames on any screen
-- **New death animations**: _First Hunt_'s collapse, and ragdolls
-- **Lua mods** and game modes made as mods, and a **Hard Mode** campaign with enemies from _First Hunt_ and the
-  Prime games
+### Special Thanks
 
-Everything in detail: [Features](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/FEATURES.md) ·
-[Controls](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/CONTROLS.md)
+This project's reverse engineering effort was developed parallel to **[hackyourlife's mph-viewer](https://github.com/hackyourlife/mph-viewer)**, a model viewer implementation in C. Major features such as the transparency rendering implementation were derived from its source code.
 
-<a name="known-issues"></a>
-<p><a href="#known-issues"><img src="docs/images/hy-h2-known-issues.webp" width="100%" alt="Known issues"></a></p>
+(Note from Second Hunt: that transparency rendering code has since been replaced with a clean-room version that draws
+the same result. See [docs/cleanroom](docs/cleanroom).)
 
+### Notice
+> **AI tools were used in the making of this project.**
 
-- Only USA ROMs (1.0 and 1.1) work for now.
-- No rumble yet.
-- After you quit a LAN match from the pause menu you can't rejoin it (closing and reopening the app does).
-- Some save details aren't kept yet: the best-time records, part of the game timer, a few stats and the artifact flags.
-
-The full list, and what's planned next:
-[Known issues and plans](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/KNOWN_ISSUES.md)
-
-<a name="help-and-bug-reports"></a>
-<p><a href="#help-and-bug-reports"><img src="docs/images/hy-h2-help-and-bug-reports.webp" width="100%" alt="Help and bug reports"></a></p>
-
-
-If the game crashes, go to SECOND HUNT SETTINGS > APP > HELP > SHARE CRASH LOG (OPEN CRASH LOG on Windows) and attach
-the report to a bug report on the [Issues](https://github.com/BountyHunterKanden/SecondHunt/issues) page, with your
-device and what you were doing. It has no personal data in it. For a bad online match or anything else, SHARE LOG
-(SAVE LOG on Windows) sends the game's log. You can also ask on the Discord above.
-
-<a name="credits"></a>
-<p><a href="#credits"><img src="docs/images/hy-h2-credits.webp" width="100%" alt="Credits"></a></p>
-
-
-Second Hunt is built on **[MphRead](https://github.com/NoneGiven/MphRead)** by NoneGiven, a C# recreation of the game
-from reverse engineering.
-
-<a name="thanks"></a>
-<p><a href="#thanks"><img src="docs/images/hy-h3-thanks.png" width="100%" alt="Thanks"></a></p>
-
-
-Second Hunt wouldn't be where it is without these people:
-
-- **[Fruity Prime](https://github.com/liveteklol/Fruity-Prime)** by liveteklol, another MphRead fork, for its netcode
-  work. Second Hunt's served online matches run on a port of it, with the server in charge, hits checked by the server
-  and a longer lag compensation rewind.
-- **Limoki**, for the low-poly Dark Samus model that Dark Samus seats wear when no Dark Samus is imported, and the
-  morph ball to match. The app builds them from your own game files plus Limoki's edits, so none of the
-  game's art ships with it. Limoki also helped with the Second Hunt logo.
-- **Everyone who reported issues on GitHub** that have since been fixed or added:
-  - [@MusicGoat91](https://github.com/MusicGoat91): QUIT SECOND HUNT? on the title screen ([#3](https://github.com/BountyHunterKanden/SecondHunt/issues/3)),
-    typing on the on-screen keyboards with a PC keyboard ([#4](https://github.com/BountyHunterKanden/SecondHunt/issues/4)), and side mouse buttons repeating
-    next/previous weapon ([#2](https://github.com/BountyHunterKanden/SecondHunt/issues/2))
-  - [@drencoss](https://github.com/drencoss): visor and helmet opacity settings ([#1](https://github.com/BountyHunterKanden/SecondHunt/issues/1))
-  - [@EliParker28](https://github.com/EliParker28): SDL3 controller support on Windows, including the Switch Pro
-    Controller ([#6](https://github.com/BountyHunterKanden/SecondHunt/issues/6))
-  - [@JustinBenedick](https://github.com/JustinBenedick): look invert for X and Y separately, for an inverted mouse
-    ([#10](https://github.com/BountyHunterKanden/SecondHunt/issues/10))
-  - [@Swordman14](https://github.com/Swordman14): asking for a static reticle, which turned into AIM VIEW
-    ([#11](https://github.com/BountyHunterKanden/SecondHunt/issues/11))
-- **Everyone on Discord**, including finRatman, Limoki and Yaba, and every player who has sent in bug reports, logs,
-  replays, screenshots and videos. Second Hunt is a lot better for it.
-
-<a name="upstream-projects"></a>
-<p><a href="#upstream-projects"><img src="docs/images/hy-h3-upstream-projects.png" width="100%" alt="Upstream projects"></a></p>
-
-
-Second Hunt also uses code and file format research from these projects:
-
-- **MphRead's sources:** dsgraph, [Chemical's model format notes](https://gitlab.com/ch-mcl/metroid-prime-hunters-file-document/-/blob/master/Model/BinModel.md),
-  McKay42's [mph-model-viewer](https://github.com/McKay42/mph-model-viewer) and
-  [mph-arc-extractor](https://github.com/McKay42/mph-arc-extractor), Barubary's [dsdecmp](https://github.com/Barubary/dsdecmp),
-  loveemu's [swav2wav](https://github.com/loveemu/loveemu-lab), Gericom's
-  [ffmpeg patch](https://lists.ffmpeg.org/pipermail/ffmpeg-devel/2021-March/277774.html) and CharlesVanEeckhout's
-  [actimagine decoder](https://github.com/CharlesVanEeckhout/actimagine) for the movies, CyberBotX's
-  [NCSF](https://github.com/CyberBotX/NCSF) for the music, and hackyourlife's
-  [mph-viewer](https://github.com/hackyourlife/mph-viewer).
-- **Reading the Metroid Prime games:** AxioDL's [metaforce](https://gitlab.axiodl.com/AxioDL/metaforce),
-  [PrimeWorldEditor](https://github.com/AxioDL/PrimeWorldEditor), [amuse](https://gitlab.axiodl.com/AxioDL/amuse) and
-  [lzokay](https://github.com/AxioDL/lzokay), the [Retro Modding Wiki](https://wiki.axiodl.com), Dolphin's notes on the
-  RVZ disc format, and Sun Microsystems' G.721 decoder for Prime music.
-- **Libraries:** [OpenTK](https://github.com/opentk/opentk), [GLFW](https://github.com/glfw/glfw),
-  [SDL](https://github.com/libsdl-org/SDL), [SoundFlow](https://github.com/LSXPrime/SoundFlow) with
-  [miniaudio](https://github.com/mackron/miniaudio), [Concentus](https://github.com/lostromb/concentus) (Opus, for voice
-  chat), [MoonSharp](https://github.com/moonsharp-devs/moonsharp), [ImageSharp](https://github.com/SixLabors/ImageSharp)
-  and .NET.
-
-The full list, with what each one was used for:
-[Acknowledgements](https://github.com/BountyHunterKanden/SecondHunt/blob/master/docs/ACKNOWLEDGEMENTS.md)
-
-> **AI tools were used in the making of this project.** 
+</details>
