@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 
 // The game's ending in the menus (owner queue #36; ROM notes in docs/ENDINGS.md). After an ending movie the campaign
@@ -87,8 +88,8 @@ namespace MphRecomp.Frontend
         {
             if (Current is not EndingResults r || !Bound) return;
             long total = Math.Max(0, r.TotalSeconds), gorea = Math.Max(0, r.GoreaSeconds);
-            strings.Fill(_total, $"{total / 3600}h {total % 3600 / 60:00}m");
-            if (_gorea >= 0) strings.Fill(_gorea, $"{gorea % 3600 / 60}m {gorea % 60:00}s");
+            strings.Fill(_total, LocalText.FormatId("ending.total", "{0}h {1:00}m", total / 3600, total % 3600 / 60));
+            if (_gorea >= 0) strings.Fill(_gorea, LocalText.FormatId("ending.gorea", "{0}m {1:00}s", gorea % 3600 / 60, gorea % 60));
             strings.Fill(_percent, $"{Math.Clamp(r.CompletePercent, 0, 100)}%");
             strings.Fill(_deaths, r.Deaths.ToString());
             strings.Fill(_defeated, r.Defeated.ToString());

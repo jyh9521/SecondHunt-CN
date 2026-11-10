@@ -1,4 +1,4 @@
-# Second Hunt Windows 简体中文预览版
+# Second Hunt Windows 简体中文版
 
 中文游戏名为《密特罗德究极：猎人》。术语统一为 **Metroid → 密特罗德**、
 **Prime → 究极**（如「究极猎人」「究极倍率」）。`Ultimate Power` 是另一个词，
@@ -32,18 +32,20 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 
 - `locales/zh-CN/ui.json` 是应用的 UI 字符串字典；`settings.json` 按稳定 ID
   保存选项提示、键位和选项值，`terms.json` 保存导入卡片的标题、来源和内置资源名称。
-  `rom.json` 是 UTF-8 覆盖包，
+  `extras.json` 保存扩展页面动态句式，保留文件名、分数等运行时参数。`rom.json` 是 UTF-8 覆盖包，
   `glyphs.bin` 是 16×16 字形。启动器完成解包后把覆盖包原子写入
   `data/game/localization/zh-CN.json`。`data/game/files/AMHE*` 的原始文件保留；
   运行时按源文本指纹匹配，不匹配的行回退到原文，而不是套错译文。
 - 菜单渲染优先用译文，脚本仍读原索引及原字符串。十张 ROM 表保留条目 ID、
-  前缀、扫描类别和速度，动态变量如 `%s` 和 `&tab0` 也保留。菜单标题是程序绘制
-  的中文替代，不包含原版标题贴图。
+  前缀、扫描类别和速度，动态变量如 `%s` 和 `&tab0` 也保留。332 条扫描记录对照
+  原文逐条核对；设置说明、模组、回放及联机页面含中文界面文案。
+- 原版贴图和片头嵌字通过[轮廓遮罩与原画恢复](MEDIA-LOCALIZATION.zh-CN.md)
+  本地化。覆盖包只带遮罩、字形和版式；原版圆徽、人物、厂商商标和音频保持使用用户的 ROM。
 - 美版 1.0 已用实际解包数据验证。1.1 保留上游的解包支持，共用匹配规则，但
   没有 1.1 样本验收。历史基线的联机服务兼容性没有验收。
-- 这是预览版，不是全流程校对稿。扫描描述有本地机译初稿；游戏少数新增页面、
-  贴图与影片中的嵌字、可选导入内容仍未全部本地化。厂商标志和人名署名按原样保留。
-  Windows 安全桌面上的真实 UAC 交互需要管理员现场批准或取消；自动检查不操作它。
+- 验收涵盖 Windows 启动器、菜单、扩展页面、开场影片和首个可游玩房间；不是每个
+  任务、结局、联机状态或可选导入游戏的完整实机通关。厂商标志、人名署名、玩家输入
+  及第三方模组自带文本按原样显示。Windows 安全桌面上的真实 UAC 交互需要现场批准或取消。
 - 本地构建沿用基线依赖。若计划公开分发，还应单独复核 NuGet 审计结果和联网功能。
 
 ## 复现构建
@@ -51,7 +53,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.3
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.4
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -77,7 +79,7 @@ py tools/localization/catalog.py pack 'D:\work\source.json' 'D:\work\translation
 
 ```powershell
 py -m pip install Pillow==12.2.0 fonttools==4.63.0
-py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin --catalog locales/zh-CN/settings.json --catalog locales/zh-CN/terms.json
+py tools/localization/catalog.py glyphs 'D:\fonts\NotoSansCJKsc-Medium.otf' locales/zh-CN/ui.json locales/zh-CN/rom.json locales/zh-CN/glyphs.bin --catalog locales/zh-CN/settings.json --catalog locales/zh-CN/terms.json --catalog locales/zh-CN/extras.json
 ```
 
 字形来源：[Noto Sans CJK SC Medium, Sans2.004](https://github.com/notofonts/noto-cjk/blob/Sans2.004/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Medium.otf)，

@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -2729,7 +2730,7 @@ namespace MphRecomp.Frontend
             int id = StringOf(p, _hint);
             _hintRom ??= _strings![id];
             string? address = Hosting ? LocalAddresses().FirstOrDefault() : null;
-            _strings!.Fill(id, address == null ? _hintRom : $"{_hintRom}\naddress: {address}");
+            _strings!.Fill(id, address == null ? _hintRom : LocalText.FormatId("lan.lobby.address", "{0}\naddress: {1}", LocalText.Ui(_hintRom), address));
         }
 
         // ---- START GAME ----
@@ -2741,7 +2742,7 @@ namespace MphRecomp.Frontend
             {
                 // (owner 2026-10-10, N27: a player without the arena would fail to load it and the match start without them)
                 string arena = ExtraArenas.Label(Metadata.GetRoomById(ArenaRooms[_setup.Arena])!.Name);
-                Popup?.Inform($"{string.Join(", ", lacking).ToLowerInvariant()} {(lacking.Count == 1 ? "doesn't" : "don't")} have {arena}.\n\npick another arena.");
+                Popup?.Inform(LocalText.FormatId("lan.arena.missing", "{0} {1} have {2}.\n\npick another arena.", string.Join(", ", lacking).ToLowerInvariant(), lacking.Count == 1 ? "doesn't" : "don't", LocalText.Ui(arena)));
                 return;
             }
             _pendingInto = -2;

@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using MphRead;
 using MphRead.Formats;
+using MphRead.Text;
 
 namespace MphRecomp.Media
 {
@@ -28,6 +30,9 @@ namespace MphRecomp.Media
 
         public string Name { get; }
         public bool DualScreen { get; }
+        public LocalizedArtwork.Film? LocalizedFilm { get; }
+        private readonly Dictionary<(bool Bottom, int Frame), byte[]> _localePlates = new();
+        public IReadOnlyDictionary<(bool Bottom, int Frame), byte[]> LocalePlates => _localePlates;
         // RGB24, 256 x 192, first row = top of the screen; the bottom screen stays black for one-screen movies
         public byte[] TopFrame { get; } = new byte[Width * Height * 3];
         public byte[] BottomFrame { get; } = new byte[Width * Height * 3];
@@ -112,6 +117,7 @@ namespace MphRecomp.Media
             _current = this;
             Name = name;
             DualScreen = bottomPath != null;
+            LocalizedFilm = LocalizedArtwork.Current?.MatchFilm(topPath, bottomPath);
             _top.Reset();
             _bottom.Reset();
             CancellationToken token = _cts.Token;
@@ -221,6 +227,12 @@ namespace MphRecomp.Media
             if (needBottom)
             {
                 _bottom.GetImage(index, BottomFrame);
+            }
+            if (LocalizedFilm != null)
+            {
+                foreach (var cue in LocalizedFilm.Cues)
+                    if (cue.Reference == index || cue.LateReference == index)
+                        _localePlates.TryAdd((cue.Bottom, index), (byte[])(cue.Bottom ? BottomFrame : TopFrame).Clone());
             }
             FrameIndex = index;
             FrameVersion++;

@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using MphRead;
@@ -158,7 +159,7 @@ namespace MphRecomp.Frontend
             int level = eight ? _lbLevel8[k] : _lbLevel[k], remove = eight ? _lbRemove8[k] : _lbRemove[k];
             (float lx0, float ltop, float lx1, float lbottom) = BotBox(0, k, eight);
             Bar(lx0, ltop, lx1, lbottom, level, glows);
-            TextS($"level {bot.BotLevel + 1}", (lx0 + lx1) / 2, ltop - (ltop - lbottom - 8 * SizeX) / 2, 2, Orange, level, SizeX);
+            TextS(LocalText.FormatId("online.bot.card", "level {0}", bot.BotLevel + 1), (lx0 + lx1) / 2, ltop - (ltop - lbottom - 8 * SizeX) / 2, 2, Orange, level, SizeX);
             (float rx0, float rtop, float rx1, float rbottom) = BotBox(1, k, eight);
             Bar(rx0, rtop, rx1, rbottom, remove, glows);
             TextS("remove", (rx0 + rx1) / 2, rtop - (rtop - rbottom - 8 * SizeX) / 2, 2, Red, remove, SizeX);

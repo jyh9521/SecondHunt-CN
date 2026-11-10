@@ -9,3 +9,4 @@ using System.Runtime.CompilerServices;
 // needs no such grant (RoomLoader uses only MphRead's public API).
 [assembly: InternalsVisibleTo("MphRead.Tools")]
 [assembly: InternalsVisibleTo("MphRead.Android")]
+[assembly: InternalsVisibleTo("SecondHunt.LocalizationTests")]

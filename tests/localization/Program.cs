@@ -11,6 +11,14 @@ Console.OutputEncoding = Encoding.UTF8;
 // The shipped launcher sets these at startup; the test runs its libraries directly.
 RecompSettings.PublicBuild = true;
 RecompSettings.DesktopHost = true;
+if (args is ["--media-inventory", string assets, string output, string stride])
+    return MediaInventory.Run(assets, output, int.Parse(stride));
+if (args is ["--movie-inventory", string movie, string movieOutput, string movieStride])
+    return MediaInventory.SingleMovie(movie, movieOutput, int.Parse(movieStride));
+if (args is ["--ui-inventory", string extracted, string uiReport])
+    return UiInventory.Run(extracted, uiReport);
+if (args.Length is 2 or 3 && args[0] == "--artwork-check")
+    return ArtworkCheck.Run(args[1], args.Length == 3 ? args[2] : null);
 if (args is ["--settings-only"])
 {
     DesktopLocale.Init("zh-CN");
@@ -166,6 +174,16 @@ try
         "built-in costume choices use the import glossary, unknown exports keep their own label");
     Check(RecompSettings.MusicSources.All(x => AudioOptions.QualityDescription(x).Contains("即时生效")),
         "legacy audio quality uses the current choice's localized hint");
+    Check(Strings.ReadStringTable(StringTables.ScanLog).All(e => HasHan(e.Value1) && HasHan(e.Value2)),
+        "all real scan-log headings and bodies have Chinese text");
+    Check(Strings.GetScanEntry(34)!.Value2.Contains("终极力量的秘密就藏在阿林比克星团")
+        && Strings.GetScanEntry(453)!.Value2.Contains("神圣光谱")
+        && Strings.GetScanEntry(460)!.Value2.Contains("红色印记"),
+        "mission message and six-colour prophecy preserve the clues");
+    Check(LocalText.FormatId("online.hub.hunters", "{0} hunter{1} online", 9, "s") == "9 名猎人在线"
+        && LocalText.FormatId("import.run.progress", "importing {0}: {2}/{3}, {4}%", "fixture.iso", "防护服", 2, 3, 79)
+            == "正在从「fixture.iso」导入。\n防护服\n第 2/3 项，79%",
+        "localized runtime templates preserve counters and source names");
     var room = Strings.GetEntry('R', 103, StringTables.LocationNames)!;
     Check(room.Value1 == "Unit2_land" && room.Value2 == "天体档案馆入口", "display name changes, room key does not");
     int menuHits = Enumerable.Range(0, englishMenu.RomCount).Count(i => englishMenu[i] != MenuStringsForDisplay(i));
@@ -204,7 +222,6 @@ return 0;
 
 static bool CheckSettingsCatalogue()
 {
-    static bool HasHan(string text) => text.Any(c => c is >= '\u3400' and <= '\u9fff');
     string[] missing = ControlHints.All.Keys.Where(k => !HasHan(ControlHints.For(k))).ToArray();
     if (missing.Length > 0)
     {
@@ -237,3 +254,5 @@ static bool CheckSettingsCatalogue()
         : "FAIL: a runtime setting value or canonical import title did not resolve.");
     return ok;
 }
+
+static bool HasHan(string text) => text.Any(c => c is >= '\u3400' and <= '\u9fff');

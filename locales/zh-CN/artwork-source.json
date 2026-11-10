@@ -1,0 +1,554 @@
+{
+  "films": [
+    {
+      "key": "sylux",
+      "stream": "01_bot",
+      "steady": 75,
+      "namePlate": 15,
+      "flashSamples": [
+        18,
+        22
+      ],
+      "nameBox": [
+        24,
+        116,
+        256,
+        185
+      ],
+      "labelShift": 141,
+      "valueReference": 12,
+      "values": [
+        [
+          195,
+          0,
+          255,
+          10
+        ],
+        [
+          191,
+          10,
+          234,
+          23
+        ]
+      ],
+      "earlyValueBoxes": [],
+      "valueThreshold": 12,
+      "sharedChroma": false
+    },
+    {
+      "key": "weavel",
+      "stream": "01_top",
+      "steady": 292,
+      "namePlate": 222,
+      "flashSamples": [
+        228,
+        233
+      ],
+      "nameBox": [
+        0,
+        125,
+        231,
+        180
+      ],
+      "labelShift": 0,
+      "valueReference": 222,
+      "values": [
+        [
+          57,
+          0,
+          196,
+          10
+        ],
+        [
+          50,
+          10,
+          103,
+          23
+        ]
+      ],
+      "earlyValueBoxes": [
+        [
+          57,
+          0,
+          65,
+          9
+        ],
+        [
+          65,
+          3,
+          72,
+          10
+        ],
+        [
+          72,
+          0,
+          79,
+          9
+        ],
+        [
+          79,
+          3,
+          86,
+          9
+        ]
+      ],
+      "valueThreshold": 14,
+      "sharedChroma": false
+    },
+    {
+      "key": "noxus",
+      "stream": "01_bot",
+      "steady": 480,
+      "namePlate": 430,
+      "flashSamples": [
+        435,
+        440
+      ],
+      "nameBox": [
+        0,
+        116,
+        239,
+        181
+      ],
+      "labelShift": 0,
+      "valueReference": 429,
+      "values": [
+        [
+          56,
+          0,
+          101,
+          10
+        ],
+        [
+          49,
+          10,
+          75,
+          22
+        ]
+      ],
+      "earlyValueBoxes": [],
+      "valueThreshold": 12,
+      "sharedChroma": true
+    },
+    {
+      "key": "trace",
+      "stream": "01_top",
+      "steady": 583,
+      "namePlate": 534,
+      "flashSamples": [
+        538,
+        543
+      ],
+      "nameBox": [
+        33,
+        116,
+        256,
+        181
+      ],
+      "labelShift": 0,
+      "valueReference": 532,
+      "values": [
+        [
+          56,
+          0,
+          94,
+          10
+        ],
+        [
+          49,
+          10,
+          133,
+          22
+        ]
+      ],
+      "earlyValueBoxes": [
+        [
+          56,
+          0,
+          63,
+          9
+        ],
+        [
+          63,
+          3,
+          69,
+          9
+        ],
+        [
+          69,
+          0,
+          76,
+          9
+        ],
+        [
+          76,
+          2,
+          83,
+          9
+        ],
+        [
+          83,
+          3,
+          90,
+          9
+        ]
+      ],
+      "valueThreshold": 12,
+      "sharedChroma": false,
+      "valueSamples": [
+        [
+          554,
+          [
+            94,
+            11,
+            137,
+            23
+          ]
+        ],
+        [
+          558,
+          [
+            94,
+            11,
+            137,
+            23
+          ]
+        ],
+        [
+          562,
+          [
+            94,
+            11,
+            137,
+            23
+          ]
+        ],
+        [
+          567,
+          [
+            94,
+            11,
+            137,
+            23
+          ]
+        ],
+        [
+          570,
+          [
+            94,
+            11,
+            137,
+            23
+          ]
+        ]
+      ]
+    },
+    {
+      "key": "spire",
+      "stream": "01_bot",
+      "steady": 692,
+      "namePlate": 636,
+      "flashSamples": [
+        640,
+        645
+      ],
+      "nameBox": [
+        0,
+        116,
+        216,
+        181
+      ],
+      "labelShift": 0,
+      "valueReference": 633,
+      "values": [
+        [
+          56,
+          0,
+          108,
+          10
+        ],
+        [
+          49,
+          10,
+          112,
+          22
+        ]
+      ],
+      "earlyValueBoxes": [
+        [
+          56,
+          0,
+          65,
+          9
+        ],
+        [
+          65,
+          1,
+          71,
+          9
+        ],
+        [
+          71,
+          2,
+          80,
+          9
+        ],
+        [
+          80,
+          3,
+          87,
+          9
+        ],
+        [
+          87,
+          2,
+          94,
+          9
+        ]
+      ],
+      "valueThreshold": 12,
+      "sharedChroma": false
+    },
+    {
+      "key": "kanden",
+      "stream": "01_top",
+      "steady": 895,
+      "namePlate": 828,
+      "flashSamples": [
+        832,
+        837
+      ],
+      "nameBox": [
+        0,
+        121,
+        249,
+        183
+      ],
+      "labelShift": 0,
+      "valueReference": 826,
+      "values": [
+        [
+          56,
+          0,
+          107,
+          10
+        ],
+        [
+          49,
+          10,
+          176,
+          22
+        ]
+      ],
+      "earlyValueBoxes": [
+        [
+          56,
+          0,
+          64,
+          9
+        ],
+        [
+          64,
+          3,
+          72,
+          9
+        ],
+        [
+          72,
+          3,
+          78,
+          9
+        ],
+        [
+          78,
+          3,
+          85,
+          9
+        ],
+        [
+          85,
+          2,
+          94,
+          9
+        ]
+      ],
+      "valueThreshold": 12,
+      "sharedChroma": false
+    }
+  ],
+  "textures": {
+    "nst-type": {
+      "method": "alpha",
+      "boxes": [
+        [
+          0,
+          43,
+          210,
+          60
+        ]
+      ]
+    },
+    "nst-light": {
+      "method": "alpha",
+      "boxes": [
+        [
+          0,
+          42,
+          128,
+          64
+        ],
+        [
+          0,
+          39,
+          20,
+          42
+        ],
+        [
+          109,
+          39,
+          128,
+          42
+        ]
+      ]
+    },
+    "actimagine-copy": {
+      "method": "white",
+      "boxes": [
+        [
+          0,
+          0,
+          183,
+          21
+        ],
+        [
+          72,
+          82,
+          205,
+          96
+        ]
+      ]
+    },
+    "rating-copy": {
+      "method": "black",
+      "boxes": [
+        [
+          0,
+          0,
+          256,
+          64
+        ]
+      ]
+    },
+    "title-copy": {
+      "method": "title",
+      "chromeBoxes": [
+        [
+          0,
+          27,
+          202,
+          55
+        ],
+        [
+          46,
+          58,
+          158,
+          68
+        ]
+      ],
+      "orangeBox": [
+        23,
+        66,
+        181,
+        89
+      ],
+      "orangeInk": [
+        [
+          28,
+          71,
+          48,
+          86
+        ],
+        [
+          49,
+          71,
+          67,
+          86
+        ],
+        [
+          69,
+          71,
+          88,
+          86
+        ],
+        [
+          90,
+          71,
+          110,
+          86
+        ],
+        [
+          113,
+          71,
+          131,
+          86
+        ],
+        [
+          133,
+          71,
+          153,
+          86
+        ],
+        [
+          155,
+          71,
+          177,
+          86
+        ]
+      ],
+      "clearOutside": [
+        100.5,
+        55.0,
+        47.3,
+        51.0
+      ],
+      "shadowBox": [
+        0,
+        25,
+        205,
+        92
+      ],
+      "keepBoxes": [
+        [
+          192,
+          21,
+          202,
+          33
+        ]
+      ]
+    }
+  },
+  "sharedLabels": {
+    "stream": "01_bot",
+    "frame": 480,
+    "channels": [
+      -1,
+      2,
+      -1
+    ],
+    "threshold": 9,
+    "boxes": [
+      [
+        2,
+        0,
+        54,
+        10
+      ],
+      [
+        2,
+        10,
+        51,
+        23
+      ]
+    ]
+  }
+}

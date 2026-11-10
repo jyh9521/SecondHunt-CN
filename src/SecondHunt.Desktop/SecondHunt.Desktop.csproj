@@ -74,6 +74,10 @@
     <EmbeddedResource Include="..\..\locales\zh-CN\ui.json" LogicalName="locales.zh-CN.ui.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\settings.json" LogicalName="locales.zh-CN.settings.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\terms.json" LogicalName="locales.zh-CN.terms.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\artwork.json" LogicalName="locales.zh-CN.artwork.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\artwork-masks.json" LogicalName="locales.zh-CN.artwork-masks.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\artglyphs.bin" LogicalName="locales.zh-CN.artglyphs.bin" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\extras.json" LogicalName="locales.zh-CN.extras.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\rom.json" LogicalName="locales.zh-CN.rom.json" />
     <EmbeddedResource Include="..\..\locales\zh-CN\glyphs.bin" LogicalName="locales.zh-CN.glyphs.bin" />
   </ItemGroup>

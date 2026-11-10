@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MphRead;
 using MphRead.Formats;
+using MphRead.Text;
 using MphRecomp.Render;
 using OpenTK.Mathematics;
 
@@ -219,6 +220,7 @@ namespace MphRecomp.Frontend
                     rgba[i * 4 + 2] = c.Blue;
                     rgba[i * 4 + 3] = c.Alpha;
                 }
+                LocalizedArtwork.Current?.ApplyTexture(model.Name, textureId, paletteId, texture.Width, texture.Height, rgba);
                 return (texture.Width, texture.Height, rgba);
             }).Id;
         }

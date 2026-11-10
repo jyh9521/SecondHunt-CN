@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -230,7 +231,7 @@ namespace MphRecomp.Frontend
                 Import.Popup?.Inform("that's this device's own code.");
                 return;
             }
-            Import.Popup?.Ask($"become hunter {FriendCodes.Format(id.FriendCode)} here?\n\nthis device's profile is lost unless you kept its backup code.", yes =>
+            Import.Popup?.Ask(LocalText.FormatId("online.restore.confirm", "become hunter {0} here?\n\nthis device's profile is lost unless you kept its backup code.", FriendCodes.Format(id.FriendCode)), yes =>
             {
                 if (!yes) return;
                 id.Save(dir);

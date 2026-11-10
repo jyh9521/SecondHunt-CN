@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -343,11 +344,11 @@ namespace MphRecomp.Frontend
             if (mutes.Any(code))
             {
                 mutes.Set(code, false, false);
-                Import.Popup?.Inform($"{name} is unmuted.");
+                Import.Popup?.Inform(LocalText.FormatId("online.chat.unmuted", "{0} is unmuted.", name));
                 AfterMute();
                 return;
             }
-            Import.Popup?.Ask($"mute {name}?\n\nyou won't see their chat or hear their voice. unmute them on their hunter license.", yes =>
+            Import.Popup?.Ask(LocalText.FormatId("online.chat.mute", "mute {0}?\n\nyou won't see their chat or hear their voice. unmute them on their hunter license.", name), yes =>
             {
                 if (!yes) return;
                 mutes.Set(code, true, true);
@@ -365,7 +366,7 @@ namespace MphRecomp.Frontend
         private void AskReportChat(string code, string display)
         {
             string name = display.ToLowerInvariant();
-            Import.Popup?.Ask($"report what {name} typed?\n\ntheir last chat lines go with the report, for review.", yes =>
+            Import.Popup?.Ask(LocalText.FormatId("online.chat.report.text", "report what {0} typed?\n\ntheir last chat lines go with the report, for review.", name), yes =>
             {
                 if (yes) SendReport(code, name, ReportReason.Chat);
             });
@@ -375,7 +376,7 @@ namespace MphRecomp.Frontend
         {
             string name = display.ToLowerInvariant();
             string what = ReportReasons.First(r => r.Reason == reason).Label;
-            Import.Popup?.Ask($"report {name} for {what}?\n\nthe report is kept for review.", yes =>
+            Import.Popup?.Ask(LocalText.FormatId("online.chat.report.reason", "report {0} for {1}?\n\nthe report is kept for review.", name, LocalText.Ui(what)), yes =>
             {
                 if (yes) SendReport(code, name, reason);
             });

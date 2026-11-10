@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using MphRead;
 using MphRecomp.Media;
@@ -127,7 +128,7 @@ internal sealed partial class CampaignRenderer
     }
 
     string MovieStatus() => _movie == null || !_movieHolds ? ""
-        : $"{_host?.Scene.HostMovie}  A skip   Y layout ({_movieLayout})";
+        : LocalText.FormatId("movie.controls", "{0}  A skip   Y layout ({1})", LocalText.Ui(_host?.Scene.HostMovie.ToString() ?? ""), LocalText.Ui(_movieLayout.ToString()));
 
     void StopMovie()
     {

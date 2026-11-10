@@ -217,7 +217,7 @@ namespace MphRecomp.Frontend
                 PickDisc(gameId, () => ImportSongs(gameId));
                 return;
             }
-            Popup!.Ask($"import all {songs.Count} songs from {Lower(src.Name)}?", yes =>
+            Popup!.Ask(LocalText.FormatId("import.songs.ask", "import all {0} songs from {1}?", songs.Count, Lower(src.Name)), yes =>
             {
                 if (yes) Run(new[] { gameId }, src, songs.Select(i => i.Id).ToArray(), gameId);
             });
@@ -345,14 +345,14 @@ namespace MphRecomp.Frontend
                 : IsSuit(item) ? "samus in this suit (third person, the campaign's samus suit row)" : "an hd character model";
             return item.Status switch
             {
-                ItemImportStatus.Complete => $"{ItemName(item)}: {what}. imported. a: import it again.",
-                ItemImportStatus.Stale => $"{ItemName(item)}: {what}. this version of the game makes it a newer way. a: import it again.",
-                ItemImportStatus.Missing when item.New => $"{ItemName(item)}: {what}. new in this version of the game. a: import it.",
-                ItemImportStatus.HashMismatch when OnlyFromOriginal(item) => $"{ItemName(item)}: {OnlyFromOriginalText(gameId)}",
-                ItemImportStatus.HashMismatch => $"{ItemName(item)}: your disc isn't the version this was made from ({ExpectedDisc(gameId, item)}). "
-                    + "other versions aren't supported yet.",
-                ItemImportStatus.Failed => $"{ItemName(item)} failed: {Lower(item.Message)}",
-                _ => $"{ItemName(item)}: {what}. a: import just this one.",
+                ItemImportStatus.Complete => LocalText.FormatId("import.item.done", "{0}: {1}. imported. a: import it again.", ItemName(item), LocalText.Ui(what)),
+                ItemImportStatus.Stale => LocalText.FormatId("import.item.stale", "{0}: {1}. this version of the game makes it a newer way. a: import it again.", ItemName(item), LocalText.Ui(what)),
+                ItemImportStatus.Missing when item.New => LocalText.FormatId("import.item.new", "{0}: {1}. new in this version of the game. a: import it.", ItemName(item), LocalText.Ui(what)),
+                ItemImportStatus.HashMismatch when OnlyFromOriginal(item) => LocalText.FormatId("import.item.original", "{0}: {1}", ItemName(item), OnlyFromOriginalText(gameId)),
+                ItemImportStatus.HashMismatch => LocalText.FormatId("import.item.disc_mismatch", "{0}: your disc isn't the version this was made from ({1}). ", ItemName(item), LocalText.Ui(ExpectedDisc(gameId, item)))
+                    + LocalText.Ui("other versions aren't supported yet."),
+                ItemImportStatus.Failed => LocalText.FormatId("import.item.error", "{0} failed: {1}", ItemName(item), LocalText.Ui(Lower(item.Message))),
+                _ => LocalText.FormatId("import.item.one", "{0}: {1}. a: import just this one.", ItemName(item), LocalText.Ui(what)),
             };
         }
 
@@ -371,7 +371,7 @@ namespace MphRecomp.Frontend
         private static bool OnlyFromOriginal(ImportItemInfo item) => item.Message.Contains("isn't made from", StringComparison.Ordinal);
 
         private static string OnlyFromOriginalText(string gameId) =>
-            $"it comes from your {OriginalDisc(gameId)} disc only. import it from that disc.";
+            LocalText.FormatId("import.disc.only", "it comes from your {0} disc only. import it from that disc.", LocalText.Ui(OriginalDisc(gameId)));
 
         // the disc each game's recipes were made from
         private static string OriginalDisc(string gameId) => gameId switch
@@ -529,7 +529,7 @@ namespace MphRecomp.Frontend
             if (TakesFolder(gameId) && !FolderOnly(gameId))
             {
                 // a game file or a folder of its files (Prime 4: the .xci / .nsp, or a RomFS its owner dumped)
-                Popup!.Ask($"pick your {Lower(row.Title)} game file ({String.Join(" / ", AcceptedExtensions(gameId))})? no picks a folder you dumped from it instead.",
+                Popup!.Ask(LocalText.FormatId("import.disc.select", "pick your {0} game file ({1})? no picks a folder you dumped from it instead.", LocalText.Id("game." + row.Id + ".title", Lower(row.Title)), String.Join(" / ", AcceptedExtensions(gameId))),
                     file => PickWith(gameId, row, file ? ImportPickKind.Disc : ImportPickKind.Folder, then));
                 return;
             }
@@ -547,7 +547,7 @@ namespace MphRecomp.Frontend
                 if (got == null)
                 {
                     Log?.Invoke("import: no disc picked");
-                    EndUpdates($"no {Lower(row.Title)} disc picked: its items weren't updated.");
+                    EndUpdates(LocalText.FormatId("import.disc.cancelled", "no {0} disc picked: its items weren't updated.", LocalText.Id("game." + row.Id + ".title", Lower(row.Title))));
                     return;
                 }
                 ImportPicked picked = got with { Folder = kind == ImportPickKind.Folder };
@@ -591,7 +591,7 @@ namespace MphRecomp.Frontend
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
                 {
                     Log?.Invoke($"import: wii key from {picked.Name} refused ({ex.Message})");
-                    Popup!.Inform($"{Lower(picked.Name)} isn't a key file: {Lower(ex.Message)}.");
+                    Popup!.Inform(LocalText.FormatId("import.key.wii.error", "{0} isn't a key file: {1}.", Lower(picked.Name), LocalText.Ui(Lower(ex.Message))));
                 }
             }));
         }
@@ -631,7 +631,7 @@ namespace MphRecomp.Frontend
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
                 {
                     Log?.Invoke($"import: switch keys from {picked.Name} refused ({ex.Message})");
-                    Popup!.Inform($"{Lower(picked.Name)} isn't a prod.keys file: {Lower(ex.Message)}.");
+                    Popup!.Inform(LocalText.FormatId("import.key.switch.error", "{0} isn't a prod.keys file: {1}.", Lower(picked.Name), LocalText.Ui(Lower(ex.Message))));
                 }
             }));
         }
@@ -645,7 +645,7 @@ namespace MphRecomp.Frontend
                 ImportPicked? src = Source(TrilogyId);
                 (int _, int total) = TrilogyCount();
                 if (src == null || total == 0) return;
-                Popup!.Ask($"import everything from {Lower(src.Name)}? prime 1, echoes and corruption: {total} in all. the suits take a few minutes.", yes =>
+                Popup!.Ask(LocalText.FormatId("import.trilogy.ask", "import everything from {0}? prime 1, echoes and corruption: {1} in all. the suits take a few minutes.", Lower(src.Name), total), yes =>
                 {
                     if (yes) Run(TrilogyGames, src, null, TrilogyId);
                 });
@@ -665,7 +665,7 @@ namespace MphRecomp.Frontend
                 return;
             }
             string time = g.Items.Any(i => i.Kind == "hd") ? " the suits take a few minutes." : "";
-            Popup!.Ask($"import all {g.Items.Count} from {Lower(src.Name)}?{time}", yes =>
+            Popup!.Ask(LocalText.FormatId("import.all.ask", "import all {0} from {1}?{2}", g.Items.Count, Lower(src.Name), LocalText.Ui(time)), yes =>
             {
                 if (yes) Run(new[] { gameId }, src, null, gameId);
             });
@@ -686,8 +686,8 @@ namespace MphRecomp.Frontend
                 return;
             }
             string question = item.Status == ItemImportStatus.Complete
-                ? $"import {ItemName(item)} again from {Lower(src.Name)}?"
-                : $"import {ItemName(item)} from {Lower(src.Name)}?";
+                ? LocalText.FormatId("import.one.again", "import {0} again from {1}?", ItemName(item), Lower(src.Name))
+                : LocalText.FormatId("import.one.ask", "import {0} from {1}?", ItemName(item), Lower(src.Name));
             Popup!.Ask(question, yes =>
             {
                 if (yes) Run(new[] { gameId }, src, new[] { item.Id }, gameId);
@@ -722,9 +722,9 @@ namespace MphRecomp.Frontend
             List<(string Game, ImportItemInfo Item)> clear = items.Where(x => Clearable(x.Item)).ToList();
             if (clear.Count == 0) return;
             int made = clear.Count(x => Imported(x.Item));
-            string question = made == 0 ? $"delete {what}? none of them is imported; their rows go back to import."
-                : clear.Count == 1 ? $"delete {what}? {source} can import it again."
-                : $"delete {what}? {(made == 1 ? "the one" : $"the {made}")} imported {(made == 1 ? "is" : "are")} deleted. {source} can import {(made == 1 ? "it" : "them")} again.";
+            string question = made == 0 ? LocalText.FormatId("import.delete.reset", "delete {0}? none of them is imported; their rows go back to import.", what)
+                : clear.Count == 1 ? LocalText.FormatId("import.delete.one", "delete {0}? {1} can import it again.", what, source)
+                : LocalText.FormatId("import.delete.many", "delete {0}? {1} imported {2} deleted. {3} can import {4} again.", what, made == 1 ? "the one" : $"the {made}", made == 1 ? "is" : "are", source, made == 1 ? "it" : "them", made);
             Popup!.Ask(question, yes =>
             {
                 if (!yes) return;
@@ -736,13 +736,13 @@ namespace MphRecomp.Frontend
                     }
                     Log?.Invoke($"import: deleted {String.Join(", ", clear.Select(x => x.Item.Id))}");
                     Changed?.Invoke();
-                    Popup?.Inform($"deleted {what}.");
+                    Popup?.Inform(LocalText.FormatId("import.delete.done", "deleted {0}.", what));
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
                 {
                     Log?.Invoke("import: delete failed: " + ex);
                     Changed?.Invoke();
-                    Popup?.Inform($"{what} couldn't all be deleted: {Lower(ex.Message)}");
+                    Popup?.Inform(LocalText.FormatId("import.delete.error", "{0} couldn't all be deleted: {1}", what, LocalText.Ui(Lower(ex.Message))));
                 }
             });
         }
@@ -777,7 +777,7 @@ namespace MphRecomp.Frontend
                 return;
             }
             bool suits = UpdateGames(gameId).Any(id => Game(id)?.Items.Any(i => NeedsUpdate(i) && i.Kind == "hd") == true);
-            string question = n == 1 ? "1 item needs an update. update it now?" : $"{n} items need updates. update them all now?";
+            string question = n == 1 ? "1 item needs an update. update it now?" : LocalText.FormatId("import.update.ask", "{0} items need updates. update them all now?", n);
             Popup!.Ask(question + (suits ? " the suits take a few minutes." : ""), yes =>
             {
                 if (!yes) return;
@@ -834,7 +834,7 @@ namespace MphRecomp.Frontend
             List<string> answers = _updateAnswers.ToList();
             if (last != null) answers.Add(last);
             _updateAnswers.Clear();
-            string answer = left == 0 && last == null ? (_updateTotal == 1 ? "updated." : $"all {_updateTotal} updated.")
+            string answer = left == 0 && last == null ? (_updateTotal == 1 ? "updated." : LocalText.FormatId("import.update.done", "all {0} updated.", _updateTotal))
                 : answers.Count > 0 ? String.Join(" ", answers) : "nothing was updated.";
             Log?.Invoke("import: update all: " + answer);
             Changed?.Invoke();
@@ -948,7 +948,7 @@ namespace MphRecomp.Frontend
             var sink = new Sink(this);
             bool trilogy = key == TrilogyId;
             Log?.Invoke($"import: {String.Join("+", games)} from {src.Name}, {(all ? "all " + items.Count : String.Join(", ", only!))}");
-            Popup!.BusyCancel($"importing from {Lower(src.Name)}.", () =>
+            Popup!.BusyCancel(LocalText.FormatId("import.run.start", "importing from {0}.", Lower(src.Name)), () =>
             {
                 _cancelled = true;
                 _cts?.Cancel();
@@ -1062,7 +1062,7 @@ namespace MphRecomp.Frontend
             int pct = (int)(Math.Clamp(overall, 0, 1) * 100);
             int index = _order.TryGetValue(key, out int i) ? i : _gameOffsets.Length > 0 ? _gameOffsets[k] + 1 : 1;
             string what = _names.TryGetValue(key, out string? name) ? name : "reading the disc";
-            return $"importing from {Lower(_runName)}.\n{what}\n{index} of {_runCount}. {pct}%";
+            return LocalText.FormatId("import.run.progress", "importing from {0}.\n{1}\n{2} of {3}. {4}%", Lower(_runName), LocalText.Ui(what), index, _runCount, pct);
         }
 
         private string Summary(List<ImportReport> reports)
@@ -1078,25 +1078,25 @@ namespace MphRecomp.Frontend
                 ImportItemInfo it = items[0];
                 return it.Status switch
                 {
-                    ItemImportStatus.Complete => $"{ItemName(it)} imported.",
-                    ItemImportStatus.HashMismatch when OnlyFromOriginal(it) => $"{ItemName(it)} wasn't imported: {OnlyFromOriginalText(_runGames[0])}",
-                    ItemImportStatus.HashMismatch => $"{ItemName(it)} wasn't imported: your disc isn't the version it was made from. other versions aren't supported yet.",
-                    _ => $"{ItemName(it)} failed: {Lower(it.Message)}",
+                    ItemImportStatus.Complete => LocalText.FormatId("import.run.one.done", "{0} imported.", ItemName(it)),
+                    ItemImportStatus.HashMismatch when OnlyFromOriginal(it) => LocalText.FormatId("import.run.one.original", "{0} wasn't imported: {1}", ItemName(it), OnlyFromOriginalText(_runGames[0])),
+                    ItemImportStatus.HashMismatch => LocalText.FormatId("import.run.one.wrong", "{0} wasn't imported: your disc isn't the version it was made from. other versions aren't supported yet.", ItemName(it)),
+                    _ => LocalText.FormatId("import.run.one.fail", "{0} failed: {1}", ItemName(it), LocalText.Ui(Lower(it.Message))),
                 };
             }
             if (wrong == n && original == 0)
             {
-                return $"nothing imported: {Lower(_runName)} isn't the version these were made from ({reports[0].DiscId.ToLowerInvariant()}). other versions aren't supported yet.";
+                return LocalText.FormatId("import.run.wrong", "nothing imported: {0} isn't the version these were made from ({1}). other versions aren't supported yet.", Lower(_runName), reports[0].DiscId.ToLowerInvariant());
             }
-            string s = done == n ? $"all {n} imported." : $"{done} of {n} imported.";
-            if (original > 0) s += $" {original} come{(original == 1 ? "s" : "")} only from the original disc: see {(original == 1 ? "its row" : "their rows")}.";
+            string s = done == n ? LocalText.FormatId("import.run.all.done", "all {0} imported.", n) : LocalText.FormatId("import.run.some.done", "{0} of {1} imported.", done, n);
+            if (original > 0) s += LocalText.FormatId("import.run.some.original", " {0} come{1} only from the original disc: see {2}.", original, original == 1 ? "s" : "", original == 1 ? "its row" : "their rows");
             // a few left out are named (owner 2026-10-07, R13: "1 need another version" didn't say which), more are counted
             List<ImportItemInfo> other = items.Where(i => i.Status == ItemImportStatus.HashMismatch && !OnlyFromOriginal(i)).ToList();
             if (other.Count > 0) s += other.Count <= 3
-                ? $" {Names(other)} need{(other.Count == 1 ? "s" : "")} another version of the disc: see {(other.Count == 1 ? "its row" : "their rows")}."
-                : $" {other.Count} need another version of the disc.";
+                ? LocalText.FormatId("import.run.some.wrong.named", " {0} need{1} another version of the disc: see {2}.", Names(other), other.Count == 1 ? "s" : "", other.Count == 1 ? "its row" : "their rows")
+                : LocalText.FormatId("import.run.some.wrong", " {0} need another version of the disc.", other.Count);
             List<ImportItemInfo> broken = items.Where(i => i.Status == ItemImportStatus.Failed).ToList();
-            if (failed > 0) s += failed <= 3 ? $" {Names(broken)} failed: see {(failed == 1 ? "its row" : "their rows")}." : $" {failed} failed: see their rows.";
+            if (failed > 0) s += failed <= 3 ? LocalText.FormatId("import.run.some.error.named", " {0} failed: see {1}.", Names(broken), failed == 1 ? "its row" : "their rows") : LocalText.FormatId("import.run.some.error", " {0} failed: see their rows.", failed);
             return s;
         }
 
@@ -1123,7 +1123,7 @@ namespace MphRecomp.Frontend
                 return "this game file is encrypted and needs your switch's prod.keys, dumped from your own switch: set it on the switch keys box.";
             case FileNotFoundException or UnauthorizedAccessException or DirectoryNotFoundException:
                 WriteSource(_runKey, null); // forget it: the next press asks for the disc again
-                return $"{Lower(_runName)} can't be opened any more. pick your disc again.";
+                return LocalText.FormatId("import.run.open.error", "{0} can't be opened any more. pick your disc again.", Lower(_runName));
             case InvalidDataException:
                 WriteSource(_runKey, null); // not this game's disc (or no disc image at all): ask for the disc next time
                 return Lower(ex.Message) + ".";

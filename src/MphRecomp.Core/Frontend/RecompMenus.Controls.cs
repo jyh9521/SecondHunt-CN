@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -851,7 +852,7 @@ namespace MphRecomp.Frontend
             string name = ControlBinds.Short(ControlBinds.Normalize(keys, button));
             if (shared.Count > 0)
             {
-                Import.Popup?.Inform($"{name} is also assigned to {string.Join(" and ", shared)}.");
+                Import.Popup?.Inform(LocalText.FormatId("settings.bind.shared", "{0} is also assigned to {1}.", name, string.Join(LocalText.Ui(" and "), shared)));
             }
             else if (ControlBinds.IsCombo(button))
             {
@@ -859,7 +860,7 @@ namespace MphRecomp.Frontend
                 // combo's last button goes down
                 foreach ((string part, string label) in ControlBinds.ComboOverlaps(_settings, keys, id, button))
                 {
-                    Import.Popup?.Inform($"combo set.\n\nheads up: {ControlBinds.Short(part)} also does {label} on its own, and still does it for a moment when it's pressed first.");
+                    Import.Popup?.Inform(LocalText.FormatId("settings.bind.combo", "combo set.\n\nheads up: {0} also does {1} on its own, and still does it for a moment when it's pressed first.", ControlBinds.DisplayButton(part), label));
                     break;
                 }
             }

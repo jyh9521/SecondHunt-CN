@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using MphRead.Text;
 using MphRecomp.Media;
 
 namespace MphRecomp.App;
@@ -29,6 +30,7 @@ internal sealed class MoviePresenter : IDisposable
     int _uploadedVersion = -1;
     IMoviePlayback? _uploadedFor;
     readonly float[] _verts = new float[16];
+    readonly byte[] _overlay = new byte[MoviePlayer.Width * MoviePlayer.Height * 3];
     MovieAudio? _audio;
 
     const string VertexShader = @"#version 300 es
@@ -90,10 +92,16 @@ void main() { color = vec4(texture(tex, vUv).rgb, 1.0); }";
             return;
         }
         GLES30.GlPixelStorei(GLES30.GlUnpackAlignment, 1);
-        UploadOne(_texTop, player.TopFrame);
+        byte[] Screen(bool bottom)
+        {
+            byte[] source = bottom ? player.BottomFrame : player.TopFrame;
+            return player is MoviePlayer m && m.LocalizedFilm is { } film && LocalizedArtwork.Current is { } art
+                ? art.MovieFrame(film, m.FrameIndex, m.FrameCount, bottom, source, _overlay, m.LocalePlates) : source;
+        }
+        UploadOne(_texTop, Screen(bottom: false));
         if (player.DualScreen)
         {
-            UploadOne(_texBottom, player.BottomFrame);
+            UploadOne(_texBottom, Screen(bottom: true));
         }
         _uploadedFor = player;
         _uploadedVersion = player.FrameVersion;

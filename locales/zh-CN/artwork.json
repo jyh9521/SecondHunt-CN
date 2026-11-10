@@ -1,0 +1,725 @@
+{
+  "version": 2,
+  "textures": [
+    {
+      "model": "logo_screen/maya/nst_model.bin",
+      "id": 0,
+      "palette": 0,
+      "width": 256,
+      "height": 64,
+      "sha256": "cd5d01ef3bc9f3953f906d88d5f1c31475f3692b9a828abbd555e3e0a9b0646d",
+      "mask": "nst-type",
+      "fill": "alpha",
+      "lettering": [
+        {
+          "x": 3,
+          "y": 43,
+          "width": 203,
+          "height": 18,
+          "em": 14,
+          "text": "任天堂软件技术公司",
+          "ink": "FF172B",
+          "style": "flat",
+          "tracking": 1
+        }
+      ]
+    },
+    {
+      "model": "logo_screen/maya/nst_model.bin",
+      "id": 1,
+      "palette": 1,
+      "width": 128,
+      "height": 64,
+      "sha256": "e8fd68101230d1c54ed1cc2d9cfa7c4604f912f153e749f4bd749a1740a0b8f0",
+      "mask": "nst-light",
+      "fill": "alpha",
+      "lettering": [
+        {
+          "x": 3,
+          "y": 41,
+          "width": 122,
+          "height": 15,
+          "em": 12,
+          "text": "任天堂软件技术公司",
+          "ink": "FF7F16",
+          "style": "bloom"
+        }
+      ]
+    },
+    {
+      "model": "logo_screen/maya/whitelogo_model.bin",
+      "id": 0,
+      "palette": 0,
+      "width": 256,
+      "height": 128,
+      "sha256": "dffc3bd913cfb7f0e8d4909077ebd788d1a3848b5afff23b8e16b9f0cbf9c8b7",
+      "mask": "actimagine-copy",
+      "fill": "sample",
+      "sampleX": 245,
+      "sampleY": 120,
+      "lettering": [
+        {
+          "x": 4,
+          "y": 1,
+          "width": 182,
+          "height": 16,
+          "em": 15,
+          "text": "视频技术由以下厂商提供",
+          "ink": "23061D",
+          "style": "flat",
+          "left": true
+        },
+        {
+          "x": 74,
+          "y": 82,
+          "width": 130,
+          "height": 13,
+          "em": 11,
+          "text": "智能显示软件",
+          "ink": "23061D",
+          "style": "flat",
+          "left": true,
+          "tracking": 1
+        }
+      ]
+    },
+    {
+      "model": "main menu/esrb_model.bin",
+      "id": 0,
+      "palette": 0,
+      "width": 256,
+      "height": 64,
+      "sha256": "a292b1630f3e5cbe33bed26328672ff9a5e4f10d1d7e6f06dca5f0386927add7",
+      "mask": "rating-copy",
+      "fill": "sample",
+      "sampleX": 0,
+      "sampleY": 0,
+      "lettering": [
+        {
+          "x": 17,
+          "y": 3,
+          "width": 222,
+          "height": 18,
+          "em": 16,
+          "text": "ESRB 提示",
+          "ink": "F8F8F8",
+          "style": "flat"
+        },
+        {
+          "x": 17,
+          "y": 23,
+          "width": 222,
+          "height": 36,
+          "em": 16,
+          "text": "在线游玩的体验\n可能有所不同。",
+          "ink": "F8F8F8",
+          "style": "flat"
+        }
+      ]
+    },
+    {
+      "model": "tostart/logofinal_model.bin",
+      "id": 3,
+      "palette": 3,
+      "width": 256,
+      "height": 128,
+      "sha256": "df0e9de145f4cd2ffe9240817c92753b53d5044e50276d4d38e432047e73bb48",
+      "mask": "title-copy",
+      "fill": "ring",
+      "ring": {
+        "cx": 100.5,
+        "cy": 55.0,
+        "rx": 44.6,
+        "ry": 47.5
+      },
+      "lettering": [
+        {
+          "x": 8,
+          "y": 26,
+          "width": 184,
+          "height": 32,
+          "em": 30,
+          "text": "密特罗德",
+          "ink": "EAF3FF",
+          "style": "metal",
+          "stretch": 1.3,
+          "tracking": 4,
+          "slant": 5
+        },
+        {
+          "x": 43,
+          "y": 56,
+          "width": 112,
+          "height": 15,
+          "em": 12,
+          "text": "究极",
+          "ink": "DFE6ED",
+          "style": "metal",
+          "stretch": 1.28,
+          "tracking": 11
+        },
+        {
+          "x": 25,
+          "y": 67,
+          "width": 150,
+          "height": 25,
+          "em": 24,
+          "text": "猎人",
+          "ink": "FF8B21",
+          "style": "outline",
+          "stretch": 1.55,
+          "tracking": 17,
+          "slant": 2
+        }
+      ],
+      "aliases": [
+        {
+          "model": "main menu/toplogo_model.bin",
+          "id": 0,
+          "palette": 0
+        }
+      ]
+    }
+  ],
+  "movies": [
+    {
+      "key": "01",
+      "topSha256": "506dd0a42ec1a11e344c0cfbcef8b2aa5c1c31f4efe41414e5aa653f9dd1052a",
+      "bottomSha256": "7e5f515001acdf902648a71022e38b421c78260e30144eaa7d2cd656a10c0d51",
+      "frames": 1243,
+      "cues": [
+        {
+          "bottom": true,
+          "until": 208,
+          "reference": 6,
+          "lateReference": 12,
+          "upperValueX": 195,
+          "lowerValueX": 190,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 5,
+          "mask": "sylux-details",
+          "lettering": [
+            {
+              "x": 145,
+              "y": 0,
+              "width": 110,
+              "height": 11,
+              "em": 11,
+              "text": "种族：未知",
+              "ink": "C7FADE",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 0.98
+            },
+            {
+              "x": 145,
+              "y": 11,
+              "width": 110,
+              "height": 11,
+              "em": 11,
+              "text": "出身：赛洛西斯",
+              "ink": "C7FADE",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 0.98
+            }
+          ],
+          "from": 7,
+          "sourceTyping": [
+            {
+              "x": 193,
+              "y": 0,
+              "width": 63,
+              "height": 10,
+              "from": 30,
+              "through": 46
+            },
+            {
+              "x": 189,
+              "y": 10,
+              "width": 46,
+              "height": 14,
+              "from": 51,
+              "through": 66
+            }
+          ]
+        },
+        {
+          "bottom": true,
+          "until": 208,
+          "reference": 12,
+          "fadeIn": 2,
+          "fadeOut": 5,
+          "mask": "sylux-name",
+          "flashMask": "sylux-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 33,
+              "y": 118,
+              "width": 222,
+              "height": 61,
+              "em": 46,
+              "text": "赛拉克斯",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.08,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 17
+        },
+        {
+          "bottom": false,
+          "until": 415,
+          "reference": 213,
+          "lateReference": 222,
+          "upperValueX": 85,
+          "lowerValueX": 51,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 5,
+          "mask": "weavel-details",
+          "lettering": [
+            {
+              "x": 4,
+              "y": 0,
+              "width": 188,
+              "height": 11,
+              "em": 11,
+              "text": "种族：半机械宇宙海盗",
+              "ink": "D0EA97",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 1
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "width": 188,
+              "height": 11,
+              "em": 11,
+              "text": "出身：未知",
+              "ink": "D0EA97",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 1
+            }
+          ],
+          "from": 214,
+          "sourceTyping": [
+            {
+              "x": 54,
+              "y": 0,
+              "width": 144,
+              "height": 10,
+              "from": 215,
+              "through": 258
+            },
+            {
+              "x": 48,
+              "y": 10,
+              "width": 58,
+              "height": 15,
+              "from": 262,
+              "through": 276
+            }
+          ],
+          "guide": {
+            "x": 47,
+            "right": 93,
+            "y": 10,
+            "row": 11,
+            "slope": 1.53,
+            "hold": 239,
+            "until": 259
+          }
+        },
+        {
+          "bottom": false,
+          "until": 415,
+          "reference": 217,
+          "fadeIn": 2,
+          "fadeOut": 5,
+          "mask": "weavel-name",
+          "flashMask": "weavel-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 3,
+              "y": 126,
+              "width": 224,
+              "height": 51,
+              "em": 45,
+              "text": "韦弗尔",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.28,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 225
+        },
+        {
+          "bottom": true,
+          "until": 518,
+          "reference": 421,
+          "lateReference": 429,
+          "upperValueX": 84,
+          "lowerValueX": 51,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 5,
+          "mask": "noxus-details",
+          "lettering": [
+            {
+              "x": 4,
+              "y": 0,
+              "width": 110,
+              "height": 11,
+              "em": 11,
+              "text": "种族：沃佐恩族",
+              "ink": "91F0F1",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 0.98
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "width": 110,
+              "height": 11,
+              "em": 11,
+              "text": "出身：沃星",
+              "ink": "91F0F1",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 0.98
+            }
+          ],
+          "from": 422,
+          "sourceTyping": [
+            {
+              "x": 54,
+              "y": 0,
+              "width": 49,
+              "height": 10,
+              "from": 423,
+              "through": 434
+            },
+            {
+              "x": 48,
+              "y": 10,
+              "width": 29,
+              "height": 14,
+              "from": 439,
+              "through": 445
+            }
+          ]
+        },
+        {
+          "bottom": true,
+          "until": 518,
+          "reference": 427,
+          "fadeIn": 2,
+          "fadeOut": 5,
+          "mask": "noxus-name",
+          "flashMask": "noxus-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 0,
+              "y": 117,
+              "width": 236,
+              "height": 62,
+              "em": 46,
+              "text": "诺克萨斯",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.16,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 432
+        },
+        {
+          "bottom": false,
+          "until": 619,
+          "reference": 523,
+          "lateReference": 532,
+          "upperValueX": 90,
+          "lowerValueX": 51,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 4,
+          "mask": "trace-details",
+          "lettering": [
+            {
+              "x": 4,
+              "y": 0,
+              "width": 135,
+              "height": 11,
+              "em": 11,
+              "text": "种族：克里肯族",
+              "ink": "FFD39A",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 0.98
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "width": 135,
+              "height": 11,
+              "em": 11,
+              "text": "出身：克里肯帝国",
+              "ink": "FFD39A",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 0.98
+            }
+          ],
+          "from": 524,
+          "sourceTyping": [
+            {
+              "x": 54,
+              "y": 0,
+              "width": 42,
+              "height": 10,
+              "from": 525,
+              "through": 537
+            },
+            {
+              "x": 48,
+              "y": 10,
+              "width": 87,
+              "height": 14,
+              "from": 542,
+              "through": 569
+            }
+          ]
+        },
+        {
+          "bottom": false,
+          "until": 619,
+          "reference": 530,
+          "fadeIn": 2,
+          "fadeOut": 4,
+          "mask": "trace-name",
+          "flashMask": "trace-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 36,
+              "y": 118,
+              "width": 219,
+              "height": 62,
+              "em": 47,
+              "text": "特雷斯",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.23,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 535
+        },
+        {
+          "bottom": true,
+          "until": 813,
+          "reference": 627,
+          "lateReference": 633,
+          "upperValueX": 94,
+          "lowerValueX": 51,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 5,
+          "mask": "spire-details",
+          "lettering": [
+            {
+              "x": 4,
+              "y": 0,
+              "width": 120,
+              "height": 11,
+              "em": 11,
+              "text": "种族：戴蒙特族",
+              "ink": "FFF0AA",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 1
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "width": 120,
+              "height": 11,
+              "em": 11,
+              "text": "出身：蒙德雷乌斯",
+              "ink": "FFF0AA",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 1
+            }
+          ],
+          "from": 628,
+          "sourceTyping": [
+            {
+              "x": 54,
+              "y": 0,
+              "width": 56,
+              "height": 10,
+              "from": 629,
+              "through": 644
+            },
+            {
+              "x": 48,
+              "y": 10,
+              "width": 66,
+              "height": 14,
+              "from": 647,
+              "through": 666
+            }
+          ]
+        },
+        {
+          "bottom": true,
+          "until": 813,
+          "reference": 632,
+          "fadeIn": 2,
+          "fadeOut": 5,
+          "mask": "spire-name",
+          "flashMask": "spire-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 3,
+              "y": 117,
+              "width": 210,
+              "height": 62,
+              "em": 47,
+              "text": "斯派尔",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.23,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 637
+        },
+        {
+          "bottom": false,
+          "until": 1005,
+          "reference": 819,
+          "lateReference": 826,
+          "upperValueX": 90,
+          "lowerValueX": 51,
+          "splitY": 11,
+          "fadeIn": 7,
+          "fadeOut": 5,
+          "mask": "kanden-details",
+          "lettering": [
+            {
+              "x": 4,
+              "y": 0,
+              "width": 158,
+              "height": 11,
+              "em": 11,
+              "text": "种族：伊诺玛族",
+              "ink": "FDE2A1",
+              "style": "hud",
+              "left": true,
+              "reveal": 22,
+              "stretch": 1
+            },
+            {
+              "x": 4,
+              "y": 11,
+              "width": 158,
+              "height": 11,
+              "em": 11,
+              "text": "出身：一间秘密实验室",
+              "ink": "FDE2A1",
+              "style": "hud",
+              "left": true,
+              "reveal": 20,
+              "delay": 8,
+              "stretch": 1
+            }
+          ],
+          "from": 820,
+          "sourceTyping": [
+            {
+              "x": 54,
+              "y": 0,
+              "width": 55,
+              "height": 10,
+              "from": 821,
+              "through": 836
+            },
+            {
+              "x": 48,
+              "y": 10,
+              "width": 130,
+              "height": 14,
+              "from": 838,
+              "through": 879
+            }
+          ]
+        },
+        {
+          "bottom": false,
+          "until": 1005,
+          "reference": 824,
+          "fadeIn": 2,
+          "fadeOut": 5,
+          "mask": "kanden-name",
+          "flashMask": "kanden-flash",
+          "flashLength": 22,
+          "scanline": true,
+          "lettering": [
+            {
+              "x": 3,
+              "y": 123,
+              "width": 238,
+              "height": 56,
+              "em": 47,
+              "text": "坎登",
+              "ink": "EDF6FF",
+              "style": "metal",
+              "stretch": 1.38,
+              "tracking": 3,
+              "slant": 2
+            }
+          ],
+          "from": 830
+        }
+      ]
+    }
+  ]
+}

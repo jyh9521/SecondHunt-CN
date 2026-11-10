@@ -14,25 +14,48 @@ namespace MphRead.Text
     public static class LocalText
     {
         private static IReadOnlyDictionary<string, string>? _ui;
+        private static IReadOnlyDictionary<string, string>? _caseFolded;
         private static IReadOnlyDictionary<string, string>? _identified;
         private static RomTextPack? _rom;
         private static string? _romRoot;
         public static ExtraGlyphs? Glyphs { get; private set; }
+        // Development census: observes untranslated display lookups without changing rendering.
+        public static Action<string>? ObserveMissingUi { get; set; }
 
         public static void Configure(IReadOnlyDictionary<string, string>? ui, ExtraGlyphs? glyphs,
             IReadOnlyDictionary<string, string>? identified = null)
         {
             _ui = ui;
+            if (ui == null) _caseFolded = null;
+            else
+            {
+                var folded = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var ambiguous = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var (source, value) in ui)
+                {
+                    if (!folded.TryAdd(source, value) && folded[source] != value) ambiguous.Add(source);
+                }
+                foreach (string source in ambiguous) folded.Remove(source);
+                _caseFolded = folded;
+            }
             _identified = identified;
             Glyphs = glyphs;
         }
 
         public static string Ui(string source)
-            => _ui != null && _ui.TryGetValue(source, out string? translated) ? translated : source;
+        {
+            if (_ui == null) return source;
+            if (_ui.TryGetValue(source, out string? text) || _caseFolded!.TryGetValue(source, out text)) return text;
+            ObserveMissingUi?.Invoke(source);
+            return source;
+        }
 
         // For generated UI, a stable ID is independent of edits to the English wording.
         public static string Id(string id, string fallback)
             => _identified != null && _identified.TryGetValue(id, out string? translated) ? translated : Ui(fallback);
+
+        public static string FormatId(string id, string fallback, params object?[] values)
+            => string.Format(CultureInfo.InvariantCulture, Id(id, fallback), values);
 
         public static string Format(string source, params object?[] values)
             => string.Format(CultureInfo.InvariantCulture, Ui(source), values);

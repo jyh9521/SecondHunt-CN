@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -744,7 +745,7 @@ namespace MphRecomp.Frontend
             if (_joining || _creating || Import.Popup == null) return;
             string from = OnlineNames.Display(invite.From.Name, invite.From.Tag).ToLowerInvariant();
             string mode = ModeOf(invite.Game) is GameMode m ? ModeName(m) : invite.Game.Info.Mode.ToLowerInvariant();
-            Import.Popup.Ask($"{from} invites you to a {mode} game.\n\njoin it?", yes =>
+            Import.Popup.Ask(LocalText.FormatId("online.invite.match", "{0} invites you to a {1} game.\n\njoin it?", from, LocalText.Ui(mode)), yes =>
             {
                 if (yes && _onlineMenu != null) JoinCard(_onlineMenu, invite.Game);
             });
@@ -964,7 +965,7 @@ namespace MphRecomp.Frontend
                 if (menu.ItemState(_bJoin[r]) != MenuState.Focused || !here) menu.SetState(_bJoin[r], join);
             }
             if (count == 0 && focus >= 0) menu.SetState(_bRefresh, MenuState.Focused);
-            _strings.Set(_onBrowseTitle, OnGamePages > 1 ? $"BROWSE GAMES {_gameOffset / OnRows + 1}/{OnGamePages}" : "BROWSE GAMES");
+            _strings.Set(_onBrowseTitle, OnGamePages > 1 ? LocalText.FormatId("online.browse.title", "BROWSE GAMES {0}/{1}", _gameOffset / OnRows + 1, OnGamePages) : "BROWSE GAMES");
         }
 
         private void ShowOnGame(MenuEngine menu)
@@ -1139,7 +1140,7 @@ namespace MphRecomp.Frontend
         private static string JoinBlockMessage(GameInfo i, string reason) => reason switch
         {
             "other version" => "this game runs a different version.\n\nboth players need the same game update and rom.",
-            "needs echoes import" => $"this game is in {ExtraArenas.Label(i.Arena)}, an arena you don't have.\n\nimport metroid prime 2: echoes on import games to play it.",
+            "needs echoes import" => LocalText.FormatId("online.require.arena", "this game is in {0}, an arena you don't have.\n\nimport metroid prime 2: echoes on import games to play it.", LocalText.Ui(ExtraArenas.Label(i.Arena))),
             "extra arenas off" => "this game is in an extra arena.\n\nturn off no extra arena games in online settings to join it.",
             "extra pickups off" => "this game has extra pickups.\n\nturn off no extra pickup games in online settings to join it.",
             _ => "this game has extra characters.\n\nturn off no extra character games in online settings to join it.",
@@ -1430,7 +1431,7 @@ namespace MphRecomp.Frontend
             else if (menu.ItemState(_lbStart) is MenuState.State5 or MenuState.Hidden) menu.SetState(_lbStart, MenuState.Idle);
             Show(menu, _lbTalk, LobbyTalkShown()); // (voice's TALK under START: OnlineMenus.Voice.cs)
             int filled = seats.Count(x => x.Kind != SeatKind.Open);
-            _strings.Set(_onLobbyTitle, $"LOBBY {filled}/{seats.Count}");
+            _strings.Set(_onLobbyTitle, LocalText.FormatId("online.lobby.count", "LOBBY {0}/{1}", filled, seats.Count));
         }
 
         private void LobbyCall(MenuEngine menu, int call)
@@ -1525,7 +1526,7 @@ namespace MphRecomp.Frontend
             IReadOnlyList<string> away = m.Net.NotBack(), choosing = m.Net.StillChoosing();
             if (away.Count > 0 && Import.Popup != null)
             {
-                Import.Popup.Ask($"{Names(away)} {(away.Count == 1 ? "is" : "are")} still on the results.\n\nstart without them?", yes =>
+                Import.Popup.Ask(LocalText.FormatId("online.confirm.results", "{0} {1} still on the results.\n\nstart without them?", Names(away), away.Count == 1 ? "is" : "are"), yes =>
                 {
                     if (!yes || Runner != m) return;
                     m.Net.KickNotBack("the game started without you.");
@@ -1535,7 +1536,7 @@ namespace MphRecomp.Frontend
             }
             if (choosing.Count > 0 && Import.Popup != null)
             {
-                Import.Popup.Ask($"{Names(choosing)} {(choosing.Count == 1 ? "is" : "are")} still choosing a hunter.\n\nstart anyway?", yes =>
+                Import.Popup.Ask(LocalText.FormatId("online.confirm.choosing", "{0} {1} still choosing a hunter.\n\nstart anyway?", Names(choosing), choosing.Count == 1 ? "is" : "are"), yes =>
                 {
                     if (yes && Runner == m) StartNow(m);
                 });
@@ -1596,7 +1597,7 @@ namespace MphRecomp.Frontend
                         }
                         string names = string.Join("\n", who.Take(4).Select(c => OnlineNames.Display(c.Name, c.Tag).ToLowerInvariant()))
                             + (who.Count > 4 ? $"\n+{who.Count - 4} more" : "");
-                        Import.Popup?.Ask($"invite your friends online?\n\n{names}", yes =>
+                        Import.Popup?.Ask(LocalText.FormatId("online.invite.friends", "invite your friends online?\n\n{0}", names), yes =>
                         {
                             if (!yes) return;
                             foreach (PlayerCard c in who)
@@ -1648,7 +1649,7 @@ namespace MphRecomp.Frontend
             _client = null; // the match owns the connection from here (OnlineMatch.Dispose closes it)
             OnlinePlayer me = Me();
             string romKey = LanSession.RomKeyFor(Paths.MphKey);
-            string what = host != null ? $"joining {host.ToLowerInvariant()}'s game..." : "finding a game...";
+            string what = host != null ? LocalText.FormatId("online.join.host", "joining {0}'s game...", host.ToLowerInvariant()) : "finding a game...";
             Import.Popup?.BusyCancel(what, () => _joinCancelled = true);
             Task.Run(async () =>
             {
@@ -1718,7 +1719,7 @@ namespace MphRecomp.Frontend
             if (held == null || Import.Popup == null) return;
             if (_joining || _creating || _hosting != null || _joined != null || OnlineMatch.Current != null) return;
             string mode = ModeOf(held) is GameMode m ? ModeName(m) : held.Info.Mode.ToLowerInvariant();
-            Import.Popup.Ask($"your {mode} match in {ArenaLabel(held.Info.Arena)} is still going.\n\nrejoin it?", yes =>
+            Import.Popup.Ask(LocalText.FormatId("online.rejoin.confirm", "your {0} match in {1} is still going.\n\nrejoin it?", LocalText.Ui(mode), LocalText.Ui(ArenaLabel(held.Info.Arena))), yes =>
             {
                 if (yes)
                 {
@@ -2054,10 +2055,10 @@ namespace MphRecomp.Frontend
             Bar(Mx(100), My(226), Mx(1240), My(556), q, glows);
             DoorIcon("globe", Mx(130), My(256), Mw(270), q);
             TextS(FindOn ? "find game" : "quick match", Mx(440), My(276), 0, Orange, q, SizeS);
-            TextS(!FindOn ? "jump into a game now" : _finding ? "searching..." : _party != null ? $"search with your party of {_party.Members.Count}"
+            TextS(!FindOn ? "jump into a game now" : _finding ? "searching..." : _party != null ? LocalText.FormatId("online.party.search.count", "search with your party of {0}", _party.Members.Count)
                 : "any mode, players near you", Mx(440), My(342), 0, White, q, SizeM);
             string status = _connecting ? "connecting..." : !Live && _netError != null ? "offline: " + _netError
-                : _hunters >= 0 ? $"{_hunters} hunter{(_hunters == 1 ? "" : "s")} online" : "";
+                : _hunters >= 0 ? LocalText.FormatId("online.hub.hunters", "{0} hunter{1} online", _hunters, _hunters == 1 ? "" : "s") : "";
             TextS(Fit(status, 34), Mx(440), My(388), 0, !Live && _netError != null && !_connecting ? Red : Cyan, q, SizeM);
             Capsule(Mx(440), My(448), Mw(420), Mw(76), "go", Live, -1, glows, SizeS);
             // BROWSE, CREATE
@@ -2065,7 +2066,7 @@ namespace MphRecomp.Frontend
             Bar(Mx(100), My(586), Mx(655), My(886), _hBrowse, glows);
             DoorIcon("join", Mx(124), My(651), Mw(170), _hBrowse);
             TextS("browse", Mx(320), My(656), 0, Orange, _hBrowse, SizeS);
-            TextS(!Live ? "" : $"{open} open game{(open == 1 ? "" : "s")}", Mx(320), My(722), 0, Cyan, _hBrowse, SizeM);
+            TextS(!Live ? "" : LocalText.FormatId("online.hub.games", "{0} open game{1}", open, open == 1 ? "" : "s"), Mx(320), My(722), 0, Cyan, _hBrowse, SizeM);
             Bar(Mx(685), My(586), Mx(1240), My(886), _hCreate, glows);
             DoorIcon("create", Mx(709), My(651), Mw(170), _hCreate);
             TextS("create", Mx(905), My(656), 0, Orange, _hCreate, SizeS);
@@ -2138,7 +2139,7 @@ namespace MphRecomp.Frontend
                 TextS(host, tx, My(by + 18), 0, White, tag, SizeS);
                 Badge(g.Host, tx + _drawMenu!.Font.Measure(host) + Mw(14), My(by + 16), Mw(44), tag);
                 TextS(ModeOf(g) is GameMode m ? ModeName(m) : g.Info.Mode.ToLowerInvariant(), tx, My(by + 72), 0, Orange, tag, SizeS);
-                string players = $"{g.Players}/{g.Info.MaxPlayers} players";
+                string players = LocalText.FormatId("online.browse.players", "{0}/{1} players", g.Players, g.Info.MaxPlayers);
                 TextS(players, tx, My(by + 130), 0, Pale, tag, SizeM);
                 BanIcons(g.Info, tx + _drawMenu!.Font.Measure(players) * SizeM + Mw(24), My(by + 122), Mw(40), tag);
                 string? block = JoinBlock(g.Info);
@@ -2160,7 +2161,7 @@ namespace MphRecomp.Frontend
             }
             if (OnGamePages > 1)
             {
-                float w = _drawMenu!.Font.Measure($"BROWSE GAMES {OnGamePages}/{OnGamePages}") / 2;
+                float w = _drawMenu!.Font.Measure(LocalText.FormatId("online.browse.title", "BROWSE GAMES {0}/{1}", OnGamePages, OnGamePages)) / 2;
                 Arrow(false, 128 - w - 22, ArrowTop, _bPrev);
                 Arrow(true, 128 + w + 12, ArrowTop, _bNext);
             }
@@ -2225,7 +2226,7 @@ namespace MphRecomp.Frontend
                     TextS("open", Mx(x + 140), My(796), 0, OnGrey, tag, SizeM);
                 }
             }
-            if (max > 4) TextS($"+{max - 4} more seats", Mx(1800), My(870), 1, Pale, tag, SizeX);
+            if (max > 4) TextS(LocalText.FormatId("online.detail.seats", "+{0} more seats", max - 4), Mx(1800), My(870), 1, Pale, tag, SizeX);
             TextS("tap a name to see their hunter license", Mx(960), My(900), 2, OnGrey, tag, SizeX);
         }
 
@@ -2354,7 +2355,7 @@ namespace MphRecomp.Frontend
                 else TextS(what, Mx(cx + 240), My(cy + 150), 0, Orange, tag, SizeX);
                 // (the host's own card: no hint, its EDIT RULES is in the GAME panel; owner 2026-10-16)
                 string third = you ? (host ? "" : "tap to change hunter")
-                    : seat.Kind != SeatKind.Bot ? "" : host ? "" : $"bot level {seat.Player?.BotLevel + 1 ?? 1}";
+                    : seat.Kind != SeatKind.Bot ? "" : host ? "" : LocalText.FormatId("online.bot.level", "bot level {0}", seat.Player?.BotLevel + 1 ?? 1);
                 TextS(third, Mx(cx + 240), My(cy + 196), 0, you ? Pale : OnGrey, tag, SizeX);
                 if (ping >= 0) Ping(Mx(cx + 240), My(cy + 238), Mw(34), ping, tag);
                 // ready: in the lobby with a hunter (the check), else the red X; nothing for someone the match doesn't have yet

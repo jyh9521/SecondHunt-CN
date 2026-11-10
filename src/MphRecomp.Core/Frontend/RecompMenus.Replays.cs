@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -346,7 +347,7 @@ namespace MphRecomp.Frontend
                 menu.SetState(_lPlay[r], info.PlaysHere ? MenuState.Idle : MenuState.State5);
             }
             if (shown == 0) menu.SetState(_lRecord, MenuState.Focused);
-            _strings.Set(_listTitleString, ReplayPages > 1 ? $"REPLAYS {_replayOffset / ReplayRows + 1}/{ReplayPages}" : "REPLAYS");
+            _strings.Set(_listTitleString, ReplayPages > 1 ? LocalText.FormatId("replay.list.pages", "REPLAYS {0}/{1}", _replayOffset / ReplayRows + 1, ReplayPages) : "REPLAYS");
         }
 
         private void ShowDetail(MenuEngine menu)
@@ -486,7 +487,7 @@ namespace MphRecomp.Frontend
                 Try(() => _replayOpen = ReplayLibrary.Unpin(dir, r.Path));
                 return;
             }
-            Import.Popup.Ask($"remove it from favorites?\n\nyou have {ReplayLibrary.KeepRecent} newer replays, so this one will be deleted.", yes =>
+            Import.Popup.Ask(LocalText.FormatId("replay.confirm.unpin", "remove it from favorites?\n\nyou have {0} newer replays, so this one will be deleted.", ReplayLibrary.KeepRecent), yes =>
             {
                 if (!yes) return;
                 Try(() => ReplayLibrary.Unpin(dir, r.Path));
@@ -519,7 +520,7 @@ namespace MphRecomp.Frontend
                 else ReshowReplayList();
             }
             if (Import.Popup == null) Delete();
-            else Import.Popup.Ask($"delete this replay?\n\n{r.Title.ToLowerInvariant()}", yes =>
+            else Import.Popup.Ask(LocalText.FormatId("replay.confirm.delete", "delete this replay?\n\n{0}", r.Title.ToLowerInvariant()), yes =>
             {
                 if (yes) Delete();
             });
@@ -564,7 +565,7 @@ namespace MphRecomp.Frontend
         private static string DetailTitle(ReplayInfo r)
         {
             if (r.Header == null) return r.Title.ToLowerInvariant();
-            return Renamed(r) ? r.Title.ToLowerInvariant() : $"{ModeName(r.Header.Settings.Mode)} - {r.Arena.ToLowerInvariant()}";
+            return Renamed(r) ? r.Title.ToLowerInvariant() : LocalText.FormatId("replay.default.title", "{0} - {1}", LocalText.Ui(ModeName(r.Header.Settings.Mode)), LocalText.Ui(r.Arena.ToLowerInvariant()));
         }
 
         // the recorder names a replay "<Mode> <arena>" (ReplayLibrary); anything else is the player's own name for it

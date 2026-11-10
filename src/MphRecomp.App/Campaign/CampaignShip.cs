@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -165,7 +166,8 @@ internal sealed partial class CampaignRenderer
         }
         else
         {
-            _shipNote = error == null ? $"Slot {slot} is empty." : $"Slot {slot} could not be read: {error}";
+            _shipNote = error == null ? LocalText.FormatId("ship.slot.empty", "Slot {0} is empty.", slot)
+                : LocalText.FormatId("ship.slot.error", "Slot {0} could not be read: {1}", slot, LocalText.Ui(error));
             OpenShip(ShipPage.GameOver);
         }
         return true;
@@ -828,13 +830,13 @@ internal sealed partial class CampaignRenderer
                 Story = copy
             });
             _shipUnsaved = false;
-            _shipNote = $"Progress saved to slot {_saveSlot}.";
+            _shipNote = LocalText.FormatId("ship.slot.saved", "Progress saved to slot {0}.", _saveSlot);
             Log.Info("MPHCampaign", $"saved slot {_saveSlot}: {_saves.PathFor(_saveSlot)}");
             return true;
         }
         catch (Exception ex)
         {
-            _shipNote = $"Save failed: {ex.Message}";
+            _shipNote = LocalText.FormatId("ship.save.error", "Save failed: {0}", LocalText.Ui(ex.Message));
             Log.Error("MPHCampaign", ex.ToString());
             return false;
         }
@@ -1066,7 +1068,7 @@ internal sealed partial class CampaignRenderer
             }
             if (pressB || pressA)
             {
-                _shipNote = "Not saved.";
+                _shipNote = LocalText.Ui("Not saved.");
                 OpenShip(ShipPage.PlanetSelect);
                 return;
             }
@@ -1083,11 +1085,11 @@ internal sealed partial class CampaignRenderer
                     if (_saves!.TryLoad(_saveSlot, out CampaignSaveFile? file, out string? error))
                     {
                         AdoptSave(file!);
-                        _shipNote = $"Loaded slot {_saveSlot}.";
+                        _shipNote = LocalText.FormatId("ship.slot.loaded", "Loaded slot {0}.", _saveSlot);
                         OpenShip(ShipPage.PlanetSelect);
                         return;
                     }
-                    _shipNote = $"Slot {_saveSlot} could not be read: {error ?? "empty"}";
+                    _shipNote = LocalText.FormatId("ship.slot.error", "Slot {0} could not be read: {1}", _saveSlot, LocalText.Ui(error ?? "empty"));
                 }
                 if (row.Action == ShipAction.NewGame)
                 {
@@ -1148,10 +1150,10 @@ internal sealed partial class CampaignRenderer
         var rows = new List<ShipRow>();
         if (_saves != null && _saves.Exists(_saveSlot))
         {
-            rows.Add(new ShipRow { Text = $"LOAD LAST SAVE (slot {_saveSlot}: {SlotSummary()})", Action = ShipAction.Load });
+            rows.Add(new ShipRow { Text = LocalText.FormatId("ship.gameover.load", "LOAD LAST SAVE (slot {0}: {1})", _saveSlot, SlotSummary()), Action = ShipAction.Load });
         }
-        rows.Add(new ShipRow { Text = "NEW GAME (Celestial Archives)", Action = ShipAction.NewGame });
-        rows.Add(new ShipRow { Text = "QUIT", Action = ShipAction.Quit });
+        rows.Add(new ShipRow { Text = LocalText.Ui("NEW GAME (Celestial Archives)"), Action = ShipAction.NewGame });
+        rows.Add(new ShipRow { Text = LocalText.Ui("QUIT"), Action = ShipAction.Quit });
         return rows;
     }
 
@@ -1159,10 +1161,12 @@ internal sealed partial class CampaignRenderer
     {
         if (_saves == null || !_saves.TryLoad(_saveSlot, out CampaignSaveFile? file, out _))
         {
-            return "empty";
+            return LocalText.Ui("empty");
         }
-        return $"{ShipNavigation.Get(file!.Planet).Name}, {file.Hunter}, {file.Story.GetCompletionPercentage()}%, "
-            + $"{TimeSpan.FromSeconds(file.PlaySeconds):h\\:mm}, saved {file.SavedAtUtc.ToLocalTime():yyyy-MM-dd HH:mm}";
+        return LocalText.FormatId("ship.slot.summary", "{0}, {1}, {2}%, {3}, saved {4}",
+            LocalText.Ui(ShipNavigation.Get(file!.Planet).Name), LocalText.Ui(file.Hunter.ToString()),
+            file.Story.GetCompletionPercentage(), TimeSpan.FromSeconds(file.PlaySeconds).ToString(@"h\:mm"),
+            file.SavedAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm"));
     }
 
     // ---------------------------------------------------------------- text
@@ -1182,29 +1186,32 @@ internal sealed partial class CampaignRenderer
         switch (_shipPage)
         {
         case ShipPage.SavePrompt:
-            sb.AppendLine(_shipEnding ? "MISSION COMPLETE" : "HUNTER GUNSHIP");
+            sb.AppendLine(LocalText.Ui(_shipEnding ? "MISSION COMPLETE" : "HUNTER GUNSHIP"));
             sb.AppendLine();
             if (_shipEnding && _shipStory != null)
             {
-                sb.AppendLine($"Completion {_shipStory.GetCompletionPercentage()}%   play time {TimeSpan.FromSeconds(PlaySeconds):h\\:mm}");
+                sb.AppendLine(LocalText.FormatId("ship.save.completion", "Completion {0}%   play time {1}",
+                    _shipStory.GetCompletionPercentage(), TimeSpan.FromSeconds(PlaySeconds).ToString(@"h\:mm")));
                 sb.AppendLine();
             }
             else
             {
-                sb.AppendLine($"Docked at {ShipNavigation.Get(_shipPlanet).Name}. Energy and ammo restored.");
+                sb.AppendLine(LocalText.FormatId("ship.docked", "Docked at {0}. Energy and ammo restored.",
+                    LocalText.Ui(ShipNavigation.Get(_shipPlanet).Name)));
                 sb.AppendLine();
             }
-            sb.AppendLine("SAVE YOUR PROGRESS?");
-            sb.AppendLine($"slot {_saveSlot}: {(_saves != null && _saves.Exists(_saveSlot) ? SlotSummary() + " -- will be replaced" : "empty")}");
+            sb.AppendLine(LocalText.Ui("SAVE YOUR PROGRESS?"));
+            sb.AppendLine(LocalText.FormatId("ship.slot.line", "slot {0}: {1}", _saveSlot,
+                _saves != null && _saves.Exists(_saveSlot) ? SlotSummary() + LocalText.Ui(" -- will be replaced") : LocalText.Ui("empty")));
             sb.AppendLine();
-            sb.AppendLine($"  {(_shipCursor == 0 ? ">" : " ")} YES");
-            sb.AppendLine($"  {(_shipCursor == 1 ? ">" : " ")} NO");
+            sb.AppendLine($"  {(_shipCursor == 0 ? ">" : " ")} {LocalText.Ui("YES")}");
+            sb.AppendLine($"  {(_shipCursor == 1 ? ">" : " ")} {LocalText.Ui("NO")}");
             sb.AppendLine();
-            sb.Append("A select   B no");
+            sb.Append(LocalText.Ui("A select   B no"));
             break;
         case ShipPage.GameOver:
         {
-            sb.AppendLine("GAME OVER");
+            sb.AppendLine(LocalText.Ui("GAME OVER"));
             sb.AppendLine();
             List<ShipRow> rows = GameOverRows();
             _shipCursor = NextSelectable(rows, _shipCursor, 0);
@@ -1213,7 +1220,7 @@ internal sealed partial class CampaignRenderer
                 sb.AppendLine($"  {(i == _shipCursor ? ">" : " ")} {rows[i].Text}");
             }
             sb.AppendLine();
-            sb.Append("A select");
+            sb.Append(LocalText.Ui("A select"));
             break;
         }
         }

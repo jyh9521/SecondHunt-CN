@@ -15,6 +15,8 @@
 | Metroid Prime 4: Beyond | 密特罗德 究极4 穿越未知 | [任天堂简中产品页][beyond]直接确认全名。 |
 | Samus Aran | 萨姆斯･亚兰 | [任天堂《究极4》简中故事页][story]写作「萨姆斯·亚兰」，中点为 U+00B7；本项目保留同一人名，按用户指定改用半角中点 `･`（U+FF65），不是 `・`（U+30FB）或 ASCII 句点。优先于[《大乱斗》早期跨作品简中博客][smashblog]的旧译。 |
 | Sylux | 赛拉克斯 | [任天堂《究极4》简中故事页的角色标题][story]及[任天堂香港简中 amiibo 公告][amiibo]。 |
+| Weavel / Noxus / Trace / Spire / Kanden | 韦弗尔／诺克萨斯／特雷斯／斯派尔／坎登 | [《猎人》官方英文说明书][hunters-manual]及游戏片头核实原名；没有查到同作官方简中译名，沿用项目定名。 |
+| Alimbic Cluster / Alinos / Arcterra / Gorea | 阿林比克星团／阿利诺斯／阿克泰拉／戈瑞亚 | [《猎人》官方英文说明书][hunters-manual]和冒险文本核对指代，未查到官方简中定名。 |
 | Dark Samus / Zero Suit Samus | 黑暗萨姆斯／零装甲萨姆斯 | [任天堂香港简中 amiibo 公告][amiibo]；黑暗萨姆斯亦见[简中角色页][dark]。 |
 | Gunship（猎人自己的飞船） | 舰艇 | [《猎人》官方英文说明书][hunters-manual]为英文；[《大乱斗》简中博客][smashblog]在另一作品的场景描述里用了「战船」，不作为《猎人》设备名。没有找到可核实的本作官方简中定名，按用户指定。 |
 

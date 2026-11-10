@@ -26,15 +26,23 @@ internal static class DesktopLocale
             "en" => English,
             _ => throw new ArgumentException($"Unknown locale: {requested}. Use zh-CN or en.")
         };
+        LocalizedArtwork.Current = null;
         if (Name == English) { LocalText.Configure(null, null); return; }
         var identified = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (string resource in new[] { "settings.json", "terms.json" })
+        foreach (string resource in new[] { "settings.json", "terms.json", "extras.json" })
             foreach (var pair in LoadCatalogue(resource))
                 identified.Add(pair.Key, pair.Value);
         using Stream glyph = Resource("glyphs.bin");
         using var glyphBytes = new MemoryStream();
         glyph.CopyTo(glyphBytes);
-        LocalText.Configure(LoadCatalogue("ui.json"), new ExtraGlyphs(glyphBytes.ToArray()), identified);
+        var atlas = new ExtraGlyphs(glyphBytes.ToArray());
+        using Stream art = Resource("artwork.json");
+        using Stream masks = Resource("artwork-masks.json");
+        using Stream artFont = Resource("artglyphs.bin");
+        using var artFontBytes = new MemoryStream();
+        artFont.CopyTo(artFontBytes);
+        LocalizedArtwork.Current = LocalizedArtwork.Load(art, masks, artFontBytes.ToArray());
+        LocalText.Configure(LoadCatalogue("ui.json"), atlas, identified);
     }
 
     private static Dictionary<string, string> LoadCatalogue(string name)

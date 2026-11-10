@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -217,8 +218,8 @@ namespace MphRecomp.Frontend
                 0 => Ordered(r.Friends).Select(PresenceRow).ToList(),
                 1 => Ordered(r.Rivals).Select(PresenceRow).ToList(),
                 2 => Requests().OrderBy(q => q.Incoming ? 0 : 1).Select(q => q.Incoming
-                    ? new PlayerRow(q.Player, $"wants to be your {q.Kind}", Pale, null, White, false, q.Kind, RowButtons.Answer, q.Kind)
-                    : new PlayerRow(q.Player, $"{q.Kind} request sent - waiting", OnGrey, null, White, false, q.Kind, RowButtons.Cancel, q.Kind)).ToList(),
+                    ? new PlayerRow(q.Player, LocalText.FormatId("online.friends.want", "wants to be your {0}", LocalText.Ui(q.Kind)), Pale, null, White, false, q.Kind, RowButtons.Answer, q.Kind)
+                    : new PlayerRow(q.Player, LocalText.FormatId("online.friends.sent", "{0} request sent - waiting", LocalText.Ui(q.Kind)), OnGrey, null, White, false, q.Kind, RowButtons.Cancel, q.Kind)).ToList(),
                 _ => _recent.Select(c => LinkRow(c, PresenceLine(c))).ToList(),
             };
         }
@@ -453,7 +454,7 @@ namespace MphRecomp.Frontend
                 menu.SetState(first, MenuState.Focused);
             }
             int pages = Pages(rows.Count, AdRows);
-            _strings.Set(_adTitleString, pages > 1 ? $"FIND A HUNTER {_adOffset / AdRows + 1}/{pages}" : "FIND A HUNTER");
+            _strings.Set(_adTitleString, pages > 1 ? LocalText.FormatId("online.friends.find.page", "FIND A HUNTER {0}/{1}", _adOffset / AdRows + 1, pages) : "FIND A HUNTER");
         }
 
         private void AddCall(MenuEngine menu, int call)
@@ -614,7 +615,7 @@ namespace MphRecomp.Frontend
         {
             int tag = _frTitle;
             if (!FrTabsShown.Contains(s_frTab)) s_frTab = 0;
-            string[] labels = { "friends", "rivals", Incoming > 0 ? $"requests {Incoming}" : "requests", "recent" };
+            string[] labels = { "friends", "rivals", Incoming > 0 ? LocalText.FormatId("online.friends.incoming", "requests {0}", Incoming) : "requests", "recent" };
             foreach (int t in FrTabsShown)
             {
                 (float tx, float tw) = FrTabSpot(t);
@@ -647,7 +648,7 @@ namespace MphRecomp.Frontend
                 Arrow(true, 128 + w + 12, ArrowTop + Mw(42), _frNext);
             }
             if (MeCard is PlayerCard me && me.Code.Length > 0)
-                TextS("your code " + FriendCodes.Format(me.Code), Mx(960), My(1000), 2, Pale, tag, SizeM);
+                TextS(LocalText.FormatId("online.friends.code", "your code {0}", FriendCodes.Format(me.Code)), Mx(960), My(1000), 2, Pale, tag, SizeM);
             // ADD: the person disc, its label under it
             PersonDisc(Mx(1746), My(928), Mw(88), _frAdd);
             Glow(glows, _frAdd, Mx(1740), My(922), Mx(1840), My(1022), _frAdd);
@@ -698,7 +699,7 @@ namespace MphRecomp.Frontend
             int pages = Pages(rows.Count, AdRows);
             if (pages > 1)
             {
-                float w = _drawMenu!.Font.Measure($"FIND A HUNTER {pages}/{pages}") / 2;
+                float w = _drawMenu!.Font.Measure(LocalText.FormatId("online.friends.find.page", "FIND A HUNTER {0}/{1}", pages, pages)) / 2;
                 Arrow(false, 128 - w - 22, ArrowTop, _adPrev);
                 Arrow(true, 128 + w + 12, ArrowTop, _adNext);
             }

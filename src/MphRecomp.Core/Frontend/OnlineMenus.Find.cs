@@ -1,3 +1,4 @@
+using MphRead.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -548,7 +549,7 @@ namespace MphRecomp.Frontend
                         }
                         string names = string.Join("\n", who.Take(4).Select(c => OnlineNames.Display(c.Name, c.Tag).ToLowerInvariant()))
                             + (who.Count > 4 ? $"\n+{who.Count - 4} more" : "");
-                        Import.Popup?.Ask($"invite them to your party?\n\n{names}", yes =>
+                        Import.Popup?.Ask(LocalText.FormatId("online.party.invite", "invite them to your party?\n\n{0}", names), yes =>
                         {
                             if (!yes) return;
                             foreach (PlayerCard c in who) _ = PartyRequest(client, new PartyInviteReq { Code = c.Code });
@@ -583,7 +584,7 @@ namespace MphRecomp.Frontend
             OnlineClient? client = _client;
             if (client == null) return;
             string from = OnlineNames.Display(invite.From.Name, invite.From.Tag).ToLowerInvariant();
-            Import.Popup.Ask($"{from} invites you to their party.\n\nsearch together?", yes =>
+            Import.Popup.Ask(LocalText.FormatId("online.party.invited", "{0} invites you to their party.\n\nsearch together?", from), yes =>
             {
                 if (!yes || _client != client) return;
                 Task.Run(async () =>
@@ -744,9 +745,9 @@ namespace MphRecomp.Frontend
                 long since = Environment.TickCount64 - _findAt;
                 int waited = (f?.Waited ?? 0) + (int)(since / 1000);
                 TextS("searching" + new string('.', 1 + (int)(Environment.TickCount64 / 400 % 3)), Mx(130), My(620), 0, Orange, st, SizeS);
-                string line = $"{waited / 60}:{waited % 60:00} waited" + (f != null && f.Queued > 0 ? $" - {f.Queued} in the queue" : "");
+                string line = LocalText.FormatId("online.find.waited", "{0}:{1:00} waited", waited / 60, waited % 60) + (f != null && f.Queued > 0 ? LocalText.FormatId("online.find.queued", " - {0} in the queue", f.Queued) : "");
                 TextS(line, Mx(130), My(676), 0, White, st, SizeM);
-                string region = f == null ? "" : !f.Nearby || f.LimitMs == 0 ? "region: anyone" : $"region: routes up to {f.LimitMs} ms";
+                string region = f == null ? "" : !f.Nearby || f.LimitMs == 0 ? "region: anyone" : LocalText.FormatId("online.find.region", "region: routes up to {0} ms", f.LimitMs);
                 if (f?.Reason == "match") region = "a player left the match: searching again.";
                 if (!PartyLeader) region = "your party leader is searching.";
                 TextS(region, Mx(130), My(718), 0, Cyan, st, SizeM);
@@ -756,7 +757,7 @@ namespace MphRecomp.Frontend
             // PARTY
             int side = _fiInvite;
             Fill(Mx(1314), My(200), Mx(1846), My(238), HeaderBar.R, HeaderBar.G, HeaderBar.B, 1, side);
-            TextS(_party == null ? "party" : $"party {_party.Members.Count}/{PartyRows}", Mx(1580), My(208), 2, Dark, side, SizeM);
+            TextS(_party == null ? "party" : LocalText.FormatId("online.party.count", "party {0}/{1}", _party.Members.Count, PartyRows), Mx(1580), My(208), 2, Dark, side, SizeM);
             if (_party == null)
             {
                 TextS(!Live ? "" : "no party.", Mx(1580), My(400), 2, White, side, SizeM);
@@ -822,7 +823,7 @@ namespace MphRecomp.Frontend
                 return;
             }
             string mode = Enum.TryParse(f.Mode, out GameMode gm) ? ModeName(gm) : f.Mode.ToLowerInvariant();
-            TextS($"{mode} - {f.Players.Count} players", Mx(960), My(212), 2, Orange, tag, SizeM);
+            TextS(LocalText.FormatId("online.vote.players", "{0} - {1} players", LocalText.Ui(mode), f.Players.Count), Mx(960), My(212), 2, Orange, tag, SizeM);
             bool voting = f.State == FindState.Vote;
             List<string> arenas = voting ? f.Arenas : f.Arena.Length > 0 ? new List<string> { f.Arena } : new List<string>();
             int n = Math.Min(VoteCards, arenas.Count);
@@ -858,13 +859,13 @@ namespace MphRecomp.Frontend
             if (voting)
             {
                 long left = Math.Max(0, (_voteEnds - Environment.TickCount64 + 999) / 1000);
-                first = $"voting ends in {left} s";
-                second = $"{f.Votes}/{f.Players.Count} voted - tap an arena";
+                first = LocalText.FormatId("online.vote.time", "voting ends in {0} s", left);
+                second = LocalText.FormatId("online.vote.count", "{0}/{1} voted - tap an arena", f.Votes, f.Players.Count);
             }
             else
             {
                 string host = f.HostCard is PlayerCard h ? OnlineNames.Display(h.Name, h.Tag).ToLowerInvariant() : "a player";
-                first = f.State == FindState.Host ? "you host this match." : $"{host} hosts this match.";
+                first = f.State == FindState.Host ? "you host this match." : LocalText.FormatId("online.vote.host", "{0} hosts this match.", host);
                 second = f.State == FindState.Host ? "opening the game..." : "waiting for the game to open...";
             }
             TextS(first, Mx(960), My(790), 2, Orange, tag, SizeS);
