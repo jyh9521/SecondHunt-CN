@@ -128,7 +128,7 @@ namespace MphRecomp.Frontend
             {
                 _extraTexture = textures.GetOrAdd("locale-font", () =>
                 {
-                    int size = ExtraGlyphs.Size, width = ExtraColumns * size;
+                    int size = extra.Size, width = ExtraColumns * size;
                     int height = ((extra.Count + ExtraColumns - 1) / ExtraColumns) * size;
                     byte[] rgba = new byte[width * height * 4];
                     for (int i = 0; i < extra.Count; i++)
@@ -166,7 +166,7 @@ namespace MphRecomp.Frontend
             if (extra && tex == null || !extra && (glyph < 0 || glyph >= _widths.Count))
                 return (-1, 0, 0, 0, 0, 0);
             int index = tex != null ? _extra!.Index((char)(glyph + MinCharacter)) : glyph;
-            int cell = tex != null ? ExtraGlyphs.Size : Cell;
+            int cell = tex != null ? _extra!.Size : Cell;
             int columns = tex != null ? ExtraColumns : Columns;
             int width = tex?.Width ?? AtlasWidth, height = tex?.Height ?? AtlasHeight;
             float x = index % columns * cell, y = index / columns * cell;

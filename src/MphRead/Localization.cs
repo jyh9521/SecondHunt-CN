@@ -185,33 +185,25 @@ namespace MphRead.Text
     // 16x16 antialiased glyphs in a compact, locale-independent bitmap format.
     public sealed class ExtraGlyphs
     {
-        public const int Size = 16;
         public const int Advance = 8;
         private readonly Dictionary<char, int> _indices = new();
+        public int Size { get; }
         public byte[] Alpha { get; }
-        public byte[] HudTiles { get; }
         public int Count => _indices.Count;
 
         public ExtraGlyphs(ReadOnlySpan<byte> data)
         {
-            const int pixels = Size * Size, stride = 2 + pixels;
-            if (data.Length < 4 + stride || !data[..4].SequenceEqual("SHG1"u8) || (data.Length - 4) % stride != 0)
+            Size = data.StartsWith("SHG2"u8) ? 32 : data.StartsWith("SHG1"u8) ? 16 : 0;
+            int pixels = Size * Size, stride = 2 + pixels;
+            if (Size == 0 || data.Length < 4 + stride || (data.Length - 4) % stride != 0)
                 throw new InvalidDataException("Invalid locale glyph atlas.");
             int n = (data.Length - 4) / stride;
             Alpha = new byte[n * pixels];
-            HudTiles = new byte[n * pixels];
             for (int i = 0; i < n; i++)
             {
                 int start = 4 + i * stride;
                 _indices.Add((char)BinaryPrimitives.ReadUInt16LittleEndian(data[start..]), i);
                 data.Slice(start + 2, pixels).CopyTo(Alpha.AsSpan(i * pixels));
-                for (int y = 0; y < Size; y++)
-                    for (int x = 0; x < Size; x++)
-                    {
-                        int tile = (y / 8) * 2 + x / 8;
-                        HudTiles[i * pixels + tile * 64 + (y % 8) * 8 + x % 8] =
-                            Alpha[i * pixels + y * Size + x] >= 90 ? (byte)1 : (byte)0;
-                    }
             }
             if (!_indices.ContainsKey('□')) throw new InvalidDataException("Locale glyph atlas lacks a fallback.");
         }

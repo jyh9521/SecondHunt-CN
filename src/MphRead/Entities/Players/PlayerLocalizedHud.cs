@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MphRead.Formats;
 using MphRead.Hud;
@@ -10,6 +11,7 @@ namespace MphRead.Entities
     public partial class PlayerEntity
     {
         private HudObjectInstance? _extraText;
+        private HudGlyphRaster? _extraRaster;
 
         private static int LocaleGlyph(ReadOnlySpan<char> line, ref int i, Font font)
         {
@@ -28,20 +30,49 @@ namespace MphRead.Entities
             return width;
         }
 
+        private static ColorRgba ReadableHudInk(IReadOnlyList<ColorRgba> colors, int palette, ColorRgba? color)
+        {
+            // Index 1 of many DS palettes is a dark contour colour, not the text's ink.
+            // Keep the accent of the active palette (or explicit tint) but lift its value
+            // for readability on the visor, over the world and over solid dialog panels.
+            ColorRgba tint = color ?? new ColorRgba(255, 255, 255, 255);
+            if (color == null)
+            {
+                int start = palette * 16;
+                int brightest = -1;
+                for (int i = start + 1; i < Math.Min(start + 16, colors.Count); i++)
+                {
+                    ColorRgba candidate = colors[i];
+                    int light = 21 * candidate.Red + 72 * candidate.Green + 7 * candidate.Blue;
+                    if (candidate.Alpha != 0 && light > brightest)
+                    {
+                        brightest = light;
+                        tint = candidate;
+                    }
+                }
+            }
+            static byte Lift(byte c) => (byte)(196 + 59 * c / 255);
+            return new ColorRgba(Lift(tint.Red), Lift(tint.Green), Lift(tint.Blue), 255);
+        }
+
         private Vector2 DrawLocalizedText(float x, float y, Align align, int palette, ReadOnlySpan<char> text,
             ColorRgba? color, float alpha, float spacingY, int visibleLength)
         {
             ExtraGlyphs glyphs = LocalText.Glyphs!;
-            HudObjectInstance extra = _extraText ??= new HudObjectInstance(ExtraGlyphs.Size, ExtraGlyphs.Size)
+            if (_extraRaster?.Glyphs != glyphs)
             {
-                Enabled = true,
-                Scale = (float)ExtraGlyphs.Advance / ExtraGlyphs.Size
-            };
+                _extraRaster = new HudGlyphRaster(glyphs);
+                _extraText = new HudObjectInstance(glyphs.Size, glyphs.Size)
+                {
+                    Enabled = true,
+                    Scale = (float)ExtraGlyphs.Advance / glyphs.Size
+                };
+            }
+            HudObjectInstance extra = _extraText!;
             // Restore the original 8-pixel font if we were drawing a Japanese ROM's kanji page.
             Font font = SetUpFont(' ', set: true);
-            extra.SetCharacterData(glyphs.HudTiles, _scene);
-            extra.SetPaletteData(_textInst.PaletteData!, _scene);
-            _textInst.Alpha = extra.Alpha = alpha;
+            ColorRgba ink = ReadableHudInk(_textInst.PaletteData!, palette, color);
+            _textInst.Alpha = extra.Alpha = alpha * ((color?.Alpha ?? 255) / 255f);
             float anchor = x;
             for (int start = 0; start < text.Length;)
             {
@@ -62,8 +93,8 @@ namespace MphRead.Entities
                         HudObjectInstance instance = wide ? extra : _textInst;
                         instance.PositionX = (x + (wide ? (advance - ExtraGlyphs.Advance) / 2f : 0)) / 256f;
                         instance.PositionY = (y + (wide ? 0 : font.Offsets[glyph])) / 192f;
-                        if (color.HasValue) instance.SetData(glyph, color.Value, _scene);
-                        else instance.SetData(glyph, palette, _scene);
+                        if (wide) instance.SetRaster(_extraRaster.Get(glyph, ink), _scene);
+                        else instance.SetData(glyph, ink, _scene);
                         _scene.DrawHudObject(instance, mode: align == Align.Left ? 2 : 0);
                     }
                     x += advance;

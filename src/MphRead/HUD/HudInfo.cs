@@ -84,6 +84,7 @@ namespace MphRead.Hud
         public IReadOnlyList<int>? AnimFrames;
         public ColorRgba? Color;
         public readonly ColorRgba[] Texture;
+        internal Scene.HostHudSprite? Raster { get; private set; }
         public float Alpha = 1;
         public float Scale = 1; // recomp: drawn size multiplier (PlayerIntroBanner); 1 = MphRead's own
         // recomp: the texture is its own HostTextures entry, repainted in place (the Prime HUD's map pictures): a headless
@@ -110,6 +111,20 @@ namespace MphRead.Hud
             Width = width;
             Height = height;
             Texture = new ColorRgba[maxWidth * maxHeight];
+        }
+
+        // Direct RGBA for coverage-based text. The headless host interns this immutable sprite
+        // by reference; the legacy window still uses the instance's regular texture binding.
+        internal void SetRaster(Scene.HostHudSprite raster, Scene scene)
+        {
+            Debug.Assert(raster.Width == Width && raster.Height == Height);
+            if (ReferenceEquals(Raster, raster)) return;
+            Raster = raster;
+            if (Scene.Headless) return;
+            if (BindingId == -1)
+                BindingId = scene.BindGetTexture(raster.Pixels, Width, Height);
+            else
+                scene.BindTexture(raster.Pixels, Width, Height, BindingId);
         }
 
         public void SetAnimationFrames(IReadOnlyList<UiAnimParams> frames)
@@ -221,6 +236,7 @@ namespace MphRead.Hud
 
         private void DoTexture(Scene scene)
         {
+            Raster = null;
             Debug.Assert(CharacterData != null);
             Debug.Assert(PaletteData != null);
             int palOffset = PaletteIndex * 16;

@@ -252,12 +252,14 @@ def glyphs(args):
     chars = sorted({c for text in texts for c in text if ord(c) > 127} | {"□"})
     if any(ord(c) > 0xffff or ord(c) not in cmap for c in chars):
         raise ValueError("unavailable glyphs: " + "".join(c for c in chars if ord(c) > 0xffff or ord(c) not in cmap))
-    output = bytearray(b"SHG1")
+    # SHG2 keeps full grayscale coverage and enough samples for dense strokes.
+    # The extra margin leaves room for the in-game glyph outline and prevents atlas bleed.
+    output = bytearray(b"SHG2")
     for c in chars:
-        image = Image.new("L", (72, 72))
-        ImageDraw.Draw(image).text((36, 56), c, font=font, fill=255, anchor="ms")
+        image = Image.new("L", (76, 76))
+        ImageDraw.Draw(image).text((38, 58), c, font=font, fill=255, anchor="ms")
         output.extend(struct.pack("<H", ord(c)))
-        output.extend(image.resize((16, 16), Image.Resampling.LANCZOS).tobytes())
+        output.extend(image.resize((32, 32), Image.Resampling.LANCZOS).tobytes())
     args.output.write_bytes(output)
     print(f"{len(chars)} glyphs ({len(output)} bytes)")
 

@@ -34,7 +34,10 @@ Windows 构建基于 2026-10-18 的 MIT 提交
   保存选项提示、键位和选项值，`terms.json` 保存导入卡片的标题、来源和内置资源名称。
   `extras.json` 保存扩展页面动态句式，`runtime.json` 保存地图控件、对战、联机和回放的运行时提示，
   `names.json` 通过原有房间键、角色和模式枚举映射显示名称。`rom.json` 是 UTF-8 覆盖包，
-  `glyphs.bin` 是 16×16 字形。启动器完成解包后把覆盖包原子写入
+  `glyphs.bin` 是 32×32 灰阶字形（SHG2；加载器仍识别旧的 16×16 SHG1）。
+  游戏内 HUD 保留原字号、字距和换行；汉字直接用灰阶覆盖率绘制，
+  字色沿用当前 HUD 的色调并提亮，描边只贴着字形轮廓，不改面板、贴图或过场。
+  启动器完成解包后把覆盖包原子写入
   `data/game/localization/zh-CN.json`。`data/game/files/AMHE*` 的原始文件保留；
   运行时按源文本指纹匹配，不匹配的行回退到原文，而不是套错译文。
 - 菜单渲染优先用译文，脚本仍读原索引及原字符串。十张 ROM 表保留条目 ID、
@@ -59,7 +62,7 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 用 Windows PowerShell、Git 和 .NET 9 SDK。从源码根目录运行（无需 ROM）：
 
 ```powershell
-.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.5
+.\src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.3.5-zh.6
 ```
 
 默认输出至 `out/`。有多个 SDK 时用 `-Dotnet 'C:\path\to\dotnet.exe'`。
@@ -68,6 +71,15 @@ Windows 构建基于 2026-10-18 的 MIT 提交
 ```powershell
 dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c Release -p:MphPublic=true -p:MphJitOnly=true -- 'D:\test\data\game' 'D:\test'
 ```
+
+用美版 1.0 测试能量标签及「门」扫描的状态、标题、正文和确认按钮：
+
+```powershell
+dotnet run --project tests/localization/SecondHunt.LocalizationTests.csproj -c Release -p:MphPublic=true -p:MphJitOnly=true -- --hud-readability 'D:\test\data\game' 'D:\test\scan.png'
+```
+
+省略截图路径时只检查模拟器提交给渲染器的字形。提供路径则额外用 Windows
+的游戏渲染器导出实际画面；截图和 ROM 测试数据只保存在本机。
 
 检查扩展页面时可在 `--ui-inventory <game> <report.json>` 后再传入含实际回放的测试 `data` 目录。
 工具会打开第一条回放，额外检查有数据才显示的详情标签。

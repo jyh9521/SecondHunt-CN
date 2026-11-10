@@ -141,6 +141,7 @@ namespace MphRead
         {
             public int Width;
             public int Height;
+            public bool Smooth;
             public ColorRgba[] Pixels = Array.Empty<ColorRgba>();
         }
 
@@ -201,7 +202,7 @@ namespace MphRead
         // recomp: a HUD quad with its own pixels (First Hunt's HUD, FirstHuntHud), interned by reference
         private readonly Dictionary<HostHudSprite, int> _hudSpriteRefs = new();
 
-        public void HostHudQuad(HostHudSprite sprite, float left, float right, float top, float bottom, float alpha = 1)
+        private int InternHudSprite(HostHudSprite sprite)
         {
             if (!_hudSpriteRefs.TryGetValue(sprite, out int index))
             {
@@ -209,13 +210,18 @@ namespace MphRead
                 index = _hudSprites.Count - 1;
                 _hudSpriteRefs[sprite] = index;
             }
+            return index;
+        }
+
+        public void HostHudQuad(HostHudSprite sprite, float left, float right, float top, float bottom, float alpha = 1)
+        {
             HostHudItem item = NextHudItem();
             item.Left = left;
             item.Right = right;
             item.Top = top;
             item.Bottom = bottom;
             item.Alpha = alpha;
-            item.SpriteIndex = index;
+            item.SpriteIndex = InternHudSprite(sprite);
         }
 
         // the HUD part of OnRenderFrame, recorded instead of drawn (once per simulation step)
@@ -3960,8 +3966,9 @@ namespace MphRead
             GL.Uniform1(_shaderLocations.LayerAlpha, inst.Alpha);
             GL.Uniform1(_shaderLocations.UseMask, inst.UseMask ? 1 : 0);
             GL.BindTexture(TextureTarget.Texture2D, inst.BindingId);
-            int minParameter = (int)TextureMinFilter.Nearest;
-            int magParameter = (int)TextureMagFilter.Nearest;
+            bool smooth = inst.Raster?.Smooth == true;
+            int minParameter = (int)(smooth ? TextureMinFilter.Linear : TextureMinFilter.Nearest);
+            int magParameter = (int)(smooth ? TextureMagFilter.Linear : TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, minParameter);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, magParameter);
             GL.TexParameter(TextureTarget.Texture2D,
@@ -4204,7 +4211,7 @@ namespace MphRead
                 live.BindingId = inst.BindingId;
                 return;
             }
-            int sprite = InternHudSprite(inst.BindingId);
+            int sprite = inst.Raster is HostHudSprite raster ? InternHudSprite(raster) : InternHudSprite(inst.BindingId);
             if (sprite < 0)
             {
                 return;

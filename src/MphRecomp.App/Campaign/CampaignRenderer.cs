@@ -540,7 +540,8 @@ internal sealed partial class CampaignRenderer : IGlScreen
     sealed class GpuTexture { public int Tex, Version; public long LastUsed; }
     readonly Dictionary<int, GpuMesh> _meshes = new();
     readonly Dictionary<int, GpuTexture> _textures = new();
-    readonly int[] _samplers = new int[9]; // [xRepeat * 3 + yRepeat]
+    const int HudLinearSampler = 9;
+    readonly int[] _samplers = new int[10]; // [xRepeat * 3 + yRepeat], plus the glyph-only linear sampler
     int _dynVao, _dynVbo;
     // HUD pass (MphRead's HUD, recorded by Scene.RecordHud): its own quad shader and one texture per interned sprite
     int _hudProgram, _hudVao, _hudVbo;
@@ -599,7 +600,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
             GLES30.GlUniform1i(HU("tex"), 0);
             GLES30.GlUniform1i(HU("mask"), 1);
         }
-        GLES30.GlGenSamplers(9, _samplers, 0);
+        GLES30.GlGenSamplers(_samplers.Length, _samplers, 0);
         for (int x = 0; x < 3; x++)
         {
             for (int y = 0; y < 3; y++)
@@ -611,6 +612,11 @@ internal sealed partial class CampaignRenderer : IGlScreen
                 GLES30.GlSamplerParameteri(s, GLES30.GlTextureWrapT, Wrap(y));
             }
         }
+        int hudLinear = _samplers[HudLinearSampler];
+        GLES30.GlSamplerParameteri(hudLinear, GLES30.GlTextureMinFilter, GLES30.GlLinear);
+        GLES30.GlSamplerParameteri(hudLinear, GLES30.GlTextureMagFilter, GLES30.GlLinear);
+        GLES30.GlSamplerParameteri(hudLinear, GLES30.GlTextureWrapS, GLES30.GlClampToEdge);
+        GLES30.GlSamplerParameteri(hudLinear, GLES30.GlTextureWrapT, GLES30.GlClampToEdge);
         var ids = new int[1];
         GLES30.GlGenVertexArrays(1, ids, 0); _dynVao = ids[0];
         GLES30.GlGenBuffers(1, ids, 0); _dynVbo = ids[0];
@@ -1473,6 +1479,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
         GLES30.GlBindSampler(0, _samplers[0]);
         GLES30.GlBindSampler(1, _samplers[0]);
         bool maskBound = false;
+        bool smoothBound = false;
         for (int i = 0; i < scene.HudItemCount; i++)
         {
             Scene.HostHudItem item = scene.GetHudItem(i);
@@ -1490,6 +1497,12 @@ internal sealed partial class CampaignRenderer : IGlScreen
             {
                 continue;
             }
+            bool smooth = item.SpriteIndex >= 0 && scene.HudSprites[item.SpriteIndex].Smooth;
+            if (smooth != smoothBound)
+            {
+                GlNative.BindSampler(0, _samplers[smooth ? HudLinearSampler : 0]);
+                smoothBound = smooth;
+            }
             bool mask = item.UseMask && scene.HudMaskBindingId != -1;
             if (mask && !maskBound)
             {
@@ -1501,6 +1514,7 @@ internal sealed partial class CampaignRenderer : IGlScreen
             GlNative.Uniform1f(HU("alpha"), item.Alpha);
             DrawHudQuad(item.Left, item.Right, item.Top, item.Bottom);
         }
+        if (smoothBound) GlNative.BindSampler(0, _samplers[0]);
         float fade = scene.HostFadeAmount;
         if (fade > 0)
         {
