@@ -953,7 +953,7 @@ namespace MphRecomp.Frontend
             float Lerp(int s, int e) => (s + (e - s) * t) / 31f;
             float a = Lerp(sa, ea);
             if (a <= 0) return;
-            string text = Strings[style.StringId];
+            string text = Strings.Display(style.StringId);
             Font.Emit(text, item.X, item.Y, style.Align, style.WrapWidth, lineHeight: style.Size == 0 ? 8 : style.Size,
                 Lerp(sr, er), Lerp(sg, eg), Lerp(sb, eb), a, TextDepthZ(item.Depth), output);
         }

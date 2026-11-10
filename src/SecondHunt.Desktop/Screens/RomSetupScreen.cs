@@ -1,5 +1,5 @@
 using System.Drawing;
-using MphRecomp.App;
+using LocalText = MphRead.Text.LocalText;
 using SecondHunt.Desktop.Ui;
 
 namespace SecondHunt.Desktop.Screens;
@@ -70,8 +70,8 @@ internal sealed class RomSetupScreen : PageScreen
         string? path = null;
         using (var dialog = new System.Windows.Forms.OpenFileDialog
         {
-            Title = "Select your Metroid Prime Hunters ROM",
-            Filter = "DS ROM (*.nds)|*.nds|All files (*.*)|*.*",
+            Title = LocalText.Ui("Select your Metroid Prime Hunters ROM"),
+            Filter = LocalText.Ui("DS ROM (*.nds)|*.nds|All files (*.*)|*.*"),
             CheckFileExists = true,
             RestoreDirectory = true,
         })
@@ -97,20 +97,15 @@ internal sealed class RomSetupScreen : PageScreen
         {
             try
             {
-                Log($"Reading {Path.GetFileName(path)}…");
-                if (RomSetup.Unsupported(path) is string why)
-                {
-                    Log(why);
-                    return;
-                }
-                if (RomSetup.Extract(path, _filesDir, Log))
+                Log(LocalText.Format("Reading {0}…", Path.GetFileName(path)));
+                if (DesktopGame.Extract(path, _filesDir, LogExtraction))
                 {
                     _finished = true;
                 }
             }
             catch (Exception ex)
             {
-                Log("Could not read the ROM: " + ex.Message);
+                Log(LocalText.Format("Could not read the ROM: {0}", ex.Message));
             }
             finally
             {
@@ -118,6 +113,19 @@ internal sealed class RomSetupScreen : PageScreen
                 Invalidate();
             }
         });
+    }
+
+    private void LogExtraction(string text)
+    {
+        if (text.StartsWith("Writing ", StringComparison.Ordinal))
+            text = LocalText.Format("Writing {0}", text[8..]);
+        else if (text.StartsWith("Reading ", StringComparison.Ordinal))
+            text = LocalText.Format("Reading {0}", text[8..]
+                .Replace("Decompressing...", LocalText.Ui("Decompressing..."))
+                .Replace("Extracting archive...", LocalText.Ui("Extracting archive...")));
+        else if (text.StartsWith("Extracted ", StringComparison.Ordinal) && text.EndsWith(" files.", StringComparison.Ordinal))
+            text = LocalText.Format("Extracted {0} files.", text[10..^7]);
+        Log(LocalText.Ui(text));
     }
 
     protected override void Paint(Graphics g)
@@ -128,7 +136,7 @@ internal sealed class RomSetupScreen : PageScreen
             DrawText(g, BuildFlags.AppName, title, Color.White, new RectangleF(x, y, w, 50 * s));
         }
         y += 58 * s;
-        string info = "Select your own Metroid Prime Hunters (USA) ROM, version 1.0 or 1.1. It is read once and unpacked into "
+        const string info = "Select your own Metroid Prime Hunters (USA) ROM, version 1.0 or 1.1. It is read once and unpacked into "
             + "this app's own folder; nothing is bundled with the app or downloaded. You can also drop the .nds file on this window.";
         using (Font body = Font(17))
         {

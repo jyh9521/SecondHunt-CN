@@ -18,6 +18,7 @@ namespace MphRecomp.Update
     {
         // this build's version name (Android: versionName; Windows: the exe's informational version)
         public static string AppVersion { get; set; } = "0.0.0";
+        public static bool Enabled { get; set; } = true;
         public static string Platform { get; set; } = UpdatePlatform.Android;
         // opens a web page in the browser (the release page, when this host can't install updates itself)
         public static Action<string>? OpenUrl { get; set; }

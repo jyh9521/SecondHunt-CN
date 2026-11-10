@@ -1,0 +1,77 @@
+using MphRead.Text;
+using System.Reflection;
+using System.Text.Json;
+
+namespace SecondHunt.Desktop;
+
+internal static class DesktopLocale
+{
+    private const string Default = "zh-CN";
+    private const string English = "en";
+    public static string Name { get; private set; } = Default;
+    public static string PackPath(string game) => Path.Combine(game, "localization", Default + ".json");
+
+    public static void Init(string? requested)
+    {
+        string preference = Path.Combine(AppContext.BaseDirectory, "locale.txt");
+        if (requested == null && File.Exists(preference))
+        {
+            DesktopStorage.RequireOrdinaryEntry(preference);
+            using var reader = File.OpenText(preference);
+            requested = reader.ReadLine()?.Trim();
+        }
+        Name = requested?.ToLowerInvariant() switch
+        {
+            null or "" or "zh-cn" => Default,
+            "en" => English,
+            _ => throw new ArgumentException($"Unknown locale: {requested}. Use zh-CN or en.")
+        };
+        if (Name == English) { LocalText.Configure(null, null); return; }
+        using Stream ui = Resource("ui.json");
+        using Stream glyph = Resource("glyphs.bin");
+        using var glyphBytes = new MemoryStream();
+        glyph.CopyTo(glyphBytes);
+        LocalText.Configure(JsonSerializer.Deserialize<Dictionary<string, string>>(ui)
+            ?? throw new InvalidDataException("Missing UI catalogue."), new ExtraGlyphs(glyphBytes.ToArray()));
+    }
+
+    // Parse the built-in pack before changing the install. The installed copy has no ROM
+    // bytes; it overrides the original strings at read/render time, and is easy to remove.
+    public static void Install(string game)
+    {
+        if (Name == English) return;
+        using Stream source = Resource("rom.json");
+        using var copy = new MemoryStream();
+        source.CopyTo(copy);
+        copy.Position = 0;
+        _ = RomTextPack.Load(copy, Name);
+        byte[] bytes = copy.ToArray();
+        string path = PackPath(game);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        DesktopStorage.RequireOrdinaryDirectory(Path.GetDirectoryName(path)!);
+        if (File.Exists(path))
+        {
+            DesktopStorage.RequireOrdinaryEntry(path);
+            if (new FileInfo(path).Length == bytes.Length && File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes))
+                return;
+        }
+        string temp = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            File.WriteAllBytes(temp, bytes);
+            File.Move(temp, path, overwrite: true);
+        }
+        finally { if (File.Exists(temp)) File.Delete(temp); }
+    }
+
+    public static void Activate(string game, string rom)
+    {
+        if (Name == English) { LocalText.SetRom(null, null); return; }
+        using Stream installed = File.OpenRead(PackPath(game));
+        LocalText.SetRom(rom, RomTextPack.Load(installed, Name));
+    }
+
+    private static Stream Resource(string name)
+        => Assembly.GetExecutingAssembly().GetManifestResourceStream("locales." + Default + "." + name)
+            ?? throw new InvalidDataException($"Missing locale resource: {name}");
+}

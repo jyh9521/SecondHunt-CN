@@ -831,3 +831,12 @@ https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words
 Commons Attribution 4.0 International licence (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/. Used unmodified
 (the owner's own additions and exceptions live in a separate file on the server, `words_owner.txt`). It is used only by
 the online server's word filter (`src/SecondHunt.Server/WordFilter.cs`); the app never contains or loads it.
+
+## Second Hunt CN: locale font
+
+The Chinese text renderer includes a bitmap glyph subset rasterized from **Noto
+Sans CJK SC Medium**, Noto CJK Sans 2.004 (Adobe/Google), under the SIL Open Font
+License 1.1. The upstream font is not bundled. The licence for the bitmap
+subset is in `locales/zh-CN/OFL-Noto-CJK.txt` in source and in `licenses/` in the
+Windows package. The font source and build command are recorded in
+`docs/LOCALIZATION.zh-CN.md`.

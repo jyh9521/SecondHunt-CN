@@ -1,65 +1,87 @@
-# Builds the Windows release zip: SecondHunt-<version>-windows-x64.zip with one folder "Second Hunt" holding
-# SecondHunt.exe (a self-contained .NET app, precompiled), the two native libraries (GLFW, miniaudio), the README, the
-# licence and every third-party notice. Run from anywhere:
-#   powershell -ExecutionPolicy Bypass -File src\SecondHunt.Desktop\Publish-Windows.ps1 -Version 0.1.0-beta
-# The zip and its SHA-256 land in -OutDir (default: the repo's out\ folder, which git ignores).
+# Build a self-contained win-x64 package. The staging directory is always new, so
+# an existing portable install (which might hold the player's data) is not touched.
 param(
-    [string]$Version = "0.1.0-beta",
-    [string]$OutDir = ""
+    [ValidatePattern('^\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?$')]
+    [string]$Version = "0.3.5-zh.2",
+    [string]$OutDir = "",
+    [string]$Dotnet = "dotnet"
 )
 $ErrorActionPreference = "Stop"
-
 $project = Join-Path $PSScriptRoot "SecondHunt.Desktop.csproj"
-$repo = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-if ($OutDir -eq "") { $OutDir = Join-Path $repo "out" }
-$numeric = ($Version -split "-")[0]                     # 0.1.0-beta -> 0.1.0 (the exe's file version)
-$stage = Join-Path ([IO.Path]::GetTempPath()) "SecondHunt-publish-$Version"
-$app = Join-Path $stage "Second Hunt"
-if (Test-Path $stage) { Remove-Item -Recurse -Force $stage }
-New-Item -ItemType Directory -Force $app | Out-Null
-New-Item -ItemType Directory -Force $OutDir | Out-Null
+$repo = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+if (!$OutDir) { $OutDir = Join-Path $repo "out" }
+$OutDir = [IO.Path]::GetFullPath($OutDir)
+[void][IO.Directory]::CreateDirectory($OutDir)
+$name = "SecondHunt-CN-$Version-windows-x64"
+$loose = Join-Path $OutDir $name
+$zip = "$loose.zip"
+if ((Test-Path -LiteralPath $loose) -or (Test-Path -LiteralPath $zip)) {
+    throw "Output already exists. Use a new -Version or -OutDir to preserve it: $loose"
+}
+$stage = [IO.Path]::GetFullPath((Join-Path $OutDir (".stage-" + [Guid]::NewGuid().ToString("N"))))
+$tempZip = "$stage.zip"
+$numeric = ($Version -split "-", 2)[0]
 
-dotnet publish $project -c Release -r win-x64 --self-contained true `
-    -p:MphPublic=true `
-    -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=false -p:EnableCompressionInSingleFile=true `
-    -p:PublishReadyToRun=true `
-    -p:Version=$numeric -p:InformationalVersion=$Version `
-    -o $app
-if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
-Get-ChildItem $app -Filter *.pdb | Remove-Item
-
-# the player's README, the app's licence and notices, and the .NET runtime's own (the exe carries the runtime)
-Copy-Item (Join-Path $PSScriptRoot "dist\README.txt") (Join-Path $app "README.txt")
-Copy-Item (Join-Path $repo "LICENSE") (Join-Path $app "LICENSE.txt")
-Copy-Item (Join-Path $repo "NOTICE-fork.md") (Join-Path $app "NOTICE-fork.txt")
-Copy-Item (Join-Path $repo "THIRD_PARTY_NOTICES.md") (Join-Path $app "THIRD_PARTY_NOTICES.txt")
-$licenses = Join-Path $app "licenses"
-New-Item -ItemType Directory -Force $licenses | Out-Null
-$nuget = Join-Path $env:USERPROFILE ".nuget\packages"
-$runtime = Get-ChildItem (Join-Path $nuget "microsoft.netcore.app.runtime.win-x64") | Sort-Object Name | Select-Object -Last 1
-$desktop = Get-ChildItem (Join-Path $nuget "microsoft.windowsdesktop.app.runtime.win-x64") | Sort-Object Name | Select-Object -Last 1
-Copy-Item (Join-Path $runtime.FullName "LICENSE.TXT") (Join-Path $licenses "dotnet-runtime-LICENSE.txt")
-Copy-Item (Join-Path $runtime.FullName "THIRD-PARTY-NOTICES.TXT") (Join-Path $licenses "dotnet-runtime-THIRD-PARTY-NOTICES.txt")
-Copy-Item (Join-Path $desktop.FullName "LICENSE") (Join-Path $licenses "dotnet-windowsdesktop-LICENSE.txt")
-$glfw = Get-ChildItem (Join-Path $nuget "opentk.redist.glfw") | Sort-Object Name | Select-Object -Last 1
-Copy-Item (Join-Path $glfw.FullName "COPYING.md") (Join-Path $licenses "glfw-LICENSE.txt")
-
-$zip = Join-Path $OutDir "SecondHunt-$Version-windows-x64.zip"
-if (Test-Path $zip) { Remove-Item $zip }
-# entries written one by one with "/" separators: Windows PowerShell 5's Compress-Archive writes "\" (against the zip
-# spec), which some unzip tools turn into file names instead of folders
-Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
-$archive = [IO.Compression.ZipFile]::Open($zip, [IO.Compression.ZipArchiveMode]::Create)
-try {
-    $root = (Get-Item $app).FullName.TrimEnd("\")
-    Get-ChildItem -Recurse -File $app | ForEach-Object {
-        $entry = "Second Hunt/" + $_.FullName.Substring($root.Length + 1).Replace("\", "/")
-        [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $entry,
-            [IO.Compression.CompressionLevel]::Optimal) | Out-Null
+function Copy-RuntimeNotices([string]$dest) {
+    $assets = Get-Content -Raw -LiteralPath (Join-Path $PSScriptRoot "obj\project.assets.json") | ConvertFrom-Json
+    $downloads = @($assets.project.frameworks.PSObject.Properties.Value | ForEach-Object { $_.downloadDependencies })
+    $downloadNames = @("Microsoft.NETCore.App.Runtime.win-x64", "Microsoft.WindowsDesktop.App.Runtime.win-x64")
+    foreach ($id in $downloadNames) {
+        $dep = $downloads | Where-Object { $_.name -eq $id } | Select-Object -First 1
+        if ($dep.version -notmatch '\d+\.\d+\.\d+') { throw "Missing restore version: $id" }
+        $folder = $id.ToLowerInvariant() + "/" + $Matches[0]
+        $path = $assets.packageFolders.PSObject.Properties.Name | ForEach-Object { Join-Path $_ $folder } |
+            Where-Object { Test-Path -LiteralPath $_ -PathType Container } | Select-Object -First 1
+        if (!$path) { throw "Missing runtime pack: $folder" }
+        $license = Get-ChildItem -LiteralPath $path -File | Where-Object Name -Match '^LICENSE(\.txt)?$' | Select-Object -First 1
+        if (!$license) { throw "Missing licence in $folder" }
+        Copy-Item -LiteralPath $license.FullName -Destination (Join-Path $dest "$id-LICENSE.txt")
+        Get-ChildItem -LiteralPath $path -File | Where-Object Name -Match '^THIRD-PARTY-NOTICES(\.txt)?$' |
+            ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $dest "$id-THIRD-PARTY-NOTICES.txt") }
     }
-} finally { $archive.Dispose() }
-$hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-"$hash  $(Split-Path $zip -Leaf)" | Set-Content -Encoding ascii "$zip.sha256"
-Get-ChildItem -Recurse $app | Select-Object FullName, Length | Format-Table -AutoSize | Out-String | Write-Host
-Write-Host "zip:     $zip ($([math]::Round((Get-Item $zip).Length / 1MB, 1)) MB)"
-Write-Host "sha256:  $hash"
+    $glfw = $assets.libraries.PSObject.Properties.Name | Where-Object { $_ -like "OpenTK.redist.glfw/*" } | Select-Object -First 1
+    $glfwLicense = $assets.packageFolders.PSObject.Properties.Name | ForEach-Object { Join-Path $_ ($glfw.ToLowerInvariant() + "/COPYING.md") } |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+    if (!$glfwLicense) { throw "Missing GLFW licence" }
+    Copy-Item -LiteralPath $glfwLicense -Destination (Join-Path $dest "glfw-LICENSE.txt")
+}
+
+try {
+    $publishArgs = @('publish', $project, '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
+        '-p:MphPublic=true', '-p:MphJitOnly=true', '-p:PublishSingleFile=true', '-p:EnableCompressionInSingleFile=true',
+        '-p:IncludeNativeLibrariesForSelfExtract=false', "-p:Version=$numeric", "-p:InformationalVersion=$Version", '-o', $stage)
+    & $Dotnet @publishArgs
+    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed: $LASTEXITCODE" }
+
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot "dist\README.zh-CN.txt") -Destination (Join-Path $stage "README.txt")
+    Copy-Item -LiteralPath (Join-Path $repo "LICENSE") -Destination (Join-Path $stage "LICENSE.txt")
+    Copy-Item -LiteralPath (Join-Path $repo "NOTICE-fork.md") -Destination (Join-Path $stage "NOTICE-fork.txt")
+    Copy-Item -LiteralPath (Join-Path $repo "THIRD_PARTY_NOTICES.md") -Destination (Join-Path $stage "THIRD_PARTY_NOTICES.txt")
+    $licenses = Join-Path $stage "licenses"
+    [void][IO.Directory]::CreateDirectory($licenses)
+    Copy-Item -LiteralPath (Join-Path $repo "locales\zh-CN\OFL-Noto-CJK.txt") -Destination $licenses
+    Copy-RuntimeNotices $licenses
+
+    # Use forward slashes in the archive even on Windows PowerShell 5.
+    Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+    $archive = [IO.Compression.ZipFile]::Open($tempZip, [IO.Compression.ZipArchiveMode]::Create)
+    try {
+        Get-ChildItem -LiteralPath $stage -Recurse -File | Sort-Object FullName | ForEach-Object {
+            $entry = "Second Hunt/" + $_.FullName.Substring($stage.Length + 1).Replace("\", "/")
+            [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($archive, $_.FullName, $entry,
+                [IO.Compression.CompressionLevel]::Optimal)
+        }
+    } finally { $archive.Dispose() }
+    Move-Item -LiteralPath $stage -Destination $loose
+    Move-Item -LiteralPath $tempZip -Destination $zip
+    $sha = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+    "$sha  $(Split-Path $zip -Leaf)" | Set-Content -Encoding ascii -LiteralPath "$zip.sha256"
+    "EXE: $(Join-Path $loose 'SecondHunt.exe')"
+    "ZIP: $zip"
+    "SHA256: $sha"
+} finally {
+    if ((Split-Path $stage -Parent) -eq $OutDir -and (Split-Path $stage -Leaf) -match '^\.stage-[a-f0-9]{32}$') {
+        if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+        if (Test-Path -LiteralPath $tempZip) { Remove-Item -LiteralPath $tempZip -Force }
+    }
+}

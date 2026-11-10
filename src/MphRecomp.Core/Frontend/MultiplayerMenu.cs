@@ -3555,7 +3555,7 @@ namespace MphRecomp.Frontend
                     MenuTextStyle style = look.Text;
                     (int r, int g, int b, int a) = MenuTextStyle.Channels(style.StartColor);
                     if (a <= 0) continue;
-                    string text = texts.TryGetValue(style.StringId, out string? t) ? t : menu.Strings[style.StringId];
+                    string text = texts.TryGetValue(style.StringId, out string? t) ? t : menu.Strings.Display(style.StringId);
                     menu.Font.Emit(text, it.X, it.Y, style.Align, style.WrapWidth, style.Size == 0 ? 8 : style.Size, r / 31f, g / 31f, b / 31f,
                         a / 31f, MenuEngine.TextDepthZ(it.Depth), items);
                 }

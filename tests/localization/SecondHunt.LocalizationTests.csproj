@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>SecondHunt.LocalizationTests</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SecondHunt.Desktop\SecondHunt.Desktop.csproj" />
+  </ItemGroup>
+</Project>

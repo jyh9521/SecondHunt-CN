@@ -703,6 +703,11 @@ namespace MphRecomp.Frontend
         private void CheckForUpdates()
         {
             if (Popup == null || _updateStep != UpdateStep.Idle) return;
+            if (!UpdateHost.Enabled)
+            {
+                Popup.Inform("This build is updated separately. Check the fork for new versions.");
+                return;
+            }
             if (Paused)
             {
                 Log?.Invoke("update check: refused in game");
@@ -808,7 +813,7 @@ namespace MphRecomp.Frontend
 
         private void TickLaunchCheck()
         {
-            if (_launchDone || Paused || Popup == null) return;
+            if (!UpdateHost.Enabled || _launchDone || Paused || Popup == null) return;
             if (_launchCheck == null)
             {
                 string? feed = Config.RecompSettings.PublicBuild ? null : UpdateHost.DevFeed();
@@ -1170,10 +1175,36 @@ namespace MphRecomp.Frontend
                     if (Menu.ItemModelPath(item).Contains("touch_bg", StringComparison.OrdinalIgnoreCase)) wideBars.Add(item);
                 }
             }
+            string title = MphRead.Text.LocalText.Ui("METROID");
+            string subtitle = MphRead.Text.LocalText.Ui("PRIME HUNTERS");
+            int localeLogo = -1, secondaryLogo = -1;
+            if (!Paused && title != "METROID" && subtitle != "PRIME HUNTERS")
+            {
+                foreach (int item in bounds.Keys)
+                {
+                    string model = Menu.ItemModelPath(item);
+                    if (model.EndsWith("toplogo_Model.bin", StringComparison.OrdinalIgnoreCase))
+                        localeLogo = item;
+                    else if (model.EndsWith("toplogoR_Model.bin", StringComparison.OrdinalIgnoreCase))
+                        secondaryLogo = item;
+                }
+            }
+            bool drewLogo = false;
             foreach (WidgetTri t in _tris)
             {
                 int region = itemRegion[t.Item];
                 if (region == -1) continue;
+                if (localeLogo >= 0 && t.Item == secondaryLogo) continue;
+                if (t.Item == localeLogo && localeLogo >= 0 && region >= 0)
+                {
+                    if (!drewLogo)
+                    {
+                        drewLogo = true;
+                        DrawLocaleTitle(_placements[region], bounds[t.Item], title, subtitle,
+                            MathF.Max(t.A.A, MathF.Max(t.B.A, t.C.A)));
+                    }
+                    continue;
+                }
                 if (region == FullScreenItem)
                 {
                     var ib = bounds[t.Item];
@@ -1269,6 +1300,25 @@ namespace MphRecomp.Frontend
 
         // canvas units as the replay bar's (u = height / 360, the same size on the Odin and a PC): one u a font pixel,
         // half the menus' own text size, white at 30%, 6u in from the corner
+        // A locale may replace the title widget without shipping any ROM logo art.
+        // Use the original widget's placement so dual-screen and wide layouts both work.
+        private void DrawLocaleTitle(Placement placement, (float X0, float Y0, float X1, float Y1) bounds,
+            string title, string subtitle, float alpha)
+        {
+            (float left, float top) = placement.ToCanvas(bounds.X0, bounds.Y1);
+            (float right, float bottom) = placement.ToCanvas(bounds.X1, bounds.Y0);
+            float h = bottom - top, w = right - left, cx = (left + right) / 2;
+            if (h <= 0 || w <= 0) return;
+            float major = Math.Min(h * 0.46f / MenuFont.Cell, w * 0.94f / Math.Max(1, Menu.Font.Measure(title)));
+            float minor = Math.Min(h * 0.25f / MenuFont.Cell, w * 0.85f / Math.Max(1, Menu.Font.Measure(subtitle)));
+            float y = top + h * 0.14f, sy = top + h * 0.65f;
+            float shadow = Math.Max(1, h * 0.022f);
+            Menu.Font.EmitCanvas(title, cx + shadow, y + shadow, 2, major, 0, 0.12f, 0.08f, alpha, DrawList);
+            Menu.Font.EmitCanvas(title, cx, y, 2, major, 0.90f, 1, 0.93f, alpha, DrawList);
+            Menu.Font.EmitCanvas(subtitle, cx + shadow, sy + shadow, 2, minor, 0, 0.12f, 0.08f, alpha, DrawList);
+            Menu.Font.EmitCanvas(subtitle, cx, sy, 2, minor, 1, 0.70f, 0.26f, alpha, DrawList);
+        }
+
         private void DrawVersion(float width, float height)
         {
             float u = height / 360f;

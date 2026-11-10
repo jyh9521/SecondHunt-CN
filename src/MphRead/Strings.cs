@@ -33,6 +33,7 @@ namespace MphRead.Text
                 _cache.Add(Scene.Language, dict);
             }
             var entries = new List<StringTableEntry>();
+            RomTextPack? pack = Scene.Language == Language.English ? LocalText.ForRom(Paths.FileSystem) : null;
             string filename = name == StringTables.ScanLog && Paths.MphKey == Ver.AMHK0 ? StringTables.ScanLogSorted : name;
             string path = Paths.Combine(Paths.FileSystem, GetFolder(), filename);
             var bytes = new ReadOnlySpan<byte>(File.ReadAllBytes(path));
@@ -63,7 +64,8 @@ namespace MphRead.Text
                         value1 = split[0];
                         value2 = split[1];
                     }
-                    entries.Add(new StringTableEntry(entry, prefix, value1, value2));
+                    var item = new StringTableEntry(entry, prefix, value1, value2);
+                    entries.Add(pack?.Apply(name, item) ?? item);
                 }
             }
             dict.Add(name, entries);
@@ -292,6 +294,11 @@ namespace MphRead.Text
             for (int i = 0; i < value.Length; i++)
             {
                 char c = value[i];
+                if (c > 255)
+                {
+                    sb.Append(c);
+                    continue;
+                }
                 if ((c & 0xA0) == 0xA0)
                 {
                     return "<kanji>";
@@ -300,10 +307,10 @@ namespace MphRead.Text
                 {
                     sb.Append(c);
                 }
-                else
+                else if (i + 1 < value.Length)
                 {
                     int index = value[++i] & 0x3F | ((c & 0x1F) << 6);
-                    if (index >= 128 && index - 128 <= _nonAscii.Count)
+                    if (index >= 128 && index - 128 < _nonAscii.Count)
                     {
                         sb.Append(_nonAscii[index - 128]);
                     }

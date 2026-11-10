@@ -1,5 +1,7 @@
 # Second Hunt
 
+**Windows 简体中文版**：[安装、数据目录、构建和翻译维护](docs/LOCALIZATION.zh-CN.md)。
+
 > If you are seeing this read me from a launcher like Quiver and you like Second Hunt, please consider 
 > giving our repo a star on GitHub. It will help the game get noticed and increase the online player base!
 > Thank you!

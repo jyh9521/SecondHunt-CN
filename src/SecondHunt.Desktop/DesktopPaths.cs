@@ -1,8 +1,8 @@
 namespace SecondHunt.Desktop;
 
 // Where the Windows app keeps things. Nothing of the game ships with it: the player's ROM is unpacked once into Game.
-//   %LOCALAPPDATA%\Second Hunt\                 (a dev build: MPH Recomp; --data <dir> or a portable.txt beside the
-//     recomp_settings.json, saves\, mods\        exe: that folder / data\ beside the exe)
+//   data\ beside SecondHunt.exe by default; --data <dir> is an explicit override.
+//     recomp_settings.json, saves\, mods\
 //     game\        the unpacked ROM (MphRead's working directory: files\, .extracted)
 //     cache\       GL program binaries
 //     crash\, logs\
@@ -18,26 +18,21 @@ internal static class DesktopPaths
     public static string Settings => Path.Combine(Root, "recomp_settings.json");
     public static string Extracted => Path.Combine(Game, ".extracted");
 
-    public static void Init(string? dataArg)
+    public static bool Init(string? dataArg, bool migrate = true)
     {
-        string exeDir = AppContext.BaseDirectory;
-        if (dataArg != null)
+        Root = dataArg != null ? Path.GetFullPath(dataArg) : DesktopStorage.DefaultRoot(AppContext.BaseDirectory);
+        if (!DesktopStorage.Prepare(Root, isDefault: dataArg == null)) return false;
+        if (migrate && dataArg == null)
         {
-            Root = Path.GetFullPath(dataArg);
+            string legacy = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Second Hunt");
+            DesktopStorage.Migrate(legacy, Root);
         }
-        else if (File.Exists(Path.Combine(exeDir, "portable.txt")))
+        foreach (string dir in new[] { Game, Cache, Saves, Mods, Crash, Logs })
         {
-            Root = Path.Combine(exeDir, "data");
-        }
-        else
-        {
-            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            Root = Path.Combine(local, BuildFlags.Public ? "Second Hunt" : "MPH Recomp");
-        }
-        foreach (string dir in new[] { Root, Game, Cache, Saves, Mods, Crash, Logs })
-        {
+            DesktopStorage.RequireOrdinaryDirectory(dir);
             Directory.CreateDirectory(dir);
         }
+        return true;
     }
 }
 

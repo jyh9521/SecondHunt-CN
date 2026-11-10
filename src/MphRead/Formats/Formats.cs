@@ -1491,7 +1491,10 @@ namespace MphRead
                     string key = split[0].Trim();
                     if (split.Length == 2 && _allPaths.ContainsKey(key))
                     {
-                        _allPaths[key] = split[1].Trim();
+                        // Interpret relative paths against the directory that owns paths.txt.
+                        // Some loaders temporarily enter the ROM tree to resolve resources.
+                        string path = split[1].Trim();
+                        _allPaths[key] = path.Length == 0 ? "" : Path.GetFullPath(Replace(path));
                     }
                 }
             }

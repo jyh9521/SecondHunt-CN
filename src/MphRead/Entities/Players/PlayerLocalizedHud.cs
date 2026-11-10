@@ -1,0 +1,88 @@
+using System;
+using System.Linq;
+using MphRead.Formats;
+using MphRead.Hud;
+using MphRead.Text;
+using OpenTK.Mathematics;
+
+namespace MphRead.Entities
+{
+    public partial class PlayerEntity
+    {
+        private HudObjectInstance? _extraText;
+
+        private static int LocaleGlyph(ReadOnlySpan<char> line, ref int i, Font font)
+        {
+            int ch = line[i];
+            if ((ch & 0x80) != 0 && i + 1 < line.Length)
+                ch = line[++i] & 0x3F | ((ch & 0x1F) << 6);
+            int glyph = ch - font.MinCharacter;
+            return glyph >= 0 && glyph < font.Widths.Count ? glyph : '?' - font.MinCharacter;
+        }
+
+        private static float LocaleWidth(ReadOnlySpan<char> line, Font font)
+        {
+            float width = 0;
+            for (int i = 0; i < line.Length; i++)
+                width += line[i] > 255 ? ExtraGlyphs.Advance : font.Widths[LocaleGlyph(line, ref i, font)];
+            return width;
+        }
+
+        private Vector2 DrawLocalizedText(float x, float y, Align align, int palette, ReadOnlySpan<char> text,
+            ColorRgba? color, float alpha, float spacingY, int visibleLength)
+        {
+            ExtraGlyphs glyphs = LocalText.Glyphs!;
+            HudObjectInstance extra = _extraText ??= new HudObjectInstance(ExtraGlyphs.Size, ExtraGlyphs.Size)
+            {
+                Enabled = true,
+                Scale = (float)ExtraGlyphs.Advance / ExtraGlyphs.Size
+            };
+            // Restore the original 8-pixel font if we were drawing a Japanese ROM's kanji page.
+            Font font = SetUpFont(' ', set: true);
+            extra.SetCharacterData(glyphs.HudTiles, _scene);
+            extra.SetPaletteData(_textInst.PaletteData!, _scene);
+            _textInst.Alpha = extra.Alpha = alpha;
+            float anchor = x;
+            for (int start = 0; start < text.Length;)
+            {
+                int n = text[start..].IndexOf('\n');
+                if (n < 0) n = text.Length - start;
+                ReadOnlySpan<char> line = text.Slice(start, n);
+                float width = LocaleWidth(line, font);
+                x = align == Align.Left ? anchor : align == Align.Right ? anchor - width : anchor - width / 2;
+                for (int i = 0; i < line.Length; i++)
+                {
+                    int characterOffset = start + i;
+                    char ch = line[i];
+                    bool wide = ch > 255;
+                    int glyph = wide ? glyphs.Index(ch) : LocaleGlyph(line, ref i, font);
+                    if (ch != ' ' && (align != Align.PadCenter || characterOffset < visibleLength))
+                    {
+                        HudObjectInstance instance = wide ? extra : _textInst;
+                        instance.PositionX = x / 256f;
+                        instance.PositionY = (y + (wide ? 0 : font.Offsets[glyph])) / 192f;
+                        if (color.HasValue) instance.SetData(glyph, color.Value, _scene);
+                        else instance.SetData(glyph, palette, _scene);
+                        _scene.DrawHudObject(instance, mode: align == Align.Left ? 2 : 0);
+                    }
+                    x += wide ? ExtraGlyphs.Advance : font.Widths[glyph];
+                }
+                start += n + 1;
+                if (start < text.Length) y += spacingY;
+            }
+            return new Vector2(x, y);
+        }
+
+        private static int WrapLocalizedText(string text, int width, char[] dest)
+        {
+            string result = string.Join("\n", text.Split('\n').SelectMany(line =>
+                LocalText.WrapWide(line, width, s => LocaleWidth(s, Font.Normal))));
+            int count = Math.Min(result.Length, dest.Length - 1);
+            result.AsSpan(0, count).CopyTo(dest);
+            dest[count] = '\0';
+            int lines = 1;
+            for (int i = 0; i < count; i++) if (dest[i] == '\n') lines++;
+            return lines;
+        }
+    }
+}

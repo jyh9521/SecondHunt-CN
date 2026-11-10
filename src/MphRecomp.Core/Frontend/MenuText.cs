@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using MphRead;
 using MphRead.Formats;
+using MphRead.Text;
 
 // Menu strings and the menu font, both from the user's ROM.
 //   strings: frontend/metroidhunters_text_<lang>.bin (null-terminated list of entry offsets; each entry = offset,
@@ -19,10 +20,28 @@ namespace MphRecomp.Frontend
         public IReadOnlyList<string> Strings => _strings;
         public int RomCount { get; }
 
-        private MenuStrings(List<string> strings)
+        private readonly (string Source, string? Text)[]? _locale;
+
+        private MenuStrings(List<string> strings, RomTextPack? pack)
         {
             _strings = strings;
             RomCount = strings.Count;
+            if (pack != null)
+            {
+                _locale = new (string, string?)[RomCount];
+                for (int i = 0; i < RomCount; i++) _locale[i] = (strings[i], pack.Menu(strings[i]));
+            }
+        }
+
+        // Keep the raw indexer for game-code lookups (BEGIN GAME, placeholders, etc.).
+        // Only drawing sees the overlay, and dynamically filled values take precedence.
+        public string Display(int id)
+        {
+            string text = this[id];
+            if (_locale != null && id >= 0 && id < _locale.Length
+                && _locale[id] is var row && row.Source == text && row.Text != null)
+                return row.Text;
+            return text;
         }
 
         public string this[int id] => id >= 0 && id < _strings.Count ? _strings[id] : "";
@@ -60,7 +79,7 @@ namespace MphRecomp.Frontend
                 // Latin-1 keeps each byte as one char, so the game's two-byte (0x80) sequences survive for the font
                 list.Add(Encoding.Latin1.GetString(data, (int)offset, (end == -1 ? length : end - (int)offset)));
             }
-            return new MenuStrings(list);
+            return new MenuStrings(list, lang == "en" ? LocalText.ForRom(fileSystemRoot) : null);
         }
     }
 
@@ -69,6 +88,9 @@ namespace MphRecomp.Frontend
         public const int MinCharacter = 32;
         public const int Cell = 8;
         private const int Columns = 16;
+        private const int ExtraColumns = 64;
+        private readonly ExtraGlyphs? _extra = LocalText.Glyphs;
+        private readonly UiTexture? _extraTexture;
 
         private readonly IReadOnlyList<int> _widths;
         private readonly IReadOnlyList<int> _offsets;
@@ -102,13 +124,34 @@ namespace MphRecomp.Frontend
                 }
                 return (texture.Width, texture.Height, rgba);
             }).Id;
+            if (_extra is ExtraGlyphs extra)
+            {
+                _extraTexture = textures.GetOrAdd("locale-font", () =>
+                {
+                    int size = ExtraGlyphs.Size, width = ExtraColumns * size;
+                    int height = ((extra.Count + ExtraColumns - 1) / ExtraColumns) * size;
+                    byte[] rgba = new byte[width * height * 4];
+                    for (int i = 0; i < extra.Count; i++)
+                    {
+                        int tx = (i % ExtraColumns) * size, ty = (i / ExtraColumns) * size;
+                        for (int y = 0; y < size; y++)
+                            for (int x = 0; x < size; x++)
+                            {
+                                int dest = ((ty + y) * width + tx + x) * 4;
+                                rgba[dest] = rgba[dest + 1] = rgba[dest + 2] = 255;
+                                rgba[dest + 3] = extra.Alpha[i * size * size + y * size + x];
+                            }
+                    }
+                    return (width, height, rgba);
+                });
+            }
         }
 
         // the game's two-byte characters: a byte with the top bit set combines with the next one
         private static int Glyph(string text, ref int i)
         {
             int ch = text[i];
-            if ((ch & 0x80) != 0 && i + 1 < text.Length)
+            if (ch <= 255 && (ch & 0x80) != 0 && i + 1 < text.Length)
             {
                 ch = text[++i] & 0x3F | ((ch & 0x1F) << 6);
             }
@@ -117,12 +160,31 @@ namespace MphRecomp.Frontend
 
         private int Advance(int glyph) => glyph >= 0 && glyph < _widths.Count ? _widths[glyph] : Cell;
 
-        public float Measure(string line)
+        private (int Texture, float Offset, float U, float V, float U1, float V1) Sprite(int glyph, bool extra)
+        {
+            UiTexture? tex = extra ? _extraTexture : null;
+            if (extra && tex == null || !extra && (glyph < 0 || glyph >= _widths.Count))
+                return (-1, 0, 0, 0, 0, 0);
+            int index = tex != null ? _extra!.Index((char)(glyph + MinCharacter)) : glyph;
+            int cell = tex != null ? ExtraGlyphs.Size : Cell;
+            int columns = tex != null ? ExtraColumns : Columns;
+            int width = tex?.Width ?? AtlasWidth, height = tex?.Height ?? AtlasHeight;
+            float x = index % columns * cell, y = index / columns * cell;
+            const float inset = 0.02f;
+            return (tex?.Id ?? TextureId, tex == null && glyph < _offsets.Count ? _offsets[glyph] : 0,
+                (x + inset) / width, (y + inset) / height, (x + cell - inset) / width, (y + cell - inset) / height);
+        }
+
+        public float Measure(string line) => MeasureRaw(LocalText.Ui(line));
+
+        private float MeasureRaw(string line)
         {
             float width = 0;
             for (int i = 0; i < line.Length; i++)
             {
-                width += Advance(Glyph(line, ref i));
+                bool extra = line[i] > 255;
+                int glyph = Glyph(line, ref i);
+                width += extra ? ExtraGlyphs.Advance : Advance(glyph);
             }
             return width;
         }
@@ -131,18 +193,23 @@ namespace MphRecomp.Frontend
         public List<string> Lines(string text, int wrapWidth)
         {
             var lines = new List<string>();
-            foreach (string raw in text.Split('\n'))
+            foreach (string raw in LocalText.Ui(text).Split('\n'))
             {
-                if (wrapWidth <= 0 || Measure(raw) <= wrapWidth)
+                if (wrapWidth <= 0 || MeasureRaw(raw) <= wrapWidth)
                 {
                     lines.Add(raw);
+                    continue;
+                }
+                if (LocalText.UsesExtraGlyphs(raw))
+                {
+                    lines.AddRange(LocalText.WrapWide(raw, wrapWidth, MeasureRaw));
                     continue;
                 }
                 var sb = new StringBuilder();
                 foreach (string word in raw.Split(' '))
                 {
                     string candidate = sb.Length == 0 ? word : sb + " " + word;
-                    if (sb.Length > 0 && Measure(candidate) > wrapWidth)
+                    if (sb.Length > 0 && MeasureRaw(candidate) > wrapWidth)
                     {
                         lines.Add(sb.ToString());
                         sb.Clear().Append(word);
@@ -166,29 +233,24 @@ namespace MphRecomp.Frontend
             float top = y - 192 + lineHeight; // the anchor is the BOTTOM of the first line (checked against the game)
             foreach (string line in Lines(text, wrapWidth))
             {
-                float width = Measure(line);
+                float width = MeasureRaw(line);
                 float penX = align == 1 ? x - width : align == 2 ? x - MathF.Floor(width / 2) : x;
                 for (int i = 0; i < line.Length; i++)
                 {
-                    bool space = line[i] == ' ';
+                    bool space = line[i] == ' ', extra = line[i] > 255;
                     int glyph = Glyph(line, ref i);
-                    if (!space && glyph >= 0 && glyph < _widths.Count)
+                    var (texture, offset, u0, v0, u1, v1) = Sprite(glyph, extra);
+                    if (!space && texture >= 0)
                     {
-                        float gy = top - (glyph < _offsets.Count ? _offsets[glyph] : 0);
-                        // inset a hair so scaled, nearest-sampled glyphs never pick up the neighbouring cell
-                        const float Inset = 0.02f;
-                        float u0 = ((glyph % Columns) * Cell + Inset) / AtlasWidth;
-                        float v0 = ((glyph / Columns) * Cell + Inset) / AtlasHeight;
-                        float u1 = u0 + (Cell - 2 * Inset) / AtlasWidth;
-                        float v1 = v0 + (Cell - 2 * Inset) / AtlasHeight;
+                        float gy = top - offset;
                         var p0 = new UiVertex(penX, gy, u0, v0, r, g, b, a);
                         var p1 = new UiVertex(penX + Cell, gy, u1, v0, r, g, b, a);
                         var p2 = new UiVertex(penX + Cell, gy - Cell, u1, v1, r, g, b, a);
                         var p3 = new UiVertex(penX, gy - Cell, u0, v1, r, g, b, a);
-                        output.Add(new WidgetTri { A = p0, B = p1, C = p2, Z = z, TextureId = TextureId });
-                        output.Add(new WidgetTri { A = p0, B = p2, C = p3, Z = z, TextureId = TextureId });
+                        output.Add(new WidgetTri { A = p0, B = p1, C = p2, Z = z, TextureId = texture });
+                        output.Add(new WidgetTri { A = p0, B = p2, C = p3, Z = z, TextureId = texture });
                     }
-                    penX += Advance(glyph);
+                    penX += extra ? ExtraGlyphs.Advance : Advance(glyph);
                 }
                 top -= lineHeight;
             }
@@ -203,23 +265,19 @@ namespace MphRecomp.Frontend
             float lineTop = y;
             foreach (string line in Lines(text, wrapWidth: 0))
             {
-                float width = Measure(line) * scale;
+                float width = MeasureRaw(line) * scale;
                 float penX = align == 1 ? x - width : align == 2 ? x - width / 2 : x;
                 for (int i = 0; i < line.Length; i++)
                 {
-                    bool space = line[i] == ' ';
+                    bool space = line[i] == ' ', extra = line[i] > 255;
                     int glyph = Glyph(line, ref i);
-                    if (!space && glyph >= 0 && glyph < _widths.Count)
+                    var (texture, offset, u0, v0, u1, v1) = Sprite(glyph, extra);
+                    if (!space && texture >= 0)
                     {
-                        float glyphTop = lineTop + (glyph < _offsets.Count ? _offsets[glyph] : 0) * scale;
-                        const float Inset = 0.02f;
-                        float u0 = ((glyph % Columns) * Cell + Inset) / AtlasWidth;
-                        float v0 = ((glyph / Columns) * Cell + Inset) / AtlasHeight;
-                        float u1 = u0 + (Cell - 2 * Inset) / AtlasWidth;
-                        float v1 = v0 + (Cell - 2 * Inset) / AtlasHeight;
-                        list.Quad(TextureId, penX, glyphTop, penX + Cell * scale, glyphTop + Cell * scale, u0, v0, u1, v1, r, g, b, a);
+                        float glyphTop = lineTop + offset * scale;
+                        list.Quad(texture, penX, glyphTop, penX + Cell * scale, glyphTop + Cell * scale, u0, v0, u1, v1, r, g, b, a);
                     }
-                    penX += Advance(glyph) * scale;
+                    penX += (extra ? ExtraGlyphs.Advance : Advance(glyph)) * scale;
                 }
                 lineTop += lineHeight;
             }

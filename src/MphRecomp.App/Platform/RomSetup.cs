@@ -1,4 +1,5 @@
 using System.Text;
+using MphRead.Text;
 
 namespace MphRecomp.App;
 
@@ -20,23 +21,23 @@ internal static class RomSetup
         byte[] head = new byte[0x20];
         using (var f = File.OpenRead(romPath))
         {
-            if (f.Read(head, 0, head.Length) < head.Length) return "That file is too small to be a DS ROM.";
+            if (f.Read(head, 0, head.Length) < head.Length) return LocalText.Ui("That file is too small to be a DS ROM.");
         }
         string code = Encoding.ASCII.GetString(head, 0x0C, 4);
         byte version = head[0x1E];
         if (code == "AMHE" && version <= 1) return null;
         string what = code switch
         {
-            "AMHE" => $"Metroid Prime Hunters (USA) with an unknown revision ({version})",
+            "AMHE" => LocalText.Format("Metroid Prime Hunters (USA) with an unknown revision ({0})", version),
             "AMHP" => "Metroid Prime Hunters (Europe)",
             "AMHJ" => "Metroid Prime Hunters (Japan)",
             "AMHK" => "Metroid Prime Hunters (Korea)",
             "A76E" => "Metroid Prime Hunters (USA kiosk demo)",
             "AMFE" or "AMFP" => "Metroid Prime Hunters: First Hunt",
-            _ => $"not Metroid Prime Hunters (game code {(code.All(c => c >= 0x20 && c < 0x7F) ? code : "?")})",
+            _ => LocalText.Format("not Metroid Prime Hunters (game code {0})", code.All(c => c >= 0x20 && c < 0x7F) ? code : "?"),
         };
-        return $"This file is {what}.\n\nThis beta supports Metroid Prime Hunters (USA), version 1.0 or 1.1 (game code "
-            + "AMHE). Other regions aren't supported yet. Please pick a USA copy of the game.";
+        return LocalText.Format("This file is {0}.\n\nThis beta supports Metroid Prime Hunters (USA), version 1.0 or 1.1 (game code "
+            + "AMHE). Other regions aren't supported yet. Please pick a USA copy of the game.", LocalText.Ui(what));
     }
 
     // Unpacks the ROM into filesDir (MphRead's working directory), reporting MphRead's own progress lines; true when
@@ -51,7 +52,7 @@ internal static class RomSetup
             Console.SetOut(new ForwardWriter(log));
             try
             {
-                log("Extracting…");
+                log(LocalText.Ui("Extracting…"));
                 MphRead.Extract.Setup(romPath);
             }
             finally
@@ -62,17 +63,17 @@ internal static class RomSetup
             int count = Directory.Exists(tree) ? Directory.GetFiles(tree, "*", SearchOption.AllDirectories).Length : 0;
             if (count == 0)
             {
-                log("Nothing was extracted -- is this a Metroid Prime Hunters ROM?");
+                log(LocalText.Ui("Nothing was extracted -- is this a Metroid Prime Hunters ROM?"));
                 return false;
             }
             string root = Directory.GetDirectories(tree) is { Length: > 0 } dirs ? Path.GetFileName(dirs[0]) : "unknown";
             File.WriteAllText(MarkerPath(filesDir), $"version={MphRead.AppInfo.Version}\nrom={root}\nfiles={count}");
-            log($"Done: {root}, {count} files.");
+            log(LocalText.Format("Done: {0}, {1} files.", root, count));
             return true;
         }
         catch (Exception ex)
         {
-            log("Extraction failed: " + ex.Message);
+            log(LocalText.Format("Extraction failed: {0}", ex.Message));
             return false;
         }
     }

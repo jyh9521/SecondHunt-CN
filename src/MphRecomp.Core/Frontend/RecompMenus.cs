@@ -796,6 +796,7 @@ namespace MphRecomp.Frontend
                 rows.RemoveAll(r => r.Label == "extras");
             }
             if (RecompSettings.DesktopHost) rows.RemoveAll(r => HiddenOnDesktop.Contains(r.Label));
+            if (!MphRecomp.Update.UpdateHost.Enabled) rows.RemoveAll(r => r.Label is "update\nalerts" or "updates");
             if (!RecompSettings.DesktopHost) rows.RemoveAll(r => r.Label == "frame\nrate"); // Android: the display picks
             if (!_settings.DeveloperMode) rows.RemoveAll(r => r.Label == "dev\ntools" || r.Label == "status\ntext");
             // (in categories, each its own page: RecompMenus.SettingsPages.cs)

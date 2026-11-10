@@ -4,6 +4,7 @@ using MphRecomp.App;
 using MphRecomp.App.Gl;
 using MphRecomp.App.Platform;
 using MphRecomp.Frontend;
+using LocalText = MphRead.Text.LocalText;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Common.Input;
 using OpenTK.Windowing.Desktop;
@@ -54,7 +55,7 @@ internal sealed class DesktopApp : IDisposable
     {
         _options = options;
         WindowIcon? icon = DesktopPlatform.WindowIcon();
-        _gl = new GlWindow(BuildFlags.AppName, icon);
+        _gl = new GlWindow(LocalText.Ui(BuildFlags.AppName), icon);
         DesktopCrashLog.Gpu = _gl.Renderer;
         _input = new DesktopInput(this, _gl.Window);
         if (options.Script != null) _input.SetScript(options.Script);
@@ -66,7 +67,7 @@ internal sealed class DesktopApp : IDisposable
         };
         w.Closing += _ => Log.Info("MPHDesktop", "window closing");
         WindowPrefs.Apply(w);
-        if (!RomSetup.IsExtracted(DesktopPaths.Game))
+        if (!DesktopGame.Prepare(DesktopPaths.Game))
         {
             var setup = new RomSetupScreen(DesktopPaths.Game, () => Defer(() => { Pop(); OpenFrontend(0); }));
             Push(setup);
@@ -324,6 +325,7 @@ internal sealed class DesktopApp : IDisposable
 
     void OpenFrontend(int startPage)
     {
+        Log.Info("MPHFrontend", $"opening frontend page {startPage} (locale {DesktopLocale.Name})");
         var front = new FrontendRenderer(DesktopPaths.Game, DesktopPaths.Settings, DesktopPaths.Mods, DesktopPaths.Saves)
         {
             StartPage = startPage,
@@ -470,6 +472,8 @@ internal sealed class DesktopApp : IDisposable
 internal sealed class AppOptions
 {
     public string? Data;
+    public string? Locale;
+    public bool Migrate = true;
     public string? Rom;
     public string? Script;
     public int StartPage;
@@ -483,6 +487,11 @@ internal sealed class AppOptions
     public static AppOptions Parse(string[] args)
     {
         var o = new AppOptions();
+        if (args.Length == 1 && Path.GetExtension(args[0]).Equals(".nds", StringComparison.OrdinalIgnoreCase))
+        {
+            o.Rom = Path.GetFullPath(args[0]);
+            return o;
+        }
         var launch = new Dictionary<string, string>();
         for (int i = 0; i + 1 < args.Length; i += 2)
         {
@@ -490,6 +499,8 @@ internal sealed class AppOptions
             switch (key)
             {
             case "data": o.Data = value; break;
+            case "locale": o.Locale = value; break;
+            case "migrate": o.Migrate = !value.Equals("no", StringComparison.OrdinalIgnoreCase); break;
             case "rom": o.Rom = Path.GetFullPath(value); break;
             case "script": o.Script = value; break;
             case "page": int.TryParse(value, out o.StartPage); break;

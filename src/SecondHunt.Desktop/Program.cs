@@ -1,6 +1,7 @@
 using MphRecomp.App.Platform;
 using MphRecomp.Config;
 using MphRecomp.Update;
+using MphRead.Text;
 
 namespace SecondHunt.Desktop;
 
@@ -12,13 +13,24 @@ internal static class Program
         // every text format is invariant, like the PC tools and the Android app (10-16: Finnish -1 = "−1" crash)
         System.Globalization.CultureInfo.DefaultThreadCurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
         System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-        // after an in-game update: wait for the old process, clear its *.old files (DesktopUpdater)
-        args = DesktopUpdater.AfterUpdate(args);
+        if (args.Length > 0 && args[0] == DesktopStorage.ProvisionArg)
+            return DesktopStorage.Provision(args);
         AppOptions options = AppOptions.Parse(args);
 #if MPH_PUBLIC
         options.Launch = null; // a public build starts at the menus only (the launch shortcuts are for dev builds)
 #endif
-        DesktopPaths.Init(options.Data);
+        try
+        {
+            DesktopLocale.Init(options.Locale);
+            if (!DesktopPaths.Init(options.Data, options.Migrate)) return 2;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException
+            or System.Text.Json.JsonException)
+        {
+            System.Windows.Forms.MessageBox.Show(LocalText.Format("Could not prepare Second Hunt:\n\n{0}", ex.Message),
+                BuildFlags.AppName, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            return 2;
+        }
         DesktopLog.Init(DesktopPaths.Logs);
         DesktopCrashLog.Install();
         RecompSettings.PublicBuild = BuildFlags.Public;
@@ -29,8 +41,8 @@ internal static class Program
         // server's base URL from update_feed.txt in its data folder
         UpdateHost.AppVersion = BuildFlags.Version;
         UpdateHost.Platform = UpdatePlatform.Windows;
-        UpdateHost.DevFeedFile = BuildFlags.Public ? null : Path.Combine(DesktopPaths.Root, "update_feed.txt");
-        UpdateHost.Installer = new DesktopUpdater(args); // the game installs updates itself (owner 10-06)
+        // The upstream release feed ships a different build. Never replace this fork with it.
+        UpdateHost.Enabled = false;
         UpdateHost.OpenUrl = url =>
         {
             try
@@ -58,8 +70,9 @@ internal static class Program
             string? report = DesktopCrashLog.Write(ex, "unhandled (main loop)");
             Log.Error("MPHDesktop", ex.ToString());
             System.Windows.Forms.MessageBox.Show(
-                $"{BuildFlags.AppName} closed because of an error:\n\n{ex.Message}\n\n"
-                + (report != null ? $"A crash report was saved to\n{report}" : "No crash report could be saved."),
+                LocalText.Format("{0} closed because of an error:\n\n{1}\n\n", BuildFlags.AppName, ex.Message)
+                + (report != null ? LocalText.Format("A crash report was saved to\n{0}", report)
+                    : LocalText.Ui("No crash report could be saved.")),
                 BuildFlags.AppName, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             return 1;
         }

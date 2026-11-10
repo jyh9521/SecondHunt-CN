@@ -2700,9 +2700,11 @@ namespace MphRead.Entities
             {
                 return new Vector2(x, y);
             }
+            float spacingY = _textSpacingY == 0 ? (fontSpacing == -1 ? 12 : fontSpacing) : _textSpacingY;
+            if (LocalText.UsesExtraGlyphs(text[..length]))
+                return DrawLocalizedText(x, y, type, palette, text[..length], color, alpha, spacingY, padAfter);
             Font font = SetUpFont(text[0], set: true);
             _textInst.Alpha = alpha;
-            float spacingY = _textSpacingY == 0 ? (fontSpacing == -1 ? 12 : fontSpacing) : _textSpacingY;
             if (type == Align.Left)
             {
                 float startX = x;
@@ -2961,6 +2963,7 @@ namespace MphRead.Entities
             {
                 return 1;
             }
+            if (LocalText.UsesExtraGlyphs(text)) return WrapLocalizedText(text, maxWidth, dest);
             Font font = SetUpFont(text[0], set: false);
             for (int i = 0; i < text.Length; i++)
             {

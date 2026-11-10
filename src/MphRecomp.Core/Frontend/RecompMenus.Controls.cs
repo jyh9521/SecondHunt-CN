@@ -1080,19 +1080,9 @@ namespace MphRecomp.Frontend
         {
             if (text.Length == 0) return;
             const float size = 0.66f, pitch = 6.6f;
-            var lines = new List<string>();
-            string line = "";
-            foreach (string word in text.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            {
-                string next = line.Length == 0 ? word : line + " " + word;
-                if (line.Length > 0 && _drawMenu!.Font.Measure(next) * size > SecDescW)
-                {
-                    lines.Add(line);
-                    line = word;
-                }
-                else line = next;
-            }
-            if (line.Length > 0) lines.Add(line);
+            // Localize the entire description before wrapping it. Splitting English
+            // words first would drop the full-string match in the locale catalogue.
+            List<string> lines = _drawMenu!.Font.Lines(text, (int)(SecDescW / size));
             for (int i = 0; i < lines.Count && i < 3; i++)
             {
                 TextS(lines[i], 128, SecDescTop - pitch * i, 2, Pale, tag, size);

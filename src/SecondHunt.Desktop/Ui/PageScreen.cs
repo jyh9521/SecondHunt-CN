@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using MphRecomp.App;
 using MphRecomp.App.Gl;
+using LocalText = MphRead.Text.LocalText;
 
 namespace SecondHunt.Desktop.Ui;
 
@@ -89,10 +90,10 @@ internal abstract class PageScreen : IGlScreen
         using var brush = new SolidBrush(color);
         using var format = new StringFormat { Alignment = h, LineAlignment = v, Trimming = StringTrimming.EllipsisCharacter };
         if (!wrap) format.FormatFlags |= StringFormatFlags.NoWrap;
-        g.DrawString(text, font, brush, r, format);
+        g.DrawString(LocalText.Ui(text), font, brush, r, format);
     }
 
-    protected float MeasureHeight(Graphics g, string text, Font font, float width) => g.MeasureString(text, font, (int)width).Height;
+    protected float MeasureHeight(Graphics g, string text, Font font, float width) => g.MeasureString(LocalText.Ui(text), font, (int)width).Height;
 
     // a row or button box: dark; focused: lit with the accent edge; pressed: brighter
     protected void Box(Graphics g, RectangleF r, bool focused, bool pressed = false)

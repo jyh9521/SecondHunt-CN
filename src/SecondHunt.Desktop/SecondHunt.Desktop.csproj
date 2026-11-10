@@ -61,6 +61,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MphRecomp.App\MphRecomp.App.csproj" />
+    <InternalsVisibleTo Include="SecondHunt.LocalizationTests" />
+    <RuntimeHostConfigurationOption Include="System.StartupHookProvider.IsSupported" Value="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,6 +71,9 @@
     <EmbeddedResource Include="..\..\docs\ONLINE_RULES_IN_APP.md" LogicalName="online.md" />
     <!-- the window's icon (appicon.ico is the exe's; both drawn from the Android launcher icon's design) -->
     <EmbeddedResource Include="appicon64.png" LogicalName="appicon64.png" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\ui.json" LogicalName="locales.zh-CN.ui.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\rom.json" LogicalName="locales.zh-CN.rom.json" />
+    <EmbeddedResource Include="..\..\locales\zh-CN\glyphs.bin" LogicalName="locales.zh-CN.glyphs.bin" />
   </ItemGroup>
 
 </Project>
