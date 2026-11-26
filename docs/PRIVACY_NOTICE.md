@@ -1,5 +1,6 @@
+> [!NOTE]
 > Not legal advice. Written from what the server code actually keeps (`src/SecondHunt.Server/Store.cs`, `HubChat.cs`, `deploy/`). If
-> the server changes what it keeps, update this file (and docs/ONLINE_RULES_IN_APP.md, the in-app page) in the same change.
+> the server changes what it keeps, update this file (and [ONLINE_RULES_IN_APP.md](ONLINE_RULES_IN_APP.md), the in-app page) in the same change.
 
 # Second Hunt online play: privacy notice
 
@@ -37,7 +38,7 @@ Contact for anything in this notice, including deleting your data: secondhuntgam
 
 - **Akamai (Linode)** hosts the server in the US (Chicago). Your profile data is stored there.
 - **Cloudflare** relays some matches' traffic (its "TURN" service) when two players can't connect directly. It sees your
-  IP address and the encrypted match traffic, not your profile. Cloudflare's privacy policy: https://www.cloudflare.com/privacypolicy/
+  IP address and the encrypted match traffic, not your profile. See [Cloudflare's privacy policy](https://www.cloudflare.com/privacypolicy/).
 - Nobody else. Nothing is sold or shared for advertising.
 
 If you play from outside the US, your data is sent to and stored in the US.
@@ -54,7 +55,7 @@ If you play from outside the US, your data is sent to and stored in the US.
 
 ## Children
 
-Online play is for players 13 and older (`docs/LEGAL_AGE_NOTICE_13_PLUS.md`). If you believe a child under 13 has an
+Online play is for players 13 and older ([LEGAL_AGE_NOTICE_13_PLUS.md](LEGAL_AGE_NOTICE_13_PLUS.md)). If you believe a child under 13 has an
 online profile, tell us at secondhuntgame@gmail.com and we'll delete it.
 
 ## Changes

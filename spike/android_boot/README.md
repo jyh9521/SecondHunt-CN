@@ -14,7 +14,7 @@ proven and the renderer port has a home.
 Prereqs (being provisioned this session): .NET 9 SDK ✓, `android` workload ✓,
 a JDK 17, and an Android platform SDK (API 35).
 
-```
+```bash
 dotnet build spike/android_boot/BootSpike.csproj -c Release \
   -p:JavaSdkDirectory=<jdk17> -p:AndroidSdkDirectory=<android-sdk>
 ```
@@ -22,6 +22,7 @@ dotnet build spike/android_boot/BootSpike.csproj -c Release \
 Then install the produced APK via `adb install`, or re-sign with the buusfury
 pipeline (V1+V2+V3) if the debug signature won't install on the Odin.
 
-Status: scaffolded; not yet compiled (waiting on JDK 17 + Android platform SDK
-download). GLES binding choice for the *real* renderer (Silk.NET vs. hand-rolled
-vs. these platform bindings) is the M1 decision this spike informs.
+> [!NOTE]
+> **Status:** Scaffolded; not yet compiled (waiting on JDK 17 + Android platform SDK
+> download). GLES binding choice for the *real* renderer (Silk.NET vs. hand-rolled
+> vs. these platform bindings) is the M1 decision this spike informs.

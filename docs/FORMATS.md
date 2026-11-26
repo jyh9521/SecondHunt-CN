@@ -1,5 +1,6 @@
 # File formats → parser / converter status (M0 exit criterion)
 
+> [!NOTE]
 > Inventory of the Nintendo DS / MPH file formats the engine understands, which
 > **parser** loads each (runtime, ships in the APK) and which **converter /
 > exporter** handles it (desktop tool, never in the APK). "Runtime-needed"

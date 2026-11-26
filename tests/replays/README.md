@@ -11,7 +11,9 @@ launch, so re-recording one from its spec gives the same file byte for byte.
 
 Check (needs the desktop extraction; ~11 s):
 
-    dotnet MphRead.Tools.dll -replaygolden [view=nodraw|draw|third|spectate] [only=<name>]
+```bash
+dotnet MphRead.Tools.dll -replaygolden [view=nodraw|draw|third|spectate] [only=<name>]
+```
 
 or after a Tools build: `dotnet build src/MphRead.Tools/MphRead.Tools.csproj -c <config> -p:ReplayGolden=true`
 (fails the build if one isn't exact).
@@ -19,7 +21,9 @@ or after a Tools build: `dotnet build src/MphRead.Tools/MphRead.Tools.csproj -c 
 If one fails, the game logic changed. If that was intended, bump `ReplayFile.CurrentSimVersion` (players' older
 replays are then refused up front instead of stopping part-way), then re-record:
 
-    dotnet MphRead.Tools.dll -replaygolden record
+```bash
+dotnet MphRead.Tools.dll -replaygolden record
+```
 
 `record` is refused while a golden of the current sim version still fails, so a logic change can't slip in without
 the version bump. If the failure is a bug, `-replayplay <file> trace=a-b` prints the player around the step.

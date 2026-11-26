@@ -403,11 +403,15 @@ A **group** is 512 bytes holding a 64-byte × 8-row tile. The **block height** K
 Byte x (0 ≤ x < R) of block row y (0 ≤ y < H) of the linear top level, at linear offset y × R + x, comes from this
 surface offset:
 
-  (⌊y / 8K⌋ × G + ⌊x/64⌋) × 512K + ⌊(y mod 8K)/8⌋ × 512 + I(x mod 64, y mod 8)
+```text
+(⌊y / 8K⌋ × G + ⌊x/64⌋) × 512K + ⌊(y mod 8K)/8⌋ × 512 + I(x mod 64, y mod 8)
+```
 
 where the position inside a group is
 
-  I(a, b) = ⌊a/32⌋ × 256 + ⌊b/2⌋ × 64 + ⌊(a mod 32)/16⌋ × 32 + (b mod 2) × 16 + (a mod 16).
+```text
+I(a, b) = ⌊a/32⌋ × 256 + ⌊b/2⌋ × 64 + ⌊(a mod 32)/16⌋ × 32 + (b mod 2) × 16 + (a mod 16)
+```
 
 **[checked]** All 12 Sylux textures match. As a check: Sylux's 2048×2048 ASTC 5×5 texture has W = H = 410, K = 16,
 G = 103, and with all 12 mip levels laid out this way it fills its surface length 4,515,328 exactly.

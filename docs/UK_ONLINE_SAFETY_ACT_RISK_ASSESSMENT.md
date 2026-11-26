@@ -1,3 +1,4 @@
+> [!NOTE]
 > Not legal advice. A plain-language
 > first version of the written risk assessments the UK Online Safety Act 2023 asks of user-to-user services (Ofcom's
 > illegal content risk assessment and children's risk assessment guidance), sized for a one-person free fan game. The
@@ -46,7 +47,7 @@ Ofcom's priority harms, rated for this service (low / medium / high), with why:
 
 ## 3. Children (13-17)
 
-Online play is for 13 and older, by self-declaration (`docs/LEGAL_AGE_NOTICE_13_PLUS.md`). Players aged 13-17 can use it,
+Online play is for 13 and older, by self-declaration ([LEGAL_AGE_NOTICE_13_PLUS.md](LEGAL_AGE_NOTICE_13_PLUS.md)). Players aged 13-17 can use it,
 so it's "likely to be accessed by children". Risks to them: contact from adult strangers (grooming), bullying, seeing
 swearing or hateful words, sharing personal details. Under-13s may lie about their age; the service has no ID or
 facial age checks, which would be out of proportion to its size and features; the lack of private messages and media
@@ -68,8 +69,8 @@ is the main protection.
   memory, so reports carry evidence without the service storing chat.
 - **Moderation:** the owner's admin tool (report queue, show, dismiss/resolve, chat mute, ban by profile key, ban list,
   filter test); a ban kicks the player within 15 seconds and blocks new logins with that key.
-- **Data kept to a minimum** (`docs/PRIVACY_NOTICE.md`): no IP logs, no chat logs, reports deleted after 30/90 days.
-- **Code of conduct** shown in the game (`docs/CODE_OF_CONDUCT.md`).
+- **Data kept to a minimum** ([PRIVACY_NOTICE.md](PRIVACY_NOTICE.md)): no IP logs, no chat logs, reports deleted after 30/90 days.
+- **Code of conduct** shown in the game ([CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)).
 
 ## 5. How reports are handled
 

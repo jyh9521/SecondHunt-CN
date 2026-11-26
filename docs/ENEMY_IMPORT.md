@@ -8,8 +8,8 @@ effects, to the standard of the Shooting Gallery turret. They serve three purpos
    brings back mini bosses, and adds new enemies to rooms.
 
 This is the plan. Nothing is built yet. Research done for it (2026-10-26): a survey of the code we already have and a
-survey of where each game's enemy logic can be read from. The method being copied is in
-[SHOOTING_GALLERY_TURRET.md](SHOOTING_GALLERY_TURRET.md).
+survey of where each game's enemy logic can be read from. The method being copied is documented in
+`SHOOTING_GALLERY_TURRET.md`.
 
 ## 1. What "1:1" means here (the turret standard)
 
@@ -78,7 +78,7 @@ discs: see section 10.
 
 ## 4. Architecture: one system for all three uses
 
-```
+```text
           \                    |                        /
            +------ Campaign placement data (per room) --+
                                |

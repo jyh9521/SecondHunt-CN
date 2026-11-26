@@ -13,7 +13,7 @@ Mods are **sandboxed** (no file/OS access from Lua), **isolated** from each othe
 
 ## A mod is a folder
 
-```
+```text
 my_mod/
   mod.json      # manifest
   main.lua      # entry script (name it whatever Entry says)

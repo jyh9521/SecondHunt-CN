@@ -6,7 +6,7 @@ dir (`-EmuDir`, or the `MPH_EMU_DIR` environment variable).
 
 ## Setup (done 2026-09-30)
 
-- BizHawk 2.11.1 (`BizHawk-2.11.1-win-x64.zip` from github.com/TASEmulators/BizHawk releases, sha256
+- BizHawk 2.11.1 (`BizHawk-2.11.1-win-x64.zip` from [TASEmulators/BizHawk releases](https://github.com/TASEmulators/BizHawk/releases), sha256
   `dd7cbd5e...5717`) unzipped to `<emu dir>\BizHawk-2.11.1`. DS core = melonDS (built in). No BIOS files needed.
 - **Unbind the mouse from the DS touch screen** in `BizHawk-*\config.ini`: `AllTrollersAnalog` -> `NDS Controller` ->
   `Touch X`/`Touch Y` `"Value": ""`, and `AllTrollers` -> `NDS Controller` -> `Touch` `""`. Otherwise
@@ -16,7 +16,7 @@ dir (`-EmuDir`, or the `MPH_EMU_DIR` environment variable).
 
 ## Running
 
-```
+```powershell
 tools\accuracy\run.ps1 -Route tools\accuracy\routes\to_landing.lua
 python tools\accuracy\sheet.py <emu dir>\out\shots out.png
 ```

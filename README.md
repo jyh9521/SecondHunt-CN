@@ -5,11 +5,11 @@
 
 [下载 Windows x64 ZIP](https://github.com/jyh9521/SecondHunt-CN/releases/download/0.3.5-zh.8/SecondHunt-CN-0.3.5-zh.8-windows-x64.zip) · [SHA-256 校验文件](https://github.com/jyh9521/SecondHunt-CN/releases/download/0.3.5-zh.8/SecondHunt-CN-0.3.5-zh.8-windows-x64.zip.sha256) · [版本说明](https://github.com/jyh9521/SecondHunt-CN/releases/tag/0.3.5-zh.8) · [原项目](https://github.com/BountyHunterKanden/SecondHunt)
 
-这是 [Second Hunt](https://github.com/BountyHunterKanden/SecondHunt) 的 Windows 简体中文分支。Second Hunt 基于 [MphRead](https://github.com/NoneGiven/MphRead) 重建了 NDS《密特罗德究极：猎人》，不用模拟器就能玩原作剧情和多人模式，也支持宽屏、双摇杆手柄及键鼠。
+这是 [Second Hunt](https://github.com/BountyHunterKanden/SecondHunt) 的 Windows 简体中文分支。Second Hunt 基于 [MphRead](https://github.com/NoneGiven/MphRead) 重建了 NDS《密特罗德究极：猎人》，无需模拟器即可游玩原作剧情和多人模式，并支持宽屏、双摇杆手柄与键鼠操作。
 
-**当前简中版为 `0.3.5-zh.8`。** Windows 汉化源码及构建文档在 [`zh-cn-windows` 分支](https://github.com/jyh9521/SecondHunt-CN/tree/zh-cn-windows)，默认分支的首页也同步这份说明；下载请使用上方本仓库的发布包。
-
-**发布包不含游戏本体、ROM、解包资源、存档或测试数据。** 汉化在你提供的 ROM 解包后自动应用，不改写 ROM 或原版解包文件。此仓库不发布 Android 汉化包。
+> [!NOTE]
+> - **当前简中版为 `0.3.5-zh.8`。** Windows 汉化源码及构建文档位于 [`zh-cn-windows` 分支](https://github.com/jyh9521/SecondHunt-CN/tree/zh-cn-windows)，默认分支首页同步维护本说明；下载请使用上方本仓库的 Release 发布包。
+> - **发布包不含游戏本体、ROM、解包资源、存档或测试数据。** 汉化会在你提供的 ROM 解包后自动应用，不改写原 ROM 或原版解包文件。本仓库不发布 Android 汉化包。
 
 ## 我想……
 
@@ -65,7 +65,8 @@
 - 修复标题图中被截断的 ®，以及影片库点击后立即跳过的问题；影片缺失时显示中文提示。
 - 译名优先使用任天堂官方简中，未找到官方译名的沿用[项目术语](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/TERMINOLOGY.zh-CN.md)，例如「黑暗回声」「腐蚀」。厂商标识、署名、玩家输入及模组自己的文字保留原样。
 
-**实测样本是美版 1.0（AMHE0）**：57 项检查通过，遍历 98 个菜单入口及 7 种已填值的对战规则；26 个影片条目可连续解码，首部影片完整播放 82.9 秒后正常返回。此前已跑过正式版开局和本地人机对战，并从检查点验证两个结局的过场与结算；同一条回放的 823 步全部校验一致。1.1、公网联机和需要另备游戏文件的导入没有逐一实测；更多细节见[验收与依赖说明](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/LOCALIZATION.zh-CN.md#技术和验收边界)。
+> [!TIP]
+> **实测样本为美版 1.0（AMHE0）**：57 项自动化检查全部通过，覆盖 98 个菜单入口及 7 种对战规则配置；26 个影片条目可连续解码，首部影片完整播放 82.9 秒后正常返回。此外已实测正式版开局、本地人机对战以及检查点下的双结局过场与结算，同一条回放的 823 步校验全部一致。1.1 修订版、公网联机及需另备游戏文件的扩展导入暂未逐一实测；更多细节见[验收与依赖说明](https://github.com/jyh9521/SecondHunt-CN/blob/zh-cn-windows/docs/LOCALIZATION.zh-CN.md#技术和验收边界)。
 
 ## 校验和回退
 

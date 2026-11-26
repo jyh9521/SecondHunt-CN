@@ -579,7 +579,7 @@ you're given: the playback part of `src/MphRead/Formats/Movie.cs` (what's left o
 
 **Don't open:** any earlier version of the VX decoder, the project's git history, any other VX / Mobiclip / Actimagine
 decoder or encoder in any language (for example actimagine, Gericom's ffmpeg patch or MobiclipDecoder, or ffmpeg's own
-H.264 decoder sources), upstream MphRead online, or or the spec author's own notes and working files.
+H.264 decoder sources), upstream MphRead online, or the spec author's own notes and working files.
 If you think you need one of them, stop and say what you need instead.
 
 ### Done means

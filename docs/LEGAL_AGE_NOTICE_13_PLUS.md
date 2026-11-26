@@ -1,10 +1,11 @@
+> [!NOTE]
 > Not legal advice.
 
 # Second Hunt online play: 13 and older
 
 Shown the first time a player opens ONLINE PLAY (before an online profile is made), and again under ONLINE PLAY >
 SETTINGS > ABOUT ONLINE PLAY. Short enough for one screen; the full texts are the privacy notice
-(`docs/PRIVACY_NOTICE.md`) and the code of conduct (`docs/CODE_OF_CONDUCT.md`).
+([PRIVACY_NOTICE.md](PRIVACY_NOTICE.md)) and the code of conduct ([CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)).
 
 ## The screen text
 
@@ -30,8 +31,8 @@ More: privacy notice, code of conduct (ABOUT ONLINE PLAY).
   collect data from children under 13. A 13+ line, with no data collected from players who say they're younger, is
   the usual way small games stay out of it. The UK and EU set the age for a child's own consent to data use at 13
   (UK) to 16 (some EU countries). The choice: 13 and up everywhere, one rule for all players.
-- **It's a self-declaration** (no ID checks): the risk assessment (`docs/UK_ONLINE_SAFETY_ACT_RISK_ASSESSMENT.md`)
+- **It's a self-declaration** (no ID checks): the risk assessment ([UK_ONLINE_SAFETY_ACT_RISK_ASSESSMENT.md](UK_ONLINE_SAFETY_ACT_RISK_ASSESSMENT.md))
   explains why that fits a service of this size and what else limits the risk.
 - **Where players see it** (no popups): a dim line on the ONLINE PLAY hub (`OnlineMenus.DrawHub`),
-  the rules page from OPTIONS' bottom-left line (docs/ONLINE_RULES_IN_APP.md), and ONLINE PLAY > SETTINGS > ABOUT
+  the rules page from OPTIONS' bottom-left line ([ONLINE_RULES_IN_APP.md](ONLINE_RULES_IN_APP.md)), and ONLINE PLAY > SETTINGS > ABOUT
   ONLINE PLAY (`NoticeText` in `src/MphRecomp.Core/Frontend/OnlineMenus.Settings.cs`).

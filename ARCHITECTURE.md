@@ -1,14 +1,15 @@
 # Architecture
 
-> Status: M0 foundation draft (kit v0.1.0 → v0.2.x). This document encodes the
+> [!NOTE]
+> **Status:** M0 foundation draft (kit v0.1.0 → v0.2.x). This document encodes the
 > **non-negotiable structural rules** from the planning kit §6 as enforceable
 > engineering constraints. Every change to this repo is expected to conform. If a
 > change cannot conform, that is a design discussion, not a silent exception.
 >
-> This is a fork of **MphRead** (github.com/NoneGiven/MphRead, MIT © 2020
+> This is a fork of **[MphRead](https://github.com/NoneGiven/MphRead)** (MIT © 2020
 > NoneGiven). The upstream `LICENSE`, its README **Acknowledgements** /
 > **Special Thanks** chains, and all copyright notices are preserved verbatim and
-> must never be modified or removed. See `NOTICE-fork.md` (added, not a
+> must never be modified or removed. See [NOTICE-fork.md](NOTICE-fork.md) (added, not a
 > replacement for `LICENSE`) for the fork's own attribution posture.
 
 ---
@@ -28,7 +29,7 @@ layout. Primary device: **AYN Odin 2 Portal**.
 
 The codebase is split into two layers with a **one-way dependency**:
 
-```
+```text
   presentation  ──depends on──▶  simulation
   (may read sim)                 (must NOT know presentation exists)
 ```
